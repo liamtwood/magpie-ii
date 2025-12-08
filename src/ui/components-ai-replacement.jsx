@@ -105,7 +105,6 @@ export default function PlayerReplacementAI({ isOpen, onClose, playerId, onAddTo
             <X className="h-5 w-5" />
           </button>
         </div>
-
         <div className="flex-1 overflow-hidden flex">
           <div className="w-72 border-r border-gray-200 p-5 bg-gray-50">
             <div className="text-xs font-semibold text-gray-500 uppercase mb-4">Replacing</div>
@@ -115,7 +114,7 @@ export default function PlayerReplacementAI({ isOpen, onClose, playerId, onAddTo
                   <PlayerAvatar name={player.name} size="lg" />
                   <div>
                     <div className="font-bold text-gray-900">{player.name}</div>
-                    <div className="text-sm text-gray-500">{player.position} • {player.age} yrs</div>
+                    <div className="text-sm text-gray-500">{player.position} - {player.age} yrs</div>
                   </div>
                 </div>
                 <div className="space-y-2 text-sm mb-4">
@@ -144,9 +143,9 @@ export default function PlayerReplacementAI({ isOpen, onClose, playerId, onAddTo
               {showFilters && (
                 <div className="mt-3 space-y-3 bg-white p-3 rounded-lg border border-gray-200">
                   <div>
-                    <label className="text-xs text-gray-500">Max Value (€M)</label>
+                    <label className="text-xs text-gray-500">Max Value</label>
                     <input type="range" min="10" max="100" value={filters.maxValue} onChange={(e) => setFilters(prev => ({ ...prev, maxValue: parseInt(e.target.value) }))} className="w-full" />
-                    <div className="text-xs text-right text-gray-600">€{filters.maxValue}M</div>
+                    <div className="text-xs text-right text-gray-600">{filters.maxValue}M</div>
                   </div>
                   <div>
                     <label className="text-xs text-gray-500">Max Age</label>
@@ -161,7 +160,6 @@ export default function PlayerReplacementAI({ isOpen, onClose, playerId, onAddTo
               )}
             </div>
           </div>
-
           <div className="flex-1 overflow-y-auto p-5">
             {isLoading ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-500">
@@ -169,21 +167,19 @@ export default function PlayerReplacementAI({ isOpen, onClose, playerId, onAddTo
                   <Loader2 className="h-8 w-8 text-purple-600 animate-spin" />
                 </div>
                 <div className="font-medium text-gray-900 mb-1">Analyzing replacement options...</div>
-                <div className="text-sm">Scanning player database • Calculating fit scores</div>
+                <div className="text-sm">Scanning player database</div>
               </div>
             ) : (
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{filteredCandidates.length} Replacement{filteredCandidates.length !== 1 ? 's' : ''} Found</h3>
-                    <p className="text-sm text-gray-500">Ranked by fit score for {player?.position} position</p>
-                  </div>
+                <div className="mb-4">
+                  <h3 className="font-semibold text-gray-900">{filteredCandidates.length} Replacements Found</h3>
+                  <p className="text-sm text-gray-500">Ranked by fit score for {player?.position}</p>
                 </div>
                 <div className="space-y-3">
                   {filteredCandidates.map((candidate, index) => (
                     <div key={candidate.id} onClick={() => setSelectedCandidate(selectedCandidate?.id === candidate.id ? null : candidate)} className={`bg-white border rounded-xl p-4 cursor-pointer transition-all ${selectedCandidate?.id === candidate.id ? 'border-blue-500 ring-2 ring-blue-100' : 'border-gray-200 hover:border-gray-300'}`}>
                       <div className="flex items-start gap-4">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${index === 0 ? 'bg-amber-100 text-amber-700' : index === 1 ? 'bg-gray-100 text-gray-600' : index === 2 ? 'bg-orange-100 text-orange-700' : 'bg-gray-50 text-gray-500'}`}>{index + 1}</div>
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${index === 0 ? 'bg-amber-100 text-amber-700' : index === 1 ? 'bg-gray-100 text-gray-600' : 'bg-gray-50 text-gray-500'}`}>{index + 1}</div>
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <PlayerAvatar name={candidate.name} size="md" />
@@ -193,7 +189,7 @@ export default function PlayerReplacementAI({ isOpen, onClose, playerId, onAddTo
                                 {!candidate.available && <span className="px-1.5 py-0.5 bg-red-100 text-red-600 text-[10px] font-medium rounded">Unlikely</span>}
                                 {index === 0 && candidate.available && <span className="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] font-medium rounded">Top Pick</span>}
                               </div>
-                              <div className="text-sm text-gray-500">{candidate.club} • {candidate.league} • {candidate.age} yrs</div>
+                              <div className="text-sm text-gray-500">{candidate.club} - {candidate.age} yrs</div>
                             </div>
                           </div>
                           <div className="flex items-center gap-6 text-sm">
@@ -225,11 +221,11 @@ export default function PlayerReplacementAI({ isOpen, onClose, playerId, onAddTo
                               </div>
                               <div className="flex gap-2">
                                 {addedToShortlist.includes(candidate.id) ? (
-                                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg font-medium text-sm"><Check className="h-4 w-4" />Added to Shortlist</button>
+                                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg font-medium text-sm"><Check className="h-4 w-4" />Added</button>
                                 ) : (
-                                  <button onClick={(e) => { e.stopPropagation(); handleAddToShortlist(candidate); }} className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors"><Plus className="h-4 w-4" />Add to Shortlist</button>
+                                  <button onClick={(e) => { e.stopPropagation(); handleAddToShortlist(candidate); }} className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg font-medium text-sm hover:bg-gray-800"><Plus className="h-4 w-4" />Add to Shortlist</button>
                                 )}
-                                <button className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 transition-colors"><Play className="h-4 w-4" />Watch Clips</button>
+                                <button className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50"><Play className="h-4 w-4" />Watch Clips</button>
                               </div>
                             </div>
                           )}
@@ -242,18 +238,16 @@ export default function PlayerReplacementAI({ isOpen, onClose, playerId, onAddTo
                 {filteredCandidates.length === 0 && (
                   <div className="text-center py-12 text-gray-500">
                     <Search className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                    <div className="font-medium">No candidates match your filters</div>
-                    <div className="text-sm">Try adjusting the filters to see more options</div>
+                    <div className="font-medium">No candidates match filters</div>
                   </div>
                 )}
               </div>
             )}
           </div>
         </div>
-
         <div className="border-t border-gray-200 px-6 py-4 bg-gray-50 flex items-center justify-between">
-          <div className="text-sm text-gray-500"><Sparkles className="h-4 w-4 inline mr-1 text-purple-500" />Powered by MAGPIE AI • Data from StatsBomb, Impect, Scoutastic</div>
-          <button onClick={onClose} className="px-4 py-2 bg-gray-900 text-white rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors">Done</button>
+          <div className="text-sm text-gray-500"><Sparkles className="h-4 w-4 inline mr-1 text-purple-500" />Powered by MAGPIE AI</div>
+          <button onClick={onClose} className="px-4 py-2 bg-gray-900 text-white rounded-lg font-medium text-sm hover:bg-gray-800">Done</button>
         </div>
       </div>
     </div>
