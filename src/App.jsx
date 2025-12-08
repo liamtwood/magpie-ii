@@ -1,421 +1,594 @@
 import React, { useState } from 'react';
 import { 
-  Users, ClipboardList, User, Target, BarChart3, Video,
-  ChevronDown, ChevronUp, Plus, Star, AlertCircle,
-  CalendarDays, MessageSquare, CheckCircle2, 
-  Circle, Clock, Activity, Zap, Heart,
-  Send, X, Phone, Eye
+  Users, Search, ClipboardList, Activity, Star, AlertCircle,
+  ChevronDown, ChevronUp, Plus, Clock, TrendingUp,
+  Send, Play, Eye, Phone, FileText, Video, MapPin,
+  ChevronRight, Sparkles, Zap
 } from 'lucide-react';
 
-const FCRatingBadge = ({ rating }) => {
-  if (!rating) return <span className="text-xs text-gray-400">N/A</span>;
-  const getColor = (r) => {
-    if (r >= 85) return 'from-emerald-500 to-emerald-600';
-    if (r >= 80) return 'from-green-500 to-green-600';
-    if (r >= 75) return 'from-lime-500 to-lime-600';
-    if (r >= 70) return 'from-yellow-500 to-yellow-600';
-    if (r >= 65) return 'from-orange-500 to-orange-600';
-    return 'from-red-500 to-red-600';
-  };
-  return (
-    <div className={`inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br ${getColor(rating)} text-white font-bold text-sm shadow-md`}>
-      {rating}
-    </div>
-  );
-};
+// Import components
+import { PlayerAvatar, SourceBadge, InjuryBadge, StarRating, PipelineIndicator } from './ui/components-ui-badges';
+import PlayerReplacementAI from './ui/components-ai-replacement';
+import { squad } from './data-squad-js';
+import { formatValue, formatWages } from './utils-helpers-js';
 
-const SourceBadge = ({ source }) => {
-  const sources = {
-    statsbomb: { label: 'SB', color: 'bg-blue-600' },
-    impect: { label: 'IMP', color: 'bg-purple-600' },
-    scoutastic: { label: 'SCT', color: 'bg-green-600' },
-  };
-  const s = sources[source] || { label: '?', color: 'bg-gray-600' };
-  return <span className={`${s.color} text-white px-1.5 py-0.5 rounded text-xs font-medium`}>{s.label}</span>;
-};
-
-const InjuryBadge = ({ risk, daysOut }) => {
-  const colors = { low: 'bg-green-500', medium: 'bg-amber-500', high: 'bg-red-500' };
-  return (
-    <div className={`flex items-center gap-1.5 px-2 py-1 rounded ${colors[risk]} bg-opacity-20`}>
-      <span className={`w-2 h-2 rounded-full ${colors[risk]}`} />
-      <span className="text-xs text-gray-700">{daysOut}d</span>
-    </div>
-  );
-};
-
-const StarRating = ({ rating }) => {
-  const safeRating = Math.max(0, Math.min(4, rating || 0));
-  const fullStars = Math.floor(safeRating);
-  const emptyStars = Math.max(0, 4 - Math.ceil(safeRating));
-  return (
-    <div className="flex gap-0.5">
-      {Array.from({ length: fullStars }).map((_, i) => (
-        <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
-      ))}
-      {Array.from({ length: emptyStars }).map((_, i) => (
-        <Star key={`e-${i}`} className="h-3 w-3 text-gray-200" />
-      ))}
-    </div>
-  );
-};
-
-const PipelineIndicator = ({ stage }) => (
-  <div className="flex gap-1">
-    {[0, 1, 2, 3, 4, 5].map((i) => (
-      <div key={i} className={`w-2 h-2 rounded-sm ${i < stage ? 'bg-blue-500' : 'bg-gray-200'}`} />
-    ))}
-  </div>
-);
-
-const GateCheckbox = ({ label, checked }) => (
-  <div className="flex items-center gap-1.5 text-xs text-gray-500">
-    {checked ? <CheckCircle2 className="h-3.5 w-3.5 text-green-500" /> : <Circle className="h-3.5 w-3.5 text-gray-300" />}
-    {label}
-  </div>
-);
-
-// END PART 1 - Continue with Part 2
+// ============================================================================
+// MAGPIE II - Newcastle United Recruitment Platform
+// Demo Version - December 2025
+// ============================================================================
 
 export default function App() {
+  // ============================================================================
+  // STATE
+  // ============================================================================
   const [activeScreen, setActiveScreen] = useState('dashboard');
   const [expandedShortlist, setExpandedShortlist] = useState('trippier');
   const [selectedPlayer, setSelectedPlayer] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newShortlistData, setNewShortlistData] = useState(null);
-  const [showDismissModal, setShowDismissModal] = useState(false);
-  const [dismissingIssue, setDismissingIssue] = useState(null);
-  const [dismissedIssues, setDismissedIssues] = useState({});
-  const [snoozedIssues, setSnoozedIssues] = useState({});
-  const [showTimelineModal, setShowTimelineModal] = useState(false);
-  const [showAddNoteModal, setShowAddNoteModal] = useState(false);
-  const [activePlayerId, setActivePlayerId] = useState(null);
-  const [playerActivities, setPlayerActivities] = useState({
-    "tiago-santos": [
-      { id: 1, type: "scout_visit", date: "2024-12-03", user: "Mark Thompson", title: "Live scouting vs PSG", content: "Excellent defensive positioning. Won 4/5 aerial duels." },
-      { id: 2, type: "phone_call", date: "2024-12-06", user: "Steve Nickson", title: "Agent call", content: "Player interested in PL. Lille want 15M." },
-    ],
-    "marc-guehi": [
-      { id: 1, type: "scout_visit", date: "2024-12-06", user: "Mark Thompson", title: "Guehi vs Brighton", content: "Dominant performance. Leadership evident." },
-    ],
-  });
-  const [chatMessages] = useState([{ role: 'assistant', text: "Hi! I can help you find players or analyze shortlists." }]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [chatMessages, setChatMessages] = useState([
+    { role: 'assistant', text: "Welcome to MAGPIE II! I can help you find players, analyze your squad, or suggest replacements. Try asking: 'Find me a Trippier replacement'" }
+  ]);
   const [chatInput, setChatInput] = useState('');
+  const [isAiThinking, setIsAiThinking] = useState(false);
+  
+  // AI Replacement Modal state
+  const [showAiModal, setShowAiModal] = useState(false);
+  const [aiPlayerId, setAiPlayerId] = useState(null);
 
+  // ============================================================================
+  // DATA
+  // ============================================================================
+  
+  // Navigation screens
   const screens = [
     { id: 'dashboard', name: 'Dashboard', icon: Activity },
     { id: 'squad', name: 'Squad', icon: Users },
     { id: 'shortlists', name: 'Shortlists', icon: ClipboardList },
-    { id: 'player-profile', name: 'Player Profile', icon: User },
+    { id: 'search', name: 'Search', icon: Search },
   ];
 
+  // Transfer window info
   const currentWindow = { name: 'Summer 2025', end: 'Aug 31', daysRemaining: 85 };
 
-  const squad = [
-    { id: 1, name: 'Nick Pope', position: 'GK', age: 33, contract: '2028', value: '30M', injury: { risk: 'medium', daysOut: 45 }, flag: null, number: 1, nation: 'England', height: "6' 3\"", weight: '168 lbs', stats: { app: 12, sub: 0, saves: 39, ga: 13, fc: 0, fa: 1, yc: 1, rc: 0 }, dob: '19/04/1992', joinedFrom: 'Burnley', joinedDate: 'June 2022', fee: '£12M', bio: 'Signed in a bargain move after Burnley relegation.', fcRating: 88 },
-    { id: 26, name: 'John Ruddy', position: 'GK', age: 39, contract: '2025', value: '1M', injury: { risk: 'low', daysOut: 0 }, flag: 'Contract', number: 26, nation: 'England', height: "6' 4\"", weight: '212 lbs', stats: { app: 0, sub: 0, saves: 0, ga: 0 }, dob: '24/10/1986', joinedFrom: 'Free Transfer', joinedDate: 'July 2024', fee: 'Free', bio: 'Third-choice keeper.', fcRating: null },
-    { id: 32, name: 'Aaron Ramsdale', position: 'GK', age: 27, contract: '2026', value: '20M', injury: { risk: 'low', daysOut: 0 }, flag: 'Loan', number: 32, nation: 'England', height: "6' 3\"", weight: '192 lbs', stats: { app: 4, sub: 1, saves: 3, ga: 6 }, dob: '14/05/1998', joinedFrom: 'Southampton', joinedDate: 'August 2025', fee: '£4M loan', bio: 'On loan with option to buy.', fcRating: 73 },
-    { id: 2, name: 'Kieran Trippier', position: 'RB', age: 35, contract: '2026', value: '12M', injury: { risk: 'high', daysOut: 67 }, flag: 'Contract', number: 2, nation: 'England', height: "5' 10\"", weight: '157 lbs', stats: { app: 9, sub: 1, g: 0, a: 0, sh: 0, st: 0, fc: 13, fa: 8, yc: 1, rc: 0 }, dob: '19/09/1990', joinedFrom: 'Atlético Madrid', joinedDate: 'January 2022', fee: '£12M', bio: 'First major signing under Saudi ownership.', fcRating: 81 },
-    { id: 3, name: 'Lewis Hall', position: 'LB', age: 21, contract: '2029', value: '25M', injury: { risk: 'low', daysOut: 0 }, flag: null, number: 3, nation: 'England', height: "5' 10\"", weight: '161 lbs', stats: { app: 8, sub: 4, g: 0, a: 1, sh: 6, st: 1, fc: 1, fa: 5, yc: 0, rc: 0 }, dob: '08/09/2004', joinedFrom: 'Chelsea', joinedDate: 'August 2023', fee: '£35M', bio: 'Young left-back signed from Chelsea.', fcRating: null },
-    { id: 4, name: 'Sven Botman', position: 'CB', age: 25, contract: '2029', value: '45M', injury: { risk: 'high', daysOut: 180 }, flag: 'ACL', number: 4, nation: 'Netherlands', height: "6' 4\"", weight: '179 lbs', stats: { app: 10, sub: 2, g: 0, a: 0, sh: 2, st: 1, fc: 6, fa: 2, yc: 0, rc: 0 }, dob: '12/01/2000', joinedFrom: 'LOSC Lille', joinedDate: 'July 2022', fee: '£35M', bio: 'Top centre-half target, injury prone.', fcRating: 71 },
-    { id: 5, name: 'Fabian Schär', position: 'CB', age: 33, contract: '2026', value: '8M', injury: { risk: 'low', daysOut: 12 }, flag: null, number: 5, nation: 'Switzerland', height: "6' 1\"", weight: '183 lbs', stats: { app: 10, sub: 4, g: 0, a: 0, sh: 7, st: 1, fc: 9, fa: 4, yc: 0, rc: 0 }, dob: '20/12/1991', joinedFrom: 'Deportivo', joinedDate: 'July 2018', fee: '£3M', bio: 'Bargain signing, fan favourite.', fcRating: 82 },
-    { id: 6, name: 'Jamaal Lascelles', position: 'CB', age: 32, contract: '2025', value: '3M', injury: { risk: 'medium', daysOut: 90 }, flag: 'Contract', number: 6, nation: 'England', height: "6' 2\"", weight: '194 lbs', stats: { app: 2, sub: 2, g: 0, a: 0 }, dob: '11/11/1993', joinedFrom: 'Nottingham Forest', joinedDate: 'August 2014', fee: '£7M', bio: 'Former club captain.', fcRating: 61 },
-    { id: 12, name: 'Malick Thiaw', position: 'CB', age: 24, contract: '2029', value: '35M', injury: { risk: 'low', daysOut: 0 }, flag: null, number: 12, nation: 'Germany', height: "6' 3\"", weight: '174 lbs', stats: { app: 12, sub: 1, g: 2, a: 0, sh: 10, st: 4, fc: 6, fa: 2, yc: 1, rc: 0 }, dob: '08/08/2001', joinedFrom: 'AC Milan', joinedDate: 'August 2025', fee: '£30M', bio: 'Signed from AC Milan.', fcRating: 79 },
-    { id: 21, name: 'Tino Livramento', position: 'RB', age: 23, contract: '2028', value: '30M', injury: { risk: 'low', daysOut: 0 }, flag: null, number: 21, nation: 'England', height: "6' 0\"", weight: '141 lbs', stats: { app: 10, sub: 0, g: 0, a: 1, sh: 2, st: 0, fc: 5, fa: 11, yc: 1, rc: 0 }, dob: '12/11/2002', joinedFrom: 'Southampton', joinedDate: 'August 2023', fee: '£32M', bio: 'Versatile full-back.', fcRating: 80 },
-    { id: 33, name: 'Dan Burn', position: 'CB', age: 33, contract: '2027', value: '10M', injury: { risk: 'low', daysOut: 0 }, flag: null, number: 33, nation: 'England', height: "6' 6\"", weight: '192 lbs', stats: { app: 14, sub: 0, g: 0, a: 2, sh: 3, st: 0, fc: 23, fa: 7, yc: 3, rc: 1 }, dob: '09/05/1992', joinedFrom: 'Brighton', joinedDate: 'January 2022', fee: '£13M', bio: 'Newcastle favourite son.', fcRating: 82 },
-    { id: 7, name: 'Joelinton', position: 'CM', age: 29, contract: '2028', value: '45M', injury: { risk: 'low', daysOut: 0 }, flag: 'Key', number: 7, nation: 'Brazil', height: "6' 1\"", weight: '179 lbs', stats: { app: 13, sub: 1, g: 0, a: 0, sh: 10, st: 3, fc: 18, fa: 14, yc: 3, rc: 0 }, dob: '14/08/1996', joinedFrom: 'Hoffenheim', joinedDate: 'July 2019', fee: '£40M', bio: 'Transformed from striker to midfielder.', fcRating: 77 },
-    { id: 8, name: 'Sandro Tonali', position: 'CM', age: 25, contract: '2028', value: '55M', injury: { risk: 'low', daysOut: 0 }, flag: 'Key', number: 8, nation: 'Italy', height: "5' 11\"", weight: '172 lbs', stats: { app: 15, sub: 3, g: 0, a: 1, sh: 12, st: 5, fc: 9, fa: 14, yc: 0, rc: 0 }, dob: '08/05/2000', joinedFrom: 'AC Milan', joinedDate: 'July 2023', fee: '£55M', bio: 'Serie A title winner.', fcRating: 79 },
-    { id: 39, name: 'Bruno Guimarães', position: 'CM', age: 28, contract: '2028', value: '100M', injury: { risk: 'low', daysOut: 4 }, flag: 'Key', number: 39, nation: 'Brazil', height: "6' 0\"", weight: '161 lbs', stats: { app: 14, sub: 1, g: 5, a: 2, sh: 21, st: 8, fc: 24, fa: 33, yc: 3, rc: 0 }, dob: '16/11/1997', joinedFrom: 'Lyon', joinedDate: 'January 2022', fee: '£35M', bio: 'Club captain. Best midfielder in PL.', fcRating: 81 },
-    { id: 67, name: 'Lewis Miley', position: 'CM', age: 19, contract: '2029', value: '15M', injury: { risk: 'low', daysOut: 0 }, flag: 'Prospect', number: 67, nation: 'England', height: "6' 1\"", weight: '159 lbs', stats: { app: 11, sub: 7, g: 1, a: 2, sh: 5, st: 3, fc: 1, fa: 2, yc: 0, rc: 0 }, dob: '01/05/2006', joinedFrom: 'Academy', joinedDate: 'May 2023', fee: 'Academy', bio: 'Youngest ever PL debutant for Newcastle.', fcRating: null },
-    { id: 10, name: 'Anthony Gordon', position: 'LW', age: 24, contract: '2029', value: '75M', injury: { risk: 'low', daysOut: 0 }, flag: 'Key', number: 10, nation: 'England', height: "6' 0\"", weight: '159 lbs', stats: { app: 10, sub: 2, g: 2, a: 0, sh: 18, st: 7, fc: 8, fa: 16, yc: 0, rc: 1 }, dob: '24/02/2001', joinedFrom: 'Everton', joinedDate: 'January 2023', fee: '£45M', bio: 'Player of the Year 2023-24.', fcRating: 72 },
-    { id: 11, name: 'Harvey Barnes', position: 'LW', age: 27, contract: '2028', value: '40M', injury: { risk: 'medium', daysOut: 30 }, flag: null, number: 11, nation: 'England', height: "5' 9\"", weight: '146 lbs', stats: { app: 14, sub: 7, g: 3, a: 0, sh: 20, st: 8, fc: 4, fa: 7, yc: 0, rc: 0 }, dob: '09/12/1997', joinedFrom: 'Leicester', joinedDate: 'July 2023', fee: '£39M', bio: 'FA Cup winner with Leicester.', fcRating: 80 },
-    { id: 9, name: 'Yoane Wissa', position: 'CF', age: 29, contract: '2029', value: '50M', injury: { risk: 'low', daysOut: 0 }, flag: null, number: 9, nation: 'DR Congo', height: "5' 9\"", weight: '161 lbs', stats: { app: 1, sub: 1, g: 0, a: 0 }, dob: '03/09/1996', joinedFrom: 'Brentford', joinedDate: 'September 2025', fee: '£50M', bio: 'Signed to replace Isak.', fcRating: 81 },
-    { id: 27, name: 'Nick Woltemade', position: 'CF', age: 23, contract: '2029', value: '65M', injury: { risk: 'low', daysOut: 0 }, flag: null, number: 27, nation: 'Germany', height: "6' 6\"", weight: '196 lbs', stats: { app: 12, sub: 0, g: 5, a: 1, sh: 22, st: 9, fc: 12, fa: 12, yc: 0, rc: 0 }, dob: '14/02/2002', joinedFrom: 'Stuttgart', joinedDate: 'August 2025', fee: '£65M', bio: 'Club record signing.', fcRating: 79 },
-  ];
-
-// END PART 2 - Continue with Part 3
-
-const shortlistCandidates = {
-    'tiago-santos': {
-      id: 'tiago-santos', name: 'Tiago Santos', fullName: 'Tiago Carvalho Santos',
-      photoUrl: 'https://i.imgur.com/YB4ZRUc.jpg',
-      club: 'LOSC Lille', league: 'Ligue 1', nation: 'Portugal', age: 23,
-      dob: '23/07/2002', birthplace: 'Lisboa, Portugal', height: "5' 9\"", heightMetric: '1.75m',
-      foot: 'Right', position: 'RB', otherPositions: ['RW', 'RM'], number: 22,
-      agent: 'Gestifute', contract: '2029', joinedClub: '05/07/2023',
-      marketValue: '€15M', fee: '€12M', wages: '55K/wk', rating: 4, statusStage: 5,
-      transferHistory: [
-        { season: '23/24', from: 'Estoril', to: 'Lille', fee: '€6.50m' },
-        { season: '22/23', from: 'Estoril U23', to: 'Estoril', fee: '-' },
-      ],
-      youthClubs: ['Sporting CP', 'AD Oeiras', 'Estoril Praia'],
-      stats: {
-        europaLeague: { app: 4, g: 0, a: 1, mins: 212, startingXI: '60%' },
-        ligue1: { app: 2, g: 0, a: 0, mins: 104, startingXI: '12.5%' },
-        total: { app: 6, g: 0, a: 1, mins: 316 }
-      },
-      matchLog: [
-        { comp: 'Ligue 1', md: 1, date: '17/08/2025', home: 'Stade Brestois', away: 'Lille', result: '3:3', status: 'injured', note: 'ACL tear' },
-        { comp: 'Ligue 1', md: 2, date: '24/08/2025', home: 'Lille', away: 'Monaco', result: '1:0', status: 'injured', note: 'ACL tear' },
-        { comp: 'Ligue 1', md: 3, date: '30/08/2025', home: 'FC Lorient', away: 'Lille', result: '1:7', status: 'injured', note: 'ACL tear' },
-        { comp: 'Ligue 1', md: 6, date: '28/09/2025', home: 'Lille', away: 'Lyon', result: '0:1', pos: 'RB', status: 'started', mins: 90 },
-        { comp: 'Ligue 1', md: 7, date: '05/10/2025', home: 'Lille', away: 'PSG', result: '1:1', status: 'sub', mins: 14, subIn: 76 },
-        { comp: 'Europa League', md: 'GS', date: '25/09/2025', home: 'Lille', away: 'Brann', result: '2:1', pos: 'RB', status: 'started', mins: 87 },
-        { comp: 'Europa League', md: 'GS', date: '06/11/2025', home: 'Red Star', away: 'Lille', result: '1:0', pos: 'RB', status: 'started', mins: 68 },
-      ],
-      injuries: [{ type: 'Cruciate ligament tear', period: 'Aug 2025', matchesMissed: 3 }],
-      scoutingNotes: 'Dynamic attacking full-back. Strong in 1v1 duels, excellent recovery pace. Recently returned from ACL injury.',
-      pros: ['Attacking threat', 'Recovery pace', 'Young with high ceiling', 'Europa League experience'],
-      cons: ['Recent ACL injury', 'Limited minutes this season', 'PL physicality adaptation'],
-    }
-  };
-
+  // Shortlists data
   const shortlists = [
     {
-      id: 'trippier', severity: 'critical', position: 'RB', title: 'RB Cover - Trippier',
-      trigger: 'Contract expiring', budget: { transfer: 15000000, wages: 80000 }, deadline: 82,
-      ballHolder: { name: 'Steve Nickson', avatar: 'SN' },
-      gates: { scouting: true, manager: true, budget: false, medical: false },
-      planB: [
-        { id: 1, name: 'Tiago Santos', club: 'Lille', age: 23, rating: 4, statusStage: 5, fee: '€12M', wages: '55K/wk' },
-        { id: 2, name: 'Vanderson', club: 'Monaco', age: 23, rating: 3.5, statusStage: 2, fee: '€18M', wages: '70K/wk' },
-      ],
+      id: 'trippier',
+      title: 'RB Cover - Trippier',
+      priority: 'high',
+      reason: 'Contract expires 2026 + 67 days injured (12mo)',
+      planA: { action: 'Extend', player: 'Kieran Trippier', status: 'Negotiating', note: 'Wants 2yr, club offering 1+1' },
+      candidates: [
+        { id: 'tiago-santos', name: 'Tiago Santos', club: 'Lille', age: 22, value: '15M', rating: 3.5, stage: 4, sources: ['statsbomb', 'scoutastic'], fit: 92, flag: 'Top Pick' },
+        { id: 'malo-gusto', name: 'Malo Gusto', club: 'Chelsea', age: 21, value: '35M', rating: 3, stage: 2, sources: ['statsbomb'], fit: 88, flag: null },
+        { id: 'devyne-rensch', name: 'Devyne Rensch', club: 'Ajax', age: 21, value: '20M', rating: 3, stage: 3, sources: ['impect', 'scoutastic'], fit: 85, flag: null },
+      ]
     },
     {
-      id: 'cb', severity: 'critical', position: 'CB', title: 'CB Cover - Botman ACL',
-      trigger: 'Long-term injury', budget: { transfer: 25000000, wages: 70000 }, deadline: 45,
-      ballHolder: { name: 'Steve Nickson', avatar: 'SN' },
-      gates: { scouting: true, manager: true, budget: true, medical: false },
-      planB: [
-        { id: 6, name: 'Marc Guehi', club: 'Crystal Palace', age: 24, rating: 4, statusStage: 6, fee: '£65M', wages: '100K/wk' },
-        { id: 7, name: 'Castello Lukeba', club: 'RB Leipzig', age: 21, rating: 3.5, statusStage: 3, fee: '£35M', wages: '60K/wk' },
-      ],
+      id: 'cb-cover',
+      title: 'CB Cover - Botman ACL',
+      priority: 'critical',
+      reason: 'ACL injury - 6 months out',
+      planA: { action: 'Loan', player: 'TBD', status: 'Searching', note: 'Jan window priority' },
+      candidates: [
+        { id: 'marc-guehi', name: 'Marc Guéhi', club: 'Crystal Palace', age: 24, value: '65M', rating: 4, stage: 5, sources: ['statsbomb', 'transferroom'], fit: 95, flag: 'Top Pick' },
+        { id: 'goncalo-inacio', name: 'Gonçalo Inácio', club: 'Sporting CP', age: 23, value: '45M', rating: 3.5, stage: 3, sources: ['statsbomb'], fit: 90, flag: null },
+      ]
     },
+    {
+      id: 'cm-depth',
+      title: 'CM Depth',
+      priority: 'medium',
+      reason: 'Bruno interest from Saudi + PSG',
+      planA: { action: 'Retain', player: 'Bruno Guimaraes', status: 'Monitoring', note: 'Release clause £100M' },
+      candidates: [
+        { id: 'adam-wharton', name: 'Adam Wharton', club: 'Crystal Palace', age: 20, value: '50M', rating: 4, stage: 4, sources: ['statsbomb', 'impect'], fit: 93, flag: 'English' },
+        { id: 'enzo-lopes', name: 'Enzo Le Fée', club: 'Roma', age: 24, value: '25M', rating: 3, stage: 2, sources: ['scoutastic'], fit: 82, flag: null },
+      ]
+    }
   ];
 
-  const currentYear = 2025;
-  const getContractYear = (c) => parseInt(c) || 2030;
-  const parseValue = (v) => parseFloat(v.replace(/[^0-9.]/g, '')) * 1000000;
-  const formatBudget = (a) => a >= 1000000 ? `£${a / 1000000}M` : `£${a / 1000}K`;
-  const getPlayerId = (name) => name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z-]/g, '');
-  const getPlayerActivities = (name) => playerActivities[getPlayerId(name)] || [];
+  // Player database for search
+  const playerDatabase = [
+    { id: 'tiago-santos', name: 'Tiago Santos', club: 'Lille', position: 'RB', age: 22, value: '15M', nationality: 'Portugal' },
+    { id: 'malo-gusto', name: 'Malo Gusto', club: 'Chelsea', position: 'RB', age: 21, value: '35M', nationality: 'France' },
+    { id: 'devyne-rensch', name: 'Devyne Rensch', club: 'Ajax', position: 'RB', age: 21, value: '20M', nationality: 'Netherlands' },
+    { id: 'marc-guehi', name: 'Marc Guéhi', club: 'Crystal Palace', position: 'CB', age: 24, value: '65M', nationality: 'England' },
+    { id: 'goncalo-inacio', name: 'Gonçalo Inácio', club: 'Sporting CP', position: 'CB', age: 23, value: '45M', nationality: 'Portugal' },
+    { id: 'adam-wharton', name: 'Adam Wharton', club: 'Crystal Palace', position: 'CM', age: 20, value: '50M', nationality: 'England' },
+    { id: 'enzo-lopes', name: 'Enzo Le Fée', club: 'Roma', position: 'CM', age: 24, value: '25M', nationality: 'France' },
+    { id: 'jeremie-frimpong', name: 'Jeremie Frimpong', club: 'Bayer Leverkusen', position: 'RB', age: 23, value: '40M', nationality: 'Netherlands' },
+    { id: 'pedro-porro', name: 'Pedro Porro', club: 'Spurs', position: 'RB', age: 25, value: '50M', nationality: 'Spain' },
+  ];
 
-  const getSeverityConfig = (severity) => ({
-    critical: { bg: 'bg-red-50', border: 'border-red-500', text: 'text-red-700', dot: 'bg-red-500' },
-    moderate: { bg: 'bg-amber-50', border: 'border-amber-500', text: 'text-amber-700', dot: 'bg-amber-500' },
-    low: { bg: 'bg-green-50', border: 'border-green-500', text: 'text-green-700', dot: 'bg-green-500' },
-  }[severity]);
-
-  const activityTypes = {
-    discussion: { label: 'Discussion', icon: MessageSquare, color: 'blue' },
-    phone_call: { label: 'Phone Call', icon: Phone, color: 'green' },
-    scout_visit: { label: 'Scouting Visit', icon: Eye, color: 'purple' },
-    video_review: { label: 'Video Review', icon: Video, color: 'orange' },
-    meeting: { label: 'Meeting', icon: Users, color: 'cyan' },
+  // Player detail data
+  const playerDetails = {
+    'tiago-santos': {
+      fullName: 'Tiago Carvalho Santos',
+      position: 'RB',
+      altPositions: ['RWB', 'RM'],
+      age: 22,
+      dob: '23/07/2002',
+      nationality: 'Portugal',
+      height: '1.75m',
+      foot: 'Right',
+      club: 'Lille',
+      contract: '2029',
+      value: '€15M',
+      wages: '€55k/week',
+      agent: 'Gestifute',
+      strengths: ['Attacking threat', 'Recovery pace', 'High ceiling', 'Europa League exp.'],
+      concerns: ['Recent ACL', 'Limited Ligue 1 mins', 'PL physicality adaptation'],
+      stats: { appearances: 6, goals: 0, assists: 1, minutes: 316, passCompletion: 84, tacklesWon: 2.1, interceptions: 1.4 },
+      videos: [
+        { title: 'vs PSG - Attacking runs', duration: '2:34', date: '05/10/2025' },
+        { title: 'Season highlights 24/25', duration: '4:12', date: '01/12/2025' },
+      ],
+      timeline: [
+        { date: '06/12/2025', type: 'scout', title: 'Live scouting: Lille vs Marseille', user: 'Mark Thompson', note: 'Not in squad - concerning' },
+        { date: '29/10/2025', type: 'video', title: 'Video analysis: Nice vs Lille', user: 'Analysis Team', note: 'Looked rusty post-injury' },
+        { date: '15/10/2025', type: 'call', title: 'Agent call - Gestifute', user: 'Steve Nickson', note: 'Player interested in PL. Lille want €15M min.' },
+      ]
+    },
+    'marc-guehi': {
+      fullName: 'Marc Guéhi',
+      position: 'CB',
+      altPositions: ['LCB'],
+      age: 24,
+      dob: '13/07/2000',
+      nationality: 'England',
+      height: '1.82m',
+      foot: 'Right',
+      club: 'Crystal Palace',
+      contract: '2026',
+      value: '£65M',
+      wages: '£80k/week',
+      agent: 'CAA Stellar',
+      strengths: ['Leadership', 'Ball-playing CB', 'England international', 'PL proven'],
+      concerns: ['Price tag', 'Palace reluctant to sell', 'Multiple suitors'],
+      stats: { appearances: 18, goals: 1, assists: 0, minutes: 1620, passCompletion: 89, tacklesWon: 1.8, interceptions: 1.2, aerialWon: 65 },
+      videos: [
+        { title: 'vs Brighton - Defensive masterclass', duration: '3:45', date: '06/12/2025' },
+        { title: 'England Euro 2024 highlights', duration: '5:20', date: '01/07/2024' },
+      ],
+      timeline: [
+        { date: '06/12/2025', type: 'scout', title: 'Live scouting: Palace vs Brighton', user: 'Mark Thompson', note: 'Dominant. Leadership evident. Must sign.' },
+        { date: '04/12/2025', type: 'call', title: 'Palace DoF call', user: 'Steve Nickson', note: 'Starting price £65M but flexible structure' },
+        { date: '28/11/2025', type: 'meeting', title: 'Transfer committee', user: 'Dan Ashworth', note: 'Approved as primary CB target' },
+      ]
+    },
   };
 
-  const inferShortlistReason = (player) => {
-    const yearsLeft = getContractYear(player.contract) - currentYear;
-    const isOlder = player.age >= 32;
-    const isExpiring = yearsLeft <= 1;
-    const hasLongInjury = player.injury?.daysOut >= 90;
-    if (isExpiring && isOlder) return { trigger: 'Contract expiring', severity: 'critical', reasoning: `Contract ends soon and at ${player.age}, succession planning critical.` };
-    if (isExpiring) return { trigger: 'Contract expiring', severity: 'critical', reasoning: `Contract expiring. Decision needed.` };
-    if (hasLongInjury) return { trigger: 'Long-term injury cover', severity: 'critical', reasoning: `${player.injury.daysOut} days missed.` };
-    return { trigger: 'Succession planning', severity: 'moderate', reasoning: 'Proactive squad planning.' };
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
+
+  // AI Chat handler
+  const handleChat = () => {
+    if (!chatInput.trim()) return;
+    
+    const userMsg = chatInput;
+    setChatMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+    setChatInput('');
+    setIsAiThinking(true);
+
+    setTimeout(() => {
+      let response = '';
+      const lowerInput = userMsg.toLowerCase();
+      
+      if (lowerInput.includes('trippier') && lowerInput.includes('replacement')) {
+        response = `Based on your squad needs, I recommend these Trippier replacements:\n\n🥇 **Tiago Santos** (Lille, 22) - €15M\n• 92% tactical fit score\n• Similar attacking output\n• Already in Stage 4 of pipeline\n\n🥈 **Jeremie Frimpong** (Leverkusen, 23) - €40M\n• Elite pace and 1v1 ability\n• Champions League experience\n\n🥉 **Devyne Rensch** (Ajax, 21) - €20M\n• Good value option\n• Dutch league pedigree\n\nWant me to add any of these to your RB shortlist?`;
+        setActiveScreen('shortlists');
+        setExpandedShortlist('trippier');
+      } else if (lowerInput.includes('squad') && lowerInput.includes('issue')) {
+        response = `Current squad issues I've identified:\n\n🔴 **Critical:** Botman ACL - need CB cover urgently\n🟠 **High:** Trippier contract + injury history\n🟡 **Medium:** Bruno Guimaraes interest from Saudi/PSG\n🟡 **Medium:** Gordon interest from Liverpool\n\nThe CB situation needs immediate attention for the January window.`;
+      } else if (lowerInput.includes('budget') || lowerInput.includes('spend')) {
+        response = `Based on your current shortlists:\n\n**Total potential spend:** £155M\n• CB (Guéhi): £65M\n• RB (Santos): £15M\n• CM (Wharton): £50M\n• Wages impact: ~£350k/week additional\n\nPSR considerations: You'd need to offset with sales. Gordon (£70M) or Bruno (£100M) could enable this.`;
+      } else {
+        response = `I can help you with:\n• "Find me a Trippier replacement"\n• "What are our squad issues?"\n• "Show me RB options under £20M"\n• "Compare Guéhi vs Inácio"\n\nWhat would you like to explore?`;
+      }
+      
+      setChatMessages(prev => [...prev, { role: 'assistant', text: response }]);
+      setIsAiThinking(false);
+    }, 1500);
   };
 
-  const handleCreateShortlist = (player) => {
-    const inference = inferShortlistReason(player);
-    setNewShortlistData({ player, title: `${player.position} - ${player.name} Replacement`, ...inference, budget: parseValue(player.value), wages: 80000 });
-    setShowCreateModal(true);
+  // Open AI Replacement Modal
+  const openAiReplacement = (playerId) => {
+    setAiPlayerId(playerId);
+    setShowAiModal(true);
   };
 
-  const generateSquadIssues = () => {
-    const issues = [];
-    squad.forEach(player => {
-      const yearsLeft = getContractYear(player.contract) - currentYear;
-      if (yearsLeft <= 1) issues.push({ id: `${player.id}-contract`, player, type: 'contract', severity: 'critical', score: 90, title: 'Contract expiring', description: `Contract ends ${player.contract}.` });
-      if (player.injury?.daysOut >= 90) issues.push({ id: `${player.id}-injury`, player, type: 'injury', severity: 'critical', score: 85, title: 'Long-term injury', description: `${player.injury.daysOut} days missed.` });
-    });
-    return issues.sort((a, b) => b.score - a.score);
-  };
+  // ============================================================================
+  // RENDER FUNCTIONS
+  // ============================================================================
 
-  const squadIssues = generateSquadIssues();
-  const activeIssues = squadIssues.filter(i => !dismissedIssues[i.id] && !snoozedIssues[i.id]);
-  const criticalIssues = activeIssues.filter(i => i.severity === 'critical');
+  // Render player profile
+  const renderPlayerProfile = () => {
+    const player = playerDetails[selectedPlayer];
+    if (!player) return null;
 
-  const openPlayerTimeline = (playerName) => { setActivePlayerId(getPlayerId(playerName)); setSelectedPlayer({ name: playerName }); setShowTimelineModal(true); };
-  const openAddNoteForPlayer = (playerName) => { setActivePlayerId(getPlayerId(playerName)); setSelectedPlayer({ name: playerName }); setShowAddNoteModal(true); };
-  const handleDismiss = (issue) => { setDismissingIssue(issue); setShowDismissModal(true); };
-  const confirmDismiss = (note, snooze) => {
-    if (snooze) setSnoozedIssues({ ...snoozedIssues, [dismissingIssue.id]: { note } });
-    else setDismissedIssues({ ...dismissedIssues, [dismissingIssue.id]: { note } });
-    setShowDismissModal(false);
-  };
-
-// END PART 3 - Continue with Part 4
-
-// MODALS
-  const CreateShortlistModal = () => {
-    if (!showCreateModal || !newShortlistData) return null;
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-2xl w-full max-w-lg mx-4 shadow-2xl">
-          <div className="px-6 py-4 border-b flex justify-between items-center">
-            <h2 className="text-lg font-bold">Create Shortlist</h2>
-            <button onClick={() => setShowCreateModal(false)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="h-5 w-5" /></button>
-          </div>
-          <div className="p-6 space-y-4">
-            <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-4">
-              <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center font-bold">{newShortlistData.player.name.split(' ').map(n => n[0]).join('')}</div>
-              <div className="flex-1"><div className="font-semibold">{newShortlistData.player.name}</div><div className="text-sm text-gray-500">{newShortlistData.player.position} - Age {newShortlistData.player.age}</div></div>
-            </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-              <div className="flex items-start gap-3"><Zap className="h-5 w-5 text-blue-600" /><div><div className="text-sm font-medium text-blue-900">Our assumption</div><p className="text-sm text-blue-700 mt-1">{newShortlistData.reasoning}</p></div></div>
-            </div>
-          </div>
-          <div className="px-6 py-4 bg-gray-50 border-t flex gap-3">
-            <button onClick={() => setShowCreateModal(false)} className="flex-1 py-2 border rounded-xl">Cancel</button>
-            <button onClick={() => { setShowCreateModal(false); setActiveScreen('shortlists'); }} className="flex-1 py-2 bg-slate-900 text-white rounded-xl">Create</button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const DismissModal = () => {
-    const [note, setNote] = useState('');
-    if (!showDismissModal || !dismissingIssue) return null;
-    return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-2xl w-full max-w-md mx-4 shadow-2xl">
-          <div className="px-6 py-4 border-b flex justify-between items-center">
-            <h2 className="text-lg font-bold">Resolve Issue</h2>
-            <button onClick={() => setShowDismissModal(false)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="h-5 w-5" /></button>
-          </div>
-          <div className="p-6 space-y-4">
-            <div className="bg-gray-50 rounded-xl p-4"><div className="font-semibold">{dismissingIssue.player.name}</div></div>
-            <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Why is this resolved?" rows={3} className="w-full px-4 py-2 border rounded-xl" />
-          </div>
-          <div className="px-6 py-4 bg-gray-50 border-t flex gap-3">
-            <button onClick={() => confirmDismiss(note, true)} className="flex-1 py-2 border rounded-xl">Snooze</button>
-            <button onClick={() => confirmDismiss(note, false)} className="flex-1 py-2 bg-green-600 text-white rounded-xl">Resolve</button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // SCREENS
-  const renderDashboard = () => (
-    <div className="space-y-6">
-      <div className="bg-white rounded-xl border p-6">
-        <h2 className="text-xl font-bold mb-4">Squad Health Check</h2>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-red-50 rounded-xl p-4 border border-red-100"><div className="text-2xl font-bold text-red-700">{criticalIssues.length}</div><div className="text-xs text-red-600">Critical Issues</div></div>
-          <div className="bg-green-50 rounded-xl p-4 border border-green-100"><div className="text-2xl font-bold text-green-700">{Object.keys(dismissedIssues).length}</div><div className="text-xs text-green-600">Resolved</div></div>
-          <div className="bg-gray-50 rounded-xl p-4 border"><div className="text-2xl font-bold">{Object.keys(snoozedIssues).length}</div><div className="text-xs text-gray-600">Snoozed</div></div>
-        </div>
-      </div>
-      {activeIssues.length === 0 ? (
-        <div className="bg-green-50 rounded-xl p-8 text-center border border-green-200"><CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" /><h3 className="text-lg font-semibold text-green-800">All Clear!</h3></div>
-      ) : (
-        <div className="space-y-3">
-          {activeIssues.map(issue => {
-            const config = getSeverityConfig(issue.severity);
-            return (
-              <div key={issue.id} className={`bg-white rounded-xl border-l-4 ${config.border} border p-4`}>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center font-bold">{issue.player.name.split(' ').map(n => n[0]).join('')}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2"><span className="font-semibold">{issue.player.name}</span><span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{issue.player.position}</span></div>
-                    <div className={`font-medium ${config.text}`}>{issue.title}</div>
-                    <p className="text-sm text-gray-600 mt-1">{issue.description}</p>
-                  </div>
-                  <div className={`px-2 py-1 rounded-full text-xs font-bold ${config.bg} ${config.text}`}>{issue.score}%</div>
+      <div className="flex-1 overflow-y-auto p-6">
+        <button onClick={() => setSelectedPlayer(null)} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-4">
+          <ChevronRight className="h-4 w-4 rotate-180" /> Back to shortlists
+        </button>
+        
+        {/* Player header */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <div className="flex items-start gap-6">
+            <PlayerAvatar name={player.fullName} size="xl" />
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h2 className="text-2xl font-bold text-gray-900">{player.fullName}</h2>
+                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded">Shortlist Candidate</span>
+              </div>
+              <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                <span className="font-semibold">{player.position}</span>
+                <span>•</span>
+                <span>{player.club}</span>
+                <span>•</span>
+                <span>{player.age} years</span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <MapPin className="h-3 w-3" /> {player.nationality}
+                </span>
+              </div>
+              <div className="grid grid-cols-4 gap-4">
+                <div>
+                  <div className="text-xs text-gray-500">Market Value</div>
+                  <div className="font-semibold text-gray-900">{player.value}</div>
                 </div>
-                <div className="flex gap-2 mt-4 pt-4 border-t">
-                  <button onClick={() => handleCreateShortlist(issue.player)} className="flex-1 py-2 bg-slate-900 text-white rounded-lg text-sm">Create Shortlist</button>
-                  <button onClick={() => handleDismiss(issue)} className="flex-1 py-2 border rounded-lg text-sm">Resolve</button>
+                <div>
+                  <div className="text-xs text-gray-500">Contract</div>
+                  <div className="font-semibold text-gray-900">{player.contract}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Wages</div>
+                  <div className="font-semibold text-gray-900">{player.wages}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Agent</div>
+                  <div className="font-semibold text-gray-900">{player.agent}</div>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-
-  const renderSquad = () => (
-    <div className="bg-white rounded-xl border overflow-hidden">
-      <table className="w-full">
-        <thead className="bg-gray-50 border-b">
-          <tr className="text-xs font-semibold text-gray-500 uppercase">
-            <th className="px-3 py-3 text-left">#</th><th className="px-3 py-3 text-left">Player</th><th className="px-3 py-3 text-left">Pos</th>
-            <th className="px-3 py-3 text-left">Age</th><th className="px-3 py-3 text-center">FC</th><th className="px-3 py-3 text-left">Value</th><th className="px-3 py-3 text-left">Action</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y">
-          {squad.map((p) => (
-            <tr key={p.id} className="hover:bg-gray-50">
-              <td className="px-3 py-2 text-sm text-gray-500">{p.number}</td>
-              <td className="px-3 py-2 cursor-pointer" onClick={() => { setSelectedPlayer(p); setActiveScreen('player-profile'); }}>
-                <div className="font-medium text-sm hover:text-blue-600">{p.name}</div><div className="text-xs text-gray-500">{p.nation}</div>
-              </td>
-              <td className="px-3 py-2"><span className="px-2 py-1 bg-gray-100 rounded text-xs">{p.position}</span></td>
-              <td className="px-3 py-2 text-sm">{p.age}</td>
-              <td className="px-3 py-2 text-center"><FCRatingBadge rating={p.fcRating} /></td>
-              <td className="px-3 py-2 text-sm font-medium">{p.value}</td>
-              <td className="px-3 py-2"><button onClick={() => handleCreateShortlist(p)} className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs">+ Shortlist</button></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-
-  const renderShortlists = () => (
-    <div className="space-y-4">
-      <div className="bg-slate-900 text-white rounded-xl p-4 flex items-center justify-between">
-        <div className="flex items-center gap-4"><div><div className="text-xs text-slate-400">Window</div><div className="font-semibold">{currentWindow.name}</div></div>
-        <div className="bg-blue-500 px-3 py-1 rounded-full text-sm font-semibold">{currentWindow.daysRemaining} days left</div></div>
-      </div>
-      {shortlists.map((shortlist) => {
-        const config = getSeverityConfig(shortlist.severity);
-        const isExpanded = expandedShortlist === shortlist.id;
-        return (
-          <div key={shortlist.id} className={`bg-white rounded-xl border overflow-hidden ${isExpanded ? `${config.border} border-l-4` : ''}`}>
-            <div onClick={() => setExpandedShortlist(isExpanded ? null : shortlist.id)} className={`p-4 cursor-pointer flex items-center gap-4 ${isExpanded ? config.bg : 'hover:bg-gray-50'}`}>
-              <div className={`w-10 h-10 rounded-lg ${config.bg} ${config.text} flex items-center justify-center font-bold text-sm border-2 ${config.border}`}>{shortlist.position}</div>
-              <div className="flex-1"><div className="font-semibold">{shortlist.title}</div><div className="text-sm text-gray-500">{shortlist.trigger}</div></div>
-              <div className="text-right"><div className="text-xs text-gray-400">Budget</div><div className="font-semibold">{formatBudget(shortlist.budget.transfer)}</div></div>
-              <div className={`px-3 py-1 rounded-full text-sm ${shortlist.deadline < 50 ? 'bg-red-100 text-red-700' : 'bg-gray-100'}`}>{shortlist.deadline}d</div>
-              {isExpanded ? <ChevronUp className="h-5 w-5 text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-400" />}
             </div>
-            {isExpanded && (
-              <div className="border-t">
-                <div className="px-4 py-2 bg-gray-50 border-b flex gap-4">
-                  <GateCheckbox label="Scouting" checked={shortlist.gates.scouting} />
-                  <GateCheckbox label="Manager" checked={shortlist.gates.manager} />
-                  <GateCheckbox label="Budget" checked={shortlist.gates.budget} />
-                  <GateCheckbox label="Medical" checked={shortlist.gates.medical} />
+          </div>
+        </div>
+
+        {/* Scouting assessment */}
+        <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-green-500" /> Strengths
+            </h3>
+            <ul className="space-y-2">
+              {player.strengths.map((s, i) => (
+                <li key={i} className="flex items-center gap-2 text-sm text-gray-700">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full" /> {s}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-amber-500" /> Concerns
+            </h3>
+            <ul className="space-y-2">
+              {player.concerns.map((c, i) => (
+                <li key={i} className="flex items-center gap-2 text-sm text-gray-700">
+                  <span className="w-1.5 h-1.5 bg-amber-500 rounded-full" /> {c}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Video clips */}
+        <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
+          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Video className="h-4 w-4 text-blue-500" /> Video Clips
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            {player.videos.map((v, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors">
+                <div className="w-12 h-12 bg-gray-900 rounded-lg flex items-center justify-center">
+                  <Play className="h-5 w-5 text-white" />
                 </div>
-                <div className="p-4">
-                  <div className="text-xs font-bold text-gray-500 mb-3">CANDIDATES ({shortlist.planB.length})</div>
-                  <div className="space-y-2">
-                    {shortlist.planB.map((c, idx) => (
-                      <div key={c.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer" onClick={() => { 
-                        const candidateId = c.name.toLowerCase().replace(/\s+/g, '-');
-                        setSelectedPlayer(shortlistCandidates[candidateId] || c); 
-                        setActiveScreen('player-profile'); 
-                      }}>
-                        <span className="text-gray-400 w-6">{idx + 1}</span>
-                        <div className="flex-1"><div className="font-medium">{c.name}</div><div className="text-xs text-gray-500">{c.club} • {c.age}</div></div>
-                        <StarRating rating={c.rating} />
-                        <div className="text-sm font-medium w-16">{c.fee}</div>
-                        <PipelineIndicator stage={c.statusStage} />
-                        <button onClick={(e) => { e.stopPropagation(); openAddNoteForPlayer(c.name); }} className="p-1.5 hover:bg-gray-200 rounded"><Plus className="h-3.5 w-3.5" /></button>
+                <div>
+                  <div className="font-medium text-sm text-gray-900">{v.title}</div>
+                  <div className="text-xs text-gray-500">{v.duration} • {v.date}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Activity timeline */}
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Clock className="h-4 w-4 text-purple-500" /> Activity Timeline
+          </h3>
+          <div className="space-y-4">
+            {player.timeline.map((t, i) => (
+              <div key={i} className="flex gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  t.type === 'scout' ? 'bg-green-100 text-green-600' :
+                  t.type === 'video' ? 'bg-blue-100 text-blue-600' :
+                  t.type === 'call' ? 'bg-amber-100 text-amber-600' :
+                  'bg-purple-100 text-purple-600'
+                }`}>
+                  {t.type === 'scout' ? <Eye className="h-4 w-4" /> :
+                   t.type === 'video' ? <Video className="h-4 w-4" /> :
+                   t.type === 'call' ? <Phone className="h-4 w-4" /> :
+                   <FileText className="h-4 w-4" />}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <div className="font-medium text-sm text-gray-900">{t.title}</div>
+                    <div className="text-xs text-gray-500">{t.date}</div>
+                  </div>
+                  <div className="text-xs text-gray-500 mb-1">by {t.user}</div>
+                  <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded">{t.note}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render dashboard
+  const renderDashboard = () => (
+    <div className="flex-1 overflow-y-auto p-6">
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-1">Squad Health Check</h2>
+        <p className="text-sm text-gray-500">Proactive issues requiring attention</p>
+      </div>
+
+      {/* Critical alerts */}
+      <div className="space-y-4">
+        {[
+          { severity: 'critical', title: 'CB Cover Required', subtitle: 'Sven Botman - ACL injury', detail: '6 months out. Only Schär and Burn available.', action: 'Find Replacement', playerId: 'sven-botman', shortlistId: 'cb-cover' },
+          { severity: 'high', title: 'Contract Expiring', subtitle: 'Kieran Trippier - June 2026', detail: 'Age 34, 67 injury days this season. Need succession plan.', action: 'Find Replacement', playerId: 'kieran-trippier', shortlistId: 'trippier' },
+          { severity: 'medium', title: 'Transfer Interest', subtitle: 'Bruno Guimaraes - Saudi & PSG', detail: '£100M release clause. Need contingency.', action: 'Find Replacement', playerId: 'bruno-guimaraes', shortlistId: 'cm-depth' },
+          { severity: 'medium', title: 'Transfer Interest', subtitle: 'Anthony Gordon - Liverpool', detail: 'Part of PSR discussions. May need to sell.', action: 'Find Replacement', playerId: 'anthony-gordon', shortlistId: null },
+        ].map((alert, i) => (
+          <div key={i} className={`bg-white border-l-4 rounded-lg p-4 shadow-sm ${
+            alert.severity === 'critical' ? 'border-red-500' :
+            alert.severity === 'high' ? 'border-orange-500' : 'border-amber-500'
+          }`}>
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`px-2 py-0.5 text-xs font-semibold rounded ${
+                    alert.severity === 'critical' ? 'bg-red-100 text-red-700' :
+                    alert.severity === 'high' ? 'bg-orange-100 text-orange-700' : 'bg-amber-100 text-amber-700'
+                  }`}>
+                    {alert.severity.toUpperCase()}
+                  </span>
+                  <span className="font-semibold text-gray-900">{alert.title}</span>
+                </div>
+                <div className="text-sm text-gray-700 mb-1">{alert.subtitle}</div>
+                <div className="text-xs text-gray-500">{alert.detail}</div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => openAiReplacement(alert.playerId)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  <Zap className="h-3 w-3" />
+                  {alert.action}
+                </button>
+                {alert.shortlistId && (
+                  <button
+                    onClick={() => {
+                      setActiveScreen('shortlists');
+                      setExpandedShortlist(alert.shortlistId);
+                    }}
+                    className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    View Shortlist
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Window countdown */}
+      <div className="mt-8 bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl p-5 text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-sm text-gray-400 mb-1">Transfer Window</div>
+            <div className="text-xl font-bold">{currentWindow.name}</div>
+          </div>
+          <div className="text-right">
+            <div className="text-3xl font-bold">{currentWindow.daysRemaining}</div>
+            <div className="text-sm text-gray-400">days remaining</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Render squad
+  const renderSquad = () => (
+    <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 mb-1">First Team Squad</h2>
+          <p className="text-sm text-gray-500">{squad.length} players</p>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3">Player</th>
+              <th className="px-4 py-3">Pos</th>
+              <th className="px-4 py-3">Age</th>
+              <th className="px-4 py-3">Contract</th>
+              <th className="px-4 py-3">Value</th>
+              <th className="px-4 py-3">Injury Risk</th>
+              <th className="px-4 py-3">Flag</th>
+              <th className="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {squad.map((player) => (
+              <tr key={player.id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <PlayerAvatar name={player.name} size="sm" />
+                    <span className="font-medium text-gray-900">{player.name}</span>
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-sm font-medium text-gray-700">{player.position}</td>
+                <td className="px-4 py-3 text-sm text-gray-600">{player.age}</td>
+                <td className="px-4 py-3 text-sm text-gray-600">{player.contract}</td>
+                <td className="px-4 py-3 text-sm font-medium text-gray-900">£{player.value}</td>
+                <td className="px-4 py-3">
+                  <InjuryBadge risk={player.injury.risk} daysOut={player.injury.daysOut} />
+                </td>
+                <td className="px-4 py-3">
+                  {player.flag && (
+                    <span className={`px-2 py-1 text-xs font-medium rounded ${
+                      player.flag === 'ACL' ? 'bg-red-100 text-red-700' :
+                      player.flag === 'Contract' ? 'bg-amber-100 text-amber-700' :
+                      'bg-blue-100 text-blue-700'
+                    }`}>
+                      {player.flag}
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  {player.flag && (
+                    <button
+                      onClick={() => openAiReplacement(player.id)}
+                      className="flex items-center gap-1 px-2 py-1 text-xs text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                    >
+                      <Zap className="h-3 w-3" />
+                      Find Cover
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  // Render shortlists
+  const renderShortlists = () => (
+    <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 mb-1">Active Shortlists</h2>
+          <p className="text-sm text-gray-500">{shortlists.length} positions being tracked</p>
+        </div>
+        <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">
+          <Plus className="h-4 w-4" /> New Shortlist
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        {shortlists.map((shortlist) => (
+          <div key={shortlist.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            {/* Header */}
+            <button
+              onClick={() => setExpandedShortlist(expandedShortlist === shortlist.id ? null : shortlist.id)}
+              className="w-full px-5 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <span className={`w-2 h-2 rounded-full ${
+                  shortlist.priority === 'critical' ? 'bg-red-500' :
+                  shortlist.priority === 'high' ? 'bg-orange-500' : 'bg-amber-500'
+                }`} />
+                <div className="text-left">
+                  <div className="font-semibold text-gray-900">{shortlist.title}</div>
+                  <div className="text-xs text-gray-500">{shortlist.reason}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-500">{shortlist.candidates.length} candidates</span>
+                {expandedShortlist === shortlist.id ? 
+                  <ChevronUp className="h-5 w-5 text-gray-400" /> : 
+                  <ChevronDown className="h-5 w-5 text-gray-400" />
+                }
+              </div>
+            </button>
+
+            {/* Expanded content */}
+            {expandedShortlist === shortlist.id && (
+              <div className="border-t border-gray-100">
+                {/* Plan A */}
+                <div className="px-5 py-4 bg-gray-50 border-b border-gray-100">
+                  <div className="text-xs font-semibold text-gray-500 uppercase mb-2">Plan A: {shortlist.planA.action}</div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <PlayerAvatar name={shortlist.planA.player} size="sm" />
+                      <div>
+                        <div className="font-medium text-gray-900">{shortlist.planA.player}</div>
+                        <div className="text-xs text-gray-500">{shortlist.planA.note}</div>
+                      </div>
+                    </div>
+                    <span className={`px-2 py-1 text-xs font-medium rounded ${
+                      shortlist.planA.status === 'Negotiating' ? 'bg-blue-100 text-blue-700' :
+                      shortlist.planA.status === 'Monitoring' ? 'bg-gray-100 text-gray-700' :
+                      'bg-amber-100 text-amber-700'
+                    }`}>
+                      {shortlist.planA.status}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Plan B - Candidates */}
+                <div className="px-5 py-4">
+                  <div className="text-xs font-semibold text-gray-500 uppercase mb-3">Plan B: Candidates</div>
+                  <div className="space-y-3">
+                    {shortlist.candidates.map((candidate) => (
+                      <div 
+                        key={candidate.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                        onClick={() => setSelectedPlayer(candidate.id)}
+                      >
+                        <div className="flex items-center gap-4">
+                          <PlayerAvatar name={candidate.name} size="md" />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-900">{candidate.name}</span>
+                              {candidate.flag && (
+                                <span className="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] font-semibold rounded">
+                                  {candidate.flag}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                              <span>{candidate.club}</span>
+                              <span>•</span>
+                              <span>{candidate.age} yrs</span>
+                              <span>•</span>
+                              <span className="font-medium">£{candidate.value}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-6">
+                          <div className="flex items-center gap-1">
+                            {candidate.sources.map((s, i) => <SourceBadge key={i} source={s} />)}
+                          </div>
+                          <div className="text-right">
+                            <StarRating rating={candidate.rating} />
+                            <div className="text-[10px] text-gray-500 mt-0.5">{candidate.fit}% fit</div>
+                          </div>
+                          <PipelineIndicator stage={candidate.stage} />
+                          <ChevronRight className="h-4 w-4 text-gray-400" />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -423,154 +596,221 @@ const shortlistCandidates = {
               </div>
             )}
           </div>
-        );
-      })}
+        ))}
+      </div>
     </div>
   );
 
-  const renderPlayerProfile = () => {
-    const playerId = selectedPlayer?.name?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z-]/g, '');
-    const candidateData = shortlistCandidates[playerId];
-    const squadPlayer = squad.find(p => p.name === selectedPlayer?.name);
-    const player = candidateData || squadPlayer || squad[0];
-    const isCandidate = !!candidateData;
-    const activities = getPlayerActivities(player.name);
+  // Render search
+  const renderSearch = () => {
+    const filteredPlayers = searchQuery 
+      ? playerDatabase.filter(p => 
+          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.club.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.nationality.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : playerDatabase;
 
     return (
-      <div className="space-y-6">
-        <div className="bg-white rounded-xl border p-6">
-          <div className="flex items-start gap-6">
-            {player.photoUrl ? (
-              <img src={player.photoUrl} alt={player.name} className="w-24 h-24 rounded-xl object-cover shadow-lg" />
-            ) : (
-              <div className="w-24 h-24 bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl flex items-center justify-center text-3xl font-bold text-white shadow-lg">{player.number || 'TS'}</div>
-            )}
-            <div className="flex-1">
-              <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl font-bold">{player.name}</h1>
-                {isCandidate && <span className="px-2 py-1 rounded text-xs font-medium bg-indigo-100 text-indigo-700">Shortlist Candidate</span>}
-                {player.flag && <span className={`px-2 py-1 rounded text-xs font-medium ${player.flag === 'Key' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}`}>{player.flag}</span>}
-                {player.fcRating && <FCRatingBadge rating={player.fcRating} />}
-              </div>
-              <div className="text-gray-500 mt-1">{player.club || 'Newcastle United'} • {player.position} • Age {player.age}</div>
-              {player.otherPositions && <div className="text-xs text-gray-400 mt-1">Also plays: {player.otherPositions.join(', ')}</div>}
-              <div className="flex gap-2 mt-3"><SourceBadge source="statsbomb" /><SourceBadge source="impect" /></div>
-            </div>
-            <div className="text-right">
-              <div className="text-3xl font-bold text-green-600">{player.marketValue || player.value}</div>
-              <div className="text-sm text-gray-500">Contract: {player.contract}</div>
-            </div>
+      <div className="flex-1 overflow-y-auto p-6">
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Search Players</h2>
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name, club, position, or nationality..."
+              className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+            />
           </div>
         </div>
 
-        {isCandidate && player.scoutingNotes && (
-          <div className="bg-indigo-50 rounded-xl border border-indigo-100 p-5">
-            <h3 className="font-bold text-indigo-600 mb-2 flex items-center gap-2"><Target className="h-4 w-4" /> Scouting Assessment</h3>
-            <p className="text-gray-700 mb-4">{player.scoutingNotes}</p>
-            <div className="grid grid-cols-2 gap-4">
-              <div><div className="text-xs font-semibold text-green-600 mb-2">Strengths</div>
-                {player.pros?.map((p, i) => <div key={i} className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-3.5 w-3.5 text-green-500" />{p}</div>)}
-              </div>
-              <div><div className="text-xs font-semibold text-red-600 mb-2">Concerns</div>
-                {player.cons?.map((c, i) => <div key={i} className="flex items-center gap-2 text-sm"><AlertCircle className="h-3.5 w-3.5 text-red-500" />{c}</div>)}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {isCandidate && player.matchLog && (
-          <div className="bg-white rounded-xl border p-5">
-            <h3 className="font-bold text-gray-400 uppercase text-sm mb-3 flex items-center gap-2"><CalendarDays className="h-4 w-4" /> Match Log</h3>
-            <div className="space-y-1 text-sm">
-              {player.matchLog.slice(0, 8).map((m, i) => (
-                <div key={i} className={`flex items-center gap-3 py-2 px-3 rounded ${m.status === 'injured' ? 'bg-red-50' : 'bg-gray-50'}`}>
-                  <span className="text-gray-400 w-8">{m.md}</span>
-                  <span className="text-gray-500 w-24">{m.date}</span>
-                  <span className="flex-1">{m.home} - {m.away}</span>
-                  <span className="font-mono w-10">{m.result}</span>
-                  <span className={`px-2 py-0.5 rounded text-xs ${m.status === 'started' ? 'bg-green-100 text-green-700' : m.status === 'sub' ? 'bg-blue-100 text-blue-700' : m.status === 'injured' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
-                    {m.status === 'started' ? `${m.mins}'` : m.status === 'sub' ? `Sub ${m.mins}'` : m.status === 'injured' ? m.note : 'Bench'}
-                  </span>
-                </div>
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3">Player</th>
+                <th className="px-4 py-3">Club</th>
+                <th className="px-4 py-3">Position</th>
+                <th className="px-4 py-3">Age</th>
+                <th className="px-4 py-3">Value</th>
+                <th className="px-4 py-3">Nationality</th>
+                <th className="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filteredPlayers.map((player) => (
+                <tr key={player.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <PlayerAvatar name={player.name} size="sm" />
+                      <span className="font-medium text-gray-900">{player.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{player.club}</td>
+                  <td className="px-4 py-3">
+                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded">{player.position}</span>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{player.age}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">£{player.value}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{player.nationality}</td>
+                  <td className="px-4 py-3">
+                    <button 
+                      onClick={() => setSelectedPlayer(player.id)}
+                      className="px-3 py-1.5 text-xs font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+                    >
+                      View Profile →
+                    </button>
+                  </td>
+                </tr>
               ))}
-            </div>
-          </div>
-        )}
-
-        <div className="bg-white rounded-xl border p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-blue-500" /><span className="font-semibold">Activity Timeline</span></div>
-            <button onClick={() => openAddNoteForPlayer(player.name)} className="px-3 py-1.5 text-xs bg-slate-900 text-white rounded-lg flex items-center gap-1"><Plus className="h-3 w-3" /> Add Note</button>
-          </div>
-          {activities.length === 0 ? <div className="bg-gray-50 rounded-lg p-6 text-center text-gray-500">No activities yet</div> : (
-            <div className="space-y-3">
-              {activities.map((a) => {
-                const Icon = activityTypes[a.type]?.icon || MessageSquare;
-                return (
-                  <div key={a.id} className="flex gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center"><Icon className="h-4 w-4 text-blue-600" /></div>
-                    <div><div className="font-medium text-sm">{a.title}</div><div className="text-xs text-gray-500">{a.date}</div><p className="text-xs text-gray-600 mt-1">{a.content}</p></div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+            </tbody>
+          </table>
         </div>
       </div>
     );
   };
 
+  // ============================================================================
   // MAIN RENDER
-  return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <CreateShortlistModal />
-      <DismissModal />
+  // ============================================================================
 
-      <aside className="w-64 bg-white border-r flex flex-col">
-        <div className="p-6 border-b">
+  return (
+    <div className="h-screen flex bg-gray-100 font-sans">
+      {/* Sidebar */}
+      <div className="w-64 bg-[#231F20] flex flex-col">
+        {/* Logo */}
+        <div className="p-5 border-b border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center"><span className="text-white font-bold">M</span></div>
-            <div><div className="font-bold">MAGPIE II</div><div className="text-xs text-gray-500">Recruitment</div></div>
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+              <span className="text-xl">🦅</span>
+            </div>
+            <div>
+              <div className="font-bold text-white text-lg tracking-tight">MAGPIE II</div>
+              <div className="text-[10px] text-gray-500 uppercase tracking-widest">Newcastle United</div>
+            </div>
           </div>
         </div>
-        <nav className="flex-1 p-4 space-y-1">
-          {screens.map((s) => (
-            <button key={s.id} onClick={() => setActiveScreen(s.id)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left ${activeScreen === s.id ? 'bg-slate-900 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-              <s.icon className="h-5 w-5" /><span className="font-medium">{s.name}</span>
-              {s.id === 'dashboard' && criticalIssues.length > 0 && <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${activeScreen === s.id ? 'bg-red-500' : 'bg-red-100 text-red-700'}`}>{criticalIssues.length}</span>}
+
+        {/* Navigation */}
+        <nav className="flex-1 p-3">
+          {screens.map((screen) => (
+            <button
+              key={screen.id}
+              onClick={() => { setActiveScreen(screen.id); setSelectedPlayer(null); }}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-colors ${
+                activeScreen === screen.id 
+                  ? 'bg-white/10 text-white' 
+                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              <screen.icon className="h-5 w-5" />
+              <span className="font-medium">{screen.name}</span>
             </button>
           ))}
         </nav>
-        <div className="p-4 border-t">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium">SN</div>
-            <div><div className="text-sm font-medium">Steve Nickson</div><div className="text-xs text-gray-500">Head of Recruitment</div></div>
-          </div>
-        </div>
-      </aside>
 
-      <div className="flex-1 flex flex-col">
-        <header className="bg-white border-b px-6 py-4"><h1 className="text-xl font-bold">{screens.find(s => s.id === activeScreen)?.name}</h1></header>
-        <main className="flex-1 p-6 overflow-auto">
-          {activeScreen === 'dashboard' && renderDashboard()}
-          {activeScreen === 'squad' && renderSquad()}
-          {activeScreen === 'shortlists' && renderShortlists()}
-          {activeScreen === 'player-profile' && renderPlayerProfile()}
-        </main>
+        {/* Window info */}
+        <div className="p-4 border-t border-gray-800">
+          <div className="text-xs text-gray-500 mb-1">Transfer Window</div>
+          <div className="text-white font-semibold">{currentWindow.name}</div>
+          <div className="text-xs text-gray-400">{currentWindow.daysRemaining} days remaining</div>
+        </div>
       </div>
 
-      <aside className="w-72 bg-white border-l flex flex-col">
-        <div className="p-4 border-b flex items-center gap-2"><Zap className="h-5 w-5 text-amber-500" /><span className="font-semibold">AI Assistant</span></div>
-        <div className="flex-1 p-4 overflow-auto space-y-3">
-          {chatMessages.map((m, i) => (<div key={i} className={`inline-block px-3 py-2 rounded-xl text-sm max-w-[90%] ${m.role === 'user' ? 'bg-slate-900 text-white ml-auto' : 'bg-gray-100'}`}>{m.text}</div>))}
-        </div>
-        <div className="p-4 border-t">
-          <div className="flex gap-2">
-            <input value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder="Ask about players..." className="flex-1 px-3 py-2 border rounded-xl text-sm" />
-            <button className="p-2 bg-slate-900 text-white rounded-xl"><Send className="h-4 w-4" /></button>
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-bold text-gray-900">
+              {selectedPlayer ? 'Player Profile' : screens.find(s => s.id === activeScreen)?.name}
+            </h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <Search className="h-5 w-5 text-gray-500" />
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                SN
+              </div>
+              <span className="text-sm font-medium text-gray-700">Steve Nickson</span>
+            </div>
+          </div>
+        </header>
+
+        {/* Content area */}
+        {selectedPlayer ? renderPlayerProfile() :
+         activeScreen === 'dashboard' ? renderDashboard() :
+         activeScreen === 'squad' ? renderSquad() :
+         activeScreen === 'shortlists' ? renderShortlists() :
+         renderSearch()}
+      </div>
+
+      {/* AI Chat panel */}
+      <div className="w-80 bg-white border-l border-gray-200 flex flex-col">
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-purple-500" />
+            <span className="font-semibold text-gray-900">AI Assistant</span>
           </div>
         </div>
-      </aside>
+        
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {chatMessages.map((msg, i) => (
+            <div key={i} className={`${msg.role === 'user' ? 'ml-8' : 'mr-4'}`}>
+              <div className={`p-3 rounded-xl text-sm whitespace-pre-wrap ${
+                msg.role === 'user' 
+                  ? 'bg-gray-900 text-white' 
+                  : 'bg-gray-100 text-gray-800'
+              }`}>
+                {msg.text}
+              </div>
+            </div>
+          ))}
+          {isAiThinking && (
+            <div className="mr-4">
+              <div className="p-3 bg-gray-100 rounded-xl text-sm text-gray-500">
+                <span className="animate-pulse">Thinking...</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="p-4 border-t border-gray-200">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleChat()}
+              placeholder="Ask about players..."
+              className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+            />
+            <button 
+              onClick={handleChat}
+              className="p-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              <Send className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* AI Replacement Modal */}
+      <PlayerReplacementAI 
+        isOpen={showAiModal}
+        onClose={() => setShowAiModal(false)}
+        playerId={aiPlayerId}
+        onAddToShortlist={(candidate) => {
+          console.log('Added to shortlist:', candidate);
+          // Could update shortlists state here
+        }}
+      />
     </div>
   );
 }
