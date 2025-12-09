@@ -160,6 +160,7 @@ export default function MagpieV2() {
   const [activePlayerId, setActivePlayerId] = useState(null);
   const [openShortlistPanel, setOpenShortlistPanel] = useState(null);
   const [shortlistRankings, setShortlistRankings] = useState({});
+  const [openPlayerPanel, setOpenPlayerPanel] = useState(null);
   const [playerActivities, setPlayerActivities] = useState({
     'kieran-trippier': [
       { id: 1, type: 'phone_call', date: '2024-12-05', user: 'Steve Nickson', title: 'Call with Trippier\'s agent', content: 'Discussed wage expectations. Agent pushing for £95K/wk, we offered £75K. Will reconvene next week.' },
@@ -1339,7 +1340,7 @@ export default function MagpieV2() {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {squad.map((player) => (
-              <tr key={player.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => { setSelectedPlayer(player); setActiveScreen('player-profile'); }}>
+              <tr key={player.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setOpenPlayerPanel(player)}>
                 <td className="px-4 py-3">
                   <div className="font-medium text-gray-900">{player.name}</div>
                 </td>
@@ -2195,6 +2196,124 @@ export default function MagpieV2() {
                 </>
               );
             })()}
+          </div>
+        </div>
+      )}
+
+      {openPlayerPanel && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div 
+            className="absolute inset-0 bg-black/30 transition-opacity"
+            onClick={() => setOpenPlayerPanel(null)}
+          />
+          <div className="relative w-[600px] bg-white shadow-2xl flex flex-col animate-slide-in-right overflow-hidden">
+            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-slate-800 to-slate-900">
+              <div className="flex items-start justify-between">
+                <button
+                  onClick={() => setOpenPlayerPanel(null)}
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/70 hover:text-white"
+                >
+                  <ChevronRight className="h-5 w-5 rotate-180" />
+                </button>
+                <div className="flex-1 flex items-center gap-4 ml-2">
+                  <PlayerAvatar name={openPlayerPanel.name} size="xl" />
+                  <div className="text-white">
+                    <h2 className="text-xl font-bold">{openPlayerPanel.name}</h2>
+                    <p className="text-white/70">{openPlayerPanel.position} • Age {openPlayerPanel.age}</p>
+                    <div className="flex gap-2 mt-2">
+                      <SourceBadge source="statsbomb" />
+                      <SourceBadge source="impect" />
+                      <SourceBadge source="scoutastic" />
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setOpenPlayerPanel(null)}
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/70 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-auto p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <div className="text-xs text-gray-500 mb-1">Market Value</div>
+                  <div className="text-xl font-bold">{openPlayerPanel.value}</div>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <div className="text-xs text-gray-500 mb-1">Contract Until</div>
+                  <div className="text-xl font-bold">{openPlayerPanel.contract}</div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Activity className="h-4 w-4 text-blue-500" />
+                  <span className="font-semibold text-sm">Performance</span>
+                  <SourceBadge source="statsbomb" />
+                </div>
+                <div className="space-y-2">
+                  {[
+                    { label: 'Pass Accuracy', value: '91.2%' },
+                    { label: 'Prog Passes/90', value: '8.4' },
+                    { label: 'xG Assisted', value: '0.18' },
+                    { label: 'Pressures/90', value: '15.7' },
+                  ].map((stat) => (
+                    <div key={stat.label} className="flex justify-between text-sm">
+                      <span className="text-gray-500">{stat.label}</span>
+                      <span className="font-medium">{stat.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Heart className="h-4 w-4 text-red-500" />
+                  <span className="font-semibold text-sm">Medical</span>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Injury Risk</span>
+                    <InjuryBadge risk={openPlayerPanel.injury?.risk || 'low'} daysOut={openPlayerPanel.injury?.daysOut || 0} />
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Minutes Played</span>
+                    <span className="font-medium">{openPlayerPanel.minutes || 0}</span>
+                  </div>
+                </div>
+              </div>
+
+              {openPlayerPanel.flag && (
+                <div className="bg-amber-50 rounded-xl border border-amber-200 p-4">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-amber-600" />
+                    <span className="font-medium text-amber-800">{openPlayerPanel.flag}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 border-t border-gray-200 bg-gray-50">
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => { handleCreateShortlist(openPlayerPanel); setOpenPlayerPanel(null); }}
+                  className="flex-1 px-4 py-2 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Create Shortlist
+                </button>
+                <button 
+                  onClick={() => { openPlayerTimeline(openPlayerPanel.name, null); }}
+                  className="px-4 py-2 border border-gray-300 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center gap-2"
+                >
+                  <Clock className="h-4 w-4" />
+                  Timeline
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
