@@ -168,6 +168,23 @@ export default function MagpieV2() {
   const [showEnhancedProfile, setShowEnhancedProfile] = useState(false);
   const [enhancedPlayerId, setEnhancedPlayerId] = useState(null);
   const [enhancedPlayerShortlistId, setEnhancedPlayerShortlistId] = useState(null);
+  const [openActionMenuId, setOpenActionMenuId] = useState(null);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusModalPlayer, setStatusModalPlayer] = useState(null);
+  const [playerStatuses, setPlayerStatuses] = useState({});
+  const [customStatusInput, setCustomStatusInput] = useState('');
+  const [selectedStatusOption, setSelectedStatusOption] = useState(null);
+  
+  const standardStatusOptions = [
+    { id: 'available', label: 'Available', color: 'bg-green-100 text-green-700' },
+    { id: 'injured', label: 'Injured', color: 'bg-red-100 text-red-700' },
+    { id: 'rehab', label: 'Rehab', color: 'bg-orange-100 text-orange-700' },
+    { id: 'on-loan', label: 'On Loan', color: 'bg-purple-100 text-purple-700' },
+    { id: 'suspended', label: 'Suspended', color: 'bg-gray-100 text-gray-700' },
+    { id: 'transfer-listed', label: 'Transfer Listed', color: 'bg-amber-100 text-amber-700' },
+    { id: 'rested', label: 'Rested', color: 'bg-blue-100 text-blue-700' },
+    { id: 'custom', label: 'Custom...', color: 'bg-slate-100 text-slate-700' },
+  ];
   const [whatsAppGroups, setWhatsAppGroups] = useState({
     'trippier': {
       hasGroup: true,
@@ -1199,6 +1216,121 @@ export default function MagpieV2() {
     );
   };
 
+  const handleOpenStatusModal = (player) => {
+    setStatusModalPlayer(player);
+    const currentStatus = playerStatuses[player.id];
+    if (currentStatus) {
+      const isStandard = standardStatusOptions.find(s => s.label === currentStatus);
+      if (isStandard) {
+        setSelectedStatusOption(isStandard.id);
+        setCustomStatusInput('');
+      } else {
+        setSelectedStatusOption('custom');
+        setCustomStatusInput(currentStatus);
+      }
+    } else {
+      setSelectedStatusOption(null);
+      setCustomStatusInput('');
+    }
+    setShowStatusModal(true);
+    setOpenActionMenuId(null);
+  };
+
+  const handleSaveStatus = () => {
+    if (!statusModalPlayer) return;
+    let newStatus = '';
+    if (selectedStatusOption === 'custom') {
+      newStatus = customStatusInput.trim();
+    } else if (selectedStatusOption) {
+      const option = standardStatusOptions.find(s => s.id === selectedStatusOption);
+      newStatus = option?.label || '';
+    }
+    if (newStatus) {
+      setPlayerStatuses({ ...playerStatuses, [statusModalPlayer.id]: newStatus });
+    }
+    setShowStatusModal(false);
+    setStatusModalPlayer(null);
+  };
+
+  const getPlayerStatusBadge = (playerId) => {
+    const status = playerStatuses[playerId];
+    if (!status) return null;
+    const option = standardStatusOptions.find(s => s.label === status);
+    const colorClass = option ? option.color : 'bg-slate-100 text-slate-700';
+    return (
+      <span className={`px-2 py-0.5 rounded text-xs font-medium ${colorClass}`}>
+        {status}
+      </span>
+    );
+  };
+
+  const StatusModal = () => {
+    if (!showStatusModal || !statusModalPlayer) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/30" onClick={() => setShowStatusModal(false)} />
+        <div className="relative bg-white rounded-xl shadow-2xl w-[400px] max-h-[80vh] overflow-hidden">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900">Change Status</h3>
+              <button onClick={() => setShowStatusModal(false)} className="p-1 hover:bg-gray-100 rounded">
+                <X className="h-5 w-5 text-gray-400" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 mt-1">Update status for {statusModalPlayer.name}</p>
+          </div>
+          <div className="p-6 space-y-2">
+            {standardStatusOptions.map((option) => (
+              <label
+                key={option.id}
+                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                  selectedStatusOption === option.id
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="status"
+                  checked={selectedStatusOption === option.id}
+                  onChange={() => setSelectedStatusOption(option.id)}
+                  className="h-4 w-4 text-blue-600"
+                />
+                <span className={`px-2 py-0.5 rounded text-xs font-medium ${option.color}`}>
+                  {option.label}
+                </span>
+              </label>
+            ))}
+            {selectedStatusOption === 'custom' && (
+              <input
+                type="text"
+                value={customStatusInput}
+                onChange={(e) => setCustomStatusInput(e.target.value)}
+                placeholder="Enter custom status..."
+                className="w-full mt-2 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                autoFocus
+              />
+            )}
+          </div>
+          <div className="p-6 border-t border-gray-200 flex gap-3">
+            <button
+              onClick={() => setShowStatusModal(false)}
+              className="flex-1 py-2.5 border border-gray-200 rounded-xl font-medium hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSaveStatus}
+              className="flex-1 py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800"
+            >
+              Save Status
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const handleChat = () => {
     if (!chatInput.trim()) return;
     setChatMessages([
@@ -1543,19 +1675,58 @@ export default function MagpieV2() {
                   <InjuryBadge risk={player.injury.risk} daysOut={player.injury.daysOut} />
                 </td>
                 <td className="px-4 py-3">
-                  {player.flag && <span className="text-sm">{player.flag}</span>}
+                  <div className="flex items-center gap-2">
+                    {player.flag && <span className="text-sm">{player.flag}</span>}
+                    {getPlayerStatusBadge(player.id)}
+                  </div>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
+                  <div className="relative">
                     <button 
-                      onClick={(e) => { e.stopPropagation(); handleCreateShortlist(player); }}
-                      className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100"
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        setOpenActionMenuId(openActionMenuId === player.id ? null : player.id);
+                      }}
+                      className="p-1.5 hover:bg-gray-100 rounded"
                     >
-                      Create Shortlist
+                      <MoreHorizontal className="h-4 w-4 text-gray-500" />
                     </button>
-                    <button className="p-1 hover:bg-gray-100 rounded">
-                      <MoreHorizontal className="h-4 w-4 text-gray-400" />
-                    </button>
+                    {openActionMenuId === player.id && (
+                      <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                        <button
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            handleCreateShortlist(player); 
+                            setOpenActionMenuId(null);
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                        >
+                          <Plus className="h-4 w-4 text-gray-400" />
+                          Create Shortlist
+                        </button>
+                        <button
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            handleOpenStatusModal(player);
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                        >
+                          <Activity className="h-4 w-4 text-gray-400" />
+                          Change Status
+                        </button>
+                        <div className="border-t border-gray-100 my-1" />
+                        <button
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            setOpenActionMenuId(null);
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 text-red-600"
+                        >
+                          <X className="h-4 w-4" />
+                          Delete Player
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -2261,6 +2432,7 @@ export default function MagpieV2() {
     <div className="min-h-screen bg-gray-50 flex">
       <CreateShortlistModal />
       <DismissModal />
+      <StatusModal />
       <TimelineModal />
       <AddNoteModal />
 
