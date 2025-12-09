@@ -90,7 +90,7 @@ const playerAvatars = {
   'Fabian Schär': '/players/schar_1765315479138.png',
   'Nick Pope': '/players/pope_1765315479137.png',
   'Sean Longstaff': '/players/longstaff_1765315600236.png',
-  'Tiago Santos': null,
+  'Tiago Santos': '/players/santos_1765321431388.webp',
   'Vanderson': null,
   'Alex Fresneda': null,
   'Sander Berge': null,
@@ -167,6 +167,7 @@ export default function MagpieV2() {
   const [activeWhatsAppShortlist, setActiveWhatsAppShortlist] = useState(null);
   const [showEnhancedProfile, setShowEnhancedProfile] = useState(false);
   const [enhancedPlayerId, setEnhancedPlayerId] = useState(null);
+  const [enhancedPlayerShortlistId, setEnhancedPlayerShortlistId] = useState(null);
   const [whatsAppGroups, setWhatsAppGroups] = useState({
     'trippier': {
       hasGroup: true,
@@ -239,8 +240,9 @@ export default function MagpieV2() {
   ]);
   const [chatInput, setChatInput] = useState('');
 
-  const openEnhancedProfile = (playerName) => {
+  const openEnhancedProfile = (playerName, shortlistId = null) => {
     setEnhancedPlayerId(playerName);
+    setEnhancedPlayerShortlistId(shortlistId);
     setShowEnhancedProfile(true);
   };
 
@@ -406,6 +408,26 @@ export default function MagpieV2() {
       ],
     },
   ];
+
+  const getEnhancedProfileData = () => {
+    if (!enhancedPlayerId) return { gates: null, activities: [], whatsAppData: null };
+    
+    const playerSlug = enhancedPlayerId.toLowerCase().replace(/ /g, '-');
+    const activities = playerActivities[playerSlug] || [];
+    
+    let gates = null;
+    let whatsAppData = null;
+    
+    if (enhancedPlayerShortlistId) {
+      const shortlist = shortlists.find(s => s.id === enhancedPlayerShortlistId);
+      if (shortlist) {
+        gates = shortlist.gates;
+        whatsAppData = whatsAppGroups[enhancedPlayerShortlistId] || null;
+      }
+    }
+    
+    return { gates, activities, whatsAppData };
+  };
 
   const deferredShortlists = [
     { id: 'lw', position: 'LW', title: 'LW Upgrade', reason: 'Market overheated - revisit January', targetWindow: 'January 2026' },
@@ -1897,7 +1919,7 @@ export default function MagpieV2() {
                               <div className="text-sm text-gray-400 font-medium">{idx + 1}</div>
                               <div 
                                 className="col-span-2 cursor-pointer flex items-center gap-2"
-                                onClick={() => openEnhancedProfile(candidate.name)}
+                                onClick={() => openEnhancedProfile(candidate.name, shortlist.id)}
                               >
                                 <PlayerAvatar name={candidate.name} size="sm" />
                                 <div>
@@ -2133,6 +2155,8 @@ export default function MagpieV2() {
       </div>
     );
   };
+
+  const enhancedProfileData = getEnhancedProfileData();
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -2441,7 +2465,7 @@ export default function MagpieV2() {
                                   <Clock className="h-4 w-4" />
                                 </button>
                                 <button
-                                  onClick={() => { openEnhancedProfile(candidate.name); setOpenShortlistPanel(null); }}
+                                  onClick={() => { openEnhancedProfile(candidate.name, shortlist.id); setOpenShortlistPanel(null); }}
                                   className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-gray-700"
                                   title="View Profile"
                                 >
@@ -2595,6 +2619,9 @@ export default function MagpieV2() {
         show={showEnhancedProfile}
         onClose={() => setShowEnhancedProfile(false)}
         playerId={enhancedPlayerId}
+        gates={enhancedProfileData.gates}
+        activities={enhancedProfileData.activities}
+        whatsAppData={enhancedProfileData.whatsAppData}
       />
 
       <WhatsAppPanel

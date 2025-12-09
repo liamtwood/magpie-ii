@@ -2,9 +2,53 @@ import React, { useState } from 'react';
 import { 
   X, ChevronRight, MapPin, Calendar, Ruler, Flag, User, 
   Briefcase, FileText, TrendingUp, Activity, Shield, Zap,
-  Target, Clock, AlertCircle, CheckCircle, ChevronDown
+  Target, Clock, AlertCircle, CheckCircle, ChevronDown,
+  Circle, Phone, Eye, Video, MessageSquare, Search, Send
 } from 'lucide-react';
 import { shortlistCandidates } from '../data-shortlist-candidates';
+
+const GateIndicator = ({ label, completed }) => (
+  <div className={`flex-1 p-3 rounded-lg border ${completed ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+    <div className="flex items-center gap-2 mb-1">
+      {completed ? (
+        <CheckCircle className="h-4 w-4 text-green-500" />
+      ) : (
+        <Circle className="h-4 w-4 text-gray-300" />
+      )}
+      <span className={`text-xs font-medium ${completed ? 'text-green-700' : 'text-gray-500'}`}>{label}</span>
+    </div>
+    <div className={`text-[10px] ${completed ? 'text-green-600' : 'text-gray-400'}`}>
+      {completed ? 'Completed' : 'Pending'}
+    </div>
+  </div>
+);
+
+const ActivityIcon = ({ type }) => {
+  const icons = {
+    phone_call: Phone,
+    scout_visit: Eye,
+    video_review: Video,
+    meeting: User,
+    discussion: MessageSquare,
+    status_change: Activity,
+    email: Send,
+  };
+  const Icon = icons[type] || Activity;
+  return <Icon className="h-4 w-4" />;
+};
+
+const getActivityTypeColor = (type) => {
+  const colors = {
+    phone_call: 'bg-blue-100 text-blue-600',
+    scout_visit: 'bg-green-100 text-green-600',
+    video_review: 'bg-purple-100 text-purple-600',
+    meeting: 'bg-amber-100 text-amber-600',
+    discussion: 'bg-cyan-100 text-cyan-600',
+    status_change: 'bg-gray-100 text-gray-600',
+    email: 'bg-pink-100 text-pink-600',
+  };
+  return colors[type] || 'bg-gray-100 text-gray-600';
+};
 
 const SourceBadge = ({ source }) => {
   const sources = {
@@ -95,7 +139,7 @@ const getStatusBadge = (status) => {
   return configs[status] || { bg: 'bg-gray-100', text: 'text-gray-600', label: status };
 };
 
-export default function EnhancedPlayerProfile({ show, onClose, playerId }) {
+export default function EnhancedPlayerProfile({ show, onClose, playerId, gates, activities, whatsAppData }) {
   const [activeTab, setActiveTab] = useState('overview');
   
   if (!show || !playerId) return null;
@@ -178,11 +222,28 @@ export default function EnhancedPlayerProfile({ show, onClose, playerId }) {
           <TabButton active={activeTab === 'performance'} onClick={() => setActiveTab('performance')}>Performance</TabButton>
           <TabButton active={activeTab === 'matches'} onClick={() => setActiveTab('matches')}>Matches</TabButton>
           <TabButton active={activeTab === 'career'} onClick={() => setActiveTab('career')}>Career</TabButton>
+          <TabButton active={activeTab === 'timeline'} onClick={() => setActiveTab('timeline')}>Timeline</TabButton>
+          <TabButton active={activeTab === 'whatsapp'} onClick={() => setActiveTab('whatsapp')}>WhatsApp</TabButton>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
           {activeTab === 'overview' && (
             <div className="space-y-6">
+              {gates && (
+                <div className="bg-white rounded-xl border border-gray-200 p-4">
+                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-blue-500" />
+                    Recruitment Gates
+                  </h3>
+                  <div className="flex gap-3">
+                    <GateIndicator label="Scouting" completed={gates.scouting} />
+                    <GateIndicator label="Manager" completed={gates.manager} />
+                    <GateIndicator label="Budget" completed={gates.budget} />
+                    <GateIndicator label="Medical" completed={gates.medical} />
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-4 gap-3">
                 <StatCard label="Contract Until" value={player.contract} icon={FileText} />
                 <StatCard label="Joined Club" value={player.joinedClub} icon={Calendar} />
@@ -547,6 +608,89 @@ export default function EnhancedPlayerProfile({ show, onClose, playerId }) {
                 <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
                   <h3 className="font-semibold text-gray-900 mb-2">Biography</h3>
                   <p className="text-sm text-gray-600">{player.bio}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'timeline' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-gray-900">Activity Timeline</h3>
+                <div className="text-xs text-gray-500">
+                  {activities?.length || 0} activities
+                </div>
+              </div>
+              
+              {activities && activities.length > 0 ? (
+                <div className="space-y-3">
+                  {activities.sort((a, b) => new Date(b.date) - new Date(a.date)).map((activity) => (
+                    <div key={activity.id} className="bg-white rounded-xl border border-gray-200 p-4">
+                      <div className="flex items-start gap-3">
+                        <div className={`p-2 rounded-lg ${getActivityTypeColor(activity.type)}`}>
+                          <ActivityIcon type={activity.type} />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <h4 className="font-medium text-gray-900">{activity.title}</h4>
+                            <span className="text-xs text-gray-500">{activity.date}</span>
+                          </div>
+                          <p className="text-sm text-gray-500 mb-2">by {activity.user}</p>
+                          <p className="text-sm text-gray-700">{activity.content}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-gray-50 rounded-xl border border-gray-200 p-8 text-center">
+                  <Clock className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">No activity recorded yet</p>
+                  <p className="text-xs text-gray-400 mt-1">Activities will appear here once added</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'whatsapp' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-gray-900">WhatsApp Conversations</h3>
+              </div>
+              
+              {whatsAppData && whatsAppData.hasGroup ? (
+                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                  <div className="bg-green-600 px-4 py-3 text-white">
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="h-5 w-5" />
+                      <div>
+                        <div className="font-medium">{whatsAppData.groupName}</div>
+                        <div className="text-xs text-green-100">
+                          {whatsAppData.participants?.join(', ')}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 bg-[#e5ddd5] min-h-[300px] max-h-[400px] overflow-y-auto space-y-2">
+                    {whatsAppData.messages?.map((msg, idx) => (
+                      <div key={idx} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[80%] rounded-lg px-3 py-2 ${msg.isOwn ? 'bg-[#dcf8c6]' : 'bg-white'}`}>
+                          {!msg.isOwn && (
+                            <div className="text-xs font-medium text-green-700 mb-1">{msg.sender}</div>
+                          )}
+                          <p className="text-sm">{msg.text}</p>
+                          <div className="text-[10px] text-gray-500 text-right mt-1">{msg.time}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-gray-50 rounded-xl border border-gray-200 p-8 text-center">
+                  <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">No WhatsApp group for this shortlist</p>
+                  <p className="text-xs text-gray-400 mt-1">Create a group to start collaborating</p>
                 </div>
               )}
             </div>
