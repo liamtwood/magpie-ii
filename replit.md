@@ -24,6 +24,7 @@ The application follows a client-side only architecture with no backend:
 - `/src/index.css` - Tailwind CSS imports
 - `/src/data-*.js` - Static data files for squad and shortlist information
 - `/src/utils-helpers-js.js` - Shared utility functions for formatting and calculations
+- `/src/ui/` - Reusable UI components (modals, panels)
 
 ### Data Management
 - **Static Data Pattern**: Player data, squad information, and shortlist candidates are stored in JavaScript modules as exported objects/arrays
@@ -81,6 +82,14 @@ The application follows a client-side only architecture with no backend:
 - **Real Headshots**: Player photos displayed throughout the app
 - **Initials Fallback**: Gradient circles with initials for players without photos
 - **Easy to Add**: Update `playerAvatars` object in App.jsx to add new player photos
+
+### 9. WhatsApp Integration (Mock)
+- **WhatsApp Panel**: View mock WhatsApp conversations related to each shortlist
+- **Group Chat UI**: Shows participants, message history with timestamps
+- **Initiate Chat**: For shortlists without a WhatsApp group, users can create one
+- **Mock Data**: Pre-populated conversations for 'trippier' and 'cb' shortlists
+- **State Management**: `whatsAppGroups` state in App.jsx tracks group data per shortlist
+- **Component**: `src/ui/WhatsAppPanel.jsx` - reusable WhatsApp-style modal
 
 ## External Dependencies
 
