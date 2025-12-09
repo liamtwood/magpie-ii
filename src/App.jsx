@@ -1524,7 +1524,6 @@ export default function MagpieV2() {
               <th className="px-4 py-3 text-left">Value</th>
               <th className="px-4 py-3 text-left">Injury Risk</th>
               <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-left">Shortlist</th>
               <th className="px-4 py-3 text-left">Actions</th>
             </tr>
           </thead>
@@ -1547,17 +1546,17 @@ export default function MagpieV2() {
                   {player.flag && <span className="text-sm">{player.flag}</span>}
                 </td>
                 <td className="px-4 py-3">
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleCreateShortlist(player); }}
-                    className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100"
-                  >
-                    Create Shortlist
-                  </button>
-                </td>
-                <td className="px-4 py-3">
-                  <button className="p-1 hover:bg-gray-100 rounded">
-                    <MoreHorizontal className="h-4 w-4 text-gray-400" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleCreateShortlist(player); }}
+                      className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100"
+                    >
+                      Create Shortlist
+                    </button>
+                    <button className="p-1 hover:bg-gray-100 rounded">
+                      <MoreHorizontal className="h-4 w-4 text-gray-400" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
