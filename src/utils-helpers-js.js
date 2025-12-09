@@ -1,5 +1,21 @@
 // Helper functions for MAGPIE II
 
+// Format player value
+export const formatValue = (value) => {
+  if (!value) return '£0';
+  if (typeof value === 'string') return value;
+  if (value >= 1000000) return `£${(value / 1000000).toFixed(1)}M`;
+  if (value >= 1000) return `£${(value / 1000).toFixed(0)}K`;
+  return `£${value}`;
+};
+
+// Format wages
+export const formatWages = (wages) => {
+  if (!wages) return '£0/week';
+  if (typeof wages === 'string') return wages;
+  return `£${(wages / 1000).toFixed(0)}K/week`;
+};
+
 // Format budget amounts
 export const formatBudget = (amount) => {
   if (amount >= 1000000) return `£${amount / 1000000}M`;
