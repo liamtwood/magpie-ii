@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plus, MessageSquare, Phone, Eye, Video, Users, Clock, Send } from 'lucide-react';
+import { X, Plus, MessageSquare, Phone, Eye, Video, Users, Clock, Send, RefreshCw } from 'lucide-react';
 import { PlayerAvatar } from './components-ui-badges';
 import { activityTypes, formatRelativeDate } from '../utils-helpers-js';
 
@@ -10,6 +10,7 @@ const ActivityIcon = ({ type }) => {
     scout_visit: Eye,
     video_review: Video,
     meeting: Users,
+    status_change: RefreshCw,
   };
   const Icon = icons[type] || MessageSquare;
   return <Icon className="h-4 w-4" />;
@@ -21,6 +22,7 @@ const ActivityTypeColors = {
   scout_visit: 'bg-purple-100 text-purple-600',
   video_review: 'bg-orange-100 text-orange-600',
   meeting: 'bg-cyan-100 text-cyan-600',
+  status_change: 'bg-gray-100 text-gray-600',
 };
 
 export default function PlayerActivityTimeline({

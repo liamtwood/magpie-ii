@@ -92,6 +92,7 @@ export const activityTypes = {
   meeting: { label: 'Meeting', color: 'cyan' },
   medical: { label: 'Medical Check', color: 'red' },
   contract: { label: 'Contract Discussion', color: 'indigo' },
+  status_change: { label: 'Status Change', color: 'gray' },
 };
 
 // Calculate player match score (AI replacement)
