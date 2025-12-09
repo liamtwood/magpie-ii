@@ -3,14 +3,17 @@ import {
   Users, Search, ClipboardList, Activity, Star, AlertCircle,
   ChevronDown, ChevronUp, Plus, Clock, TrendingUp,
   Send, Play, Eye, Phone, FileText, Video, MapPin,
-  ChevronRight, Sparkles, Zap
+  ChevronRight, Sparkles, Zap, X, CheckCircle2, Circle, MessageSquare
 } from 'lucide-react';
 
 // Import components
 import { PlayerAvatar, SourceBadge, InjuryBadge, StarRating, PipelineIndicator } from './ui/components-ui-badges';
 import PlayerReplacementAI from './ui/components-ai-replacement';
+import CreateShortlistModal from './ui/CreateShortlistModal';
+import PlayerActivityTimeline from './ui/PlayerActivityTimeline';
 import { squad } from './data-squad-js';
-import { formatValue, formatWages } from './utils-helpers-js';
+import { shortlistCandidates, playerActivities as initialPlayerActivities } from './data-shortlist-candidates';
+import { formatValue, formatWages, inferShortlistReason, generateSquadIssues, getPlayerId, parseValue } from './utils-helpers-js';
 
 // ============================================================================
 // MAGPIE II - Newcastle United Recruitment Platform
@@ -34,6 +37,19 @@ export default function App() {
   // AI Replacement Modal state
   const [showAiModal, setShowAiModal] = useState(false);
   const [aiPlayerId, setAiPlayerId] = useState(null);
+  
+  // Create Shortlist Modal state
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newShortlistData, setNewShortlistData] = useState(null);
+  
+  // Dismiss/Snooze state for issues
+  const [dismissedIssues, setDismissedIssues] = useState({});
+  const [snoozedIssues, setSnoozedIssues] = useState({});
+  
+  // Player Timeline Modal state
+  const [showTimelineModal, setShowTimelineModal] = useState(false);
+  const [activePlayerId, setActivePlayerId] = useState(null);
+  const [playerActivities, setPlayerActivities] = useState(initialPlayerActivities);
 
   // ============================================================================
   // DATA
@@ -199,6 +215,38 @@ export default function App() {
     setShowAiModal(true);
   };
 
+  // Create Shortlist handler
+  const handleCreateShortlist = (player) => {
+    const inference = inferShortlistReason(player);
+    setNewShortlistData({
+      player,
+      title: `${player.position} - ${player.name} Replacement`,
+      ...inference,
+      budget: parseValue(player.value),
+      wages: 80000,
+    });
+    setShowCreateModal(true);
+  };
+
+  // Open Player Timeline
+  const openPlayerTimeline = (playerName) => {
+    setActivePlayerId(getPlayerId(playerName));
+    setShowTimelineModal(true);
+  };
+
+  // Add note to player activities
+  const handleAddNote = (note) => {
+    if (!activePlayerId) return;
+    setPlayerActivities(prev => ({
+      ...prev,
+      [activePlayerId]: [...(prev[activePlayerId] || []), note]
+    }));
+  };
+
+  // Generate squad issues
+  const squadIssues = generateSquadIssues(squad);
+  const activeIssues = squadIssues.filter(i => !dismissedIssues[i.id] && !snoozedIssues[i.id]);
+
   // ============================================================================
   // RENDER FUNCTIONS
   // ============================================================================
@@ -350,10 +398,10 @@ export default function App() {
       {/* Critical alerts */}
       <div className="space-y-4">
         {[
-          { severity: 'critical', title: 'CB Cover Required', subtitle: 'Sven Botman - ACL injury', detail: '6 months out. Only Schär and Burn available.', action: 'Find Replacement', playerId: 'sven-botman', shortlistId: 'cb-cover' },
-          { severity: 'high', title: 'Contract Expiring', subtitle: 'Kieran Trippier - June 2026', detail: 'Age 34, 67 injury days this season. Need succession plan.', action: 'Find Replacement', playerId: 'kieran-trippier', shortlistId: 'trippier' },
-          { severity: 'medium', title: 'Transfer Interest', subtitle: 'Bruno Guimaraes - Saudi & PSG', detail: '£100M release clause. Need contingency.', action: 'Find Replacement', playerId: 'bruno-guimaraes', shortlistId: 'cm-depth' },
-          { severity: 'medium', title: 'Transfer Interest', subtitle: 'Anthony Gordon - Liverpool', detail: 'Part of PSR discussions. May need to sell.', action: 'Find Replacement', playerId: 'anthony-gordon', shortlistId: null },
+          { severity: 'critical', title: 'CB Cover Required', subtitle: 'Sven Botman - ACL injury', detail: '6 months out. Only Schär and Burn available.', action: 'Find Replacement', playerId: 4, shortlistId: 'cb-cover' },
+          { severity: 'high', title: 'Contract Expiring', subtitle: 'Kieran Trippier - June 2026', detail: 'Age 34, 67 injury days this season. Need succession plan.', action: 'Find Replacement', playerId: 2, shortlistId: 'trippier' },
+          { severity: 'medium', title: 'Transfer Interest', subtitle: 'Bruno Guimaraes - Saudi & PSG', detail: '£100M release clause. Need contingency.', action: 'Find Replacement', playerId: 39, shortlistId: 'cm-depth' },
+          { severity: 'medium', title: 'Transfer Interest', subtitle: 'Anthony Gordon - Liverpool', detail: 'Part of PSR discussions. May need to sell.', action: 'Find Replacement', playerId: 10, shortlistId: null },
         ].map((alert, i) => (
           <div key={i} className={`bg-white border-l-4 rounded-lg p-4 shadow-sm ${
             alert.severity === 'critical' ? 'border-red-500' :
@@ -381,7 +429,7 @@ export default function App() {
                   <Zap className="h-3 w-3" />
                   {alert.action}
                 </button>
-                {alert.shortlistId && (
+                {alert.shortlistId ? (
                   <button
                     onClick={() => {
                       setActiveScreen('shortlists');
@@ -390,6 +438,17 @@ export default function App() {
                     className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     View Shortlist
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      const player = squad.find(p => p.id === alert.playerId);
+                      if (player) handleCreateShortlist(player);
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                  >
+                    <Plus className="h-3 w-3" />
+                    Create Shortlist
                   </button>
                 )}
               </div>
@@ -587,6 +646,16 @@ export default function App() {
                             <div className="text-[10px] text-gray-500 mt-0.5">{candidate.fit}% fit</div>
                           </div>
                           <PipelineIndicator stage={candidate.stage} />
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openPlayerTimeline(candidate.name);
+                            }}
+                            className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                            title="View Activity Timeline"
+                          >
+                            <MessageSquare className="h-4 w-4 text-gray-500" />
+                          </button>
                           <ChevronRight className="h-4 w-4 text-gray-400" />
                         </div>
                       </div>
@@ -808,8 +877,27 @@ export default function App() {
         playerId={aiPlayerId}
         onAddToShortlist={(candidate) => {
           console.log('Added to shortlist:', candidate);
-          // Could update shortlists state here
         }}
+      />
+
+      {/* Create Shortlist Modal */}
+      <CreateShortlistModal
+        show={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        data={newShortlistData}
+        onConfirm={(data) => {
+          console.log('Created shortlist:', data);
+          setShowCreateModal(false);
+        }}
+      />
+
+      {/* Player Activity Timeline Modal */}
+      <PlayerActivityTimeline
+        show={showTimelineModal}
+        onClose={() => setShowTimelineModal(false)}
+        playerName={activePlayerId ? activePlayerId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : ''}
+        activities={playerActivities[activePlayerId] || []}
+        onAddNote={handleAddNote}
       />
     </div>
   );

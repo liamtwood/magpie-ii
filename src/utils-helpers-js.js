@@ -160,3 +160,104 @@ export const getFCRatingColor = (rating) => {
   if (rating >= 65) return 'from-orange-500 to-orange-600';
   return 'from-red-500 to-red-600';
 };
+
+// Infer shortlist reason based on player data
+export const inferShortlistReason = (player) => {
+  const currentYear = 2025;
+  const yearsLeft = getContractYear(player.contract) - currentYear;
+  const isOlder = player.age >= 32;
+  const isExpiring = yearsLeft <= 1;
+  const hasLongInjury = player.injury && player.injury.daysOut >= 90;
+
+  if (isExpiring && isOlder) {
+    return { 
+      trigger: 'Contract expiring', 
+      severity: 'critical', 
+      reasoning: `Contract ends soon and at ${player.age}, succession planning critical.` 
+    };
+  }
+  if (isExpiring) {
+    return { 
+      trigger: 'Contract expiring', 
+      severity: 'critical', 
+      reasoning: `Contract expiring. Decision needed on renewal vs replacement.` 
+    };
+  }
+  if (hasLongInjury) {
+    return { 
+      trigger: 'Long-term injury cover', 
+      severity: 'critical', 
+      reasoning: `${player.injury.daysOut} days missed. Cover needed.` 
+    };
+  }
+  if (isOlder) {
+    return { 
+      trigger: 'Succession planning', 
+      severity: 'moderate', 
+      reasoning: `At ${player.age}, succession planning advisable.` 
+    };
+  }
+  return { 
+    trigger: 'Succession planning', 
+    severity: 'low', 
+    reasoning: 'Proactive planning for squad depth.' 
+  };
+};
+
+// Generate squad issues from squad data
+export const generateSquadIssues = (squad) => {
+  const currentYear = 2025;
+  const issues = [];
+  
+  squad.forEach(player => {
+    const yearsLeft = getContractYear(player.contract) - currentYear;
+    const isExpiring = yearsLeft <= 1;
+    const hasLongInjury = player.injury && player.injury.daysOut >= 90;
+    const hasTransferInterest = player.flag === 'Saudi Interest' || player.flag === 'Key';
+
+    if (isExpiring) {
+      issues.push({ 
+        id: `${player.id}-contract`, 
+        player, 
+        type: 'contract', 
+        severity: 'critical', 
+        score: 90, 
+        title: 'Contract expiring', 
+        description: `Contract ends ${player.contract}. Decision needed.`, 
+        recommendation: 'Begin succession planning' 
+      });
+    }
+    if (hasLongInjury) {
+      issues.push({ 
+        id: `${player.id}-injury`, 
+        player, 
+        type: 'injury', 
+        severity: 'critical', 
+        score: 85, 
+        title: 'Long-term injury', 
+        description: `${player.injury.daysOut} days missed.`, 
+        recommendation: 'Source cover' 
+      });
+    }
+    if (hasTransferInterest && player.flag === 'Key') {
+      issues.push({ 
+        id: `${player.id}-key`, 
+        player, 
+        type: 'retention', 
+        severity: 'moderate', 
+        score: 70, 
+        title: 'Key player', 
+        description: 'Essential to squad. Monitor commitment.', 
+        recommendation: 'Contingency planning' 
+      });
+    }
+  });
+  
+  return issues.sort((a, b) => b.score - a.score);
+};
+
+// Get player activities by ID
+export const getPlayerActivities = (playerActivities, name) => {
+  const playerId = getPlayerId(name);
+  return playerActivities[playerId] || [];
+};
