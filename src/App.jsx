@@ -4,7 +4,8 @@ import {
   ChevronDown, ChevronUp, ChevronRight, Plus, Star, AlertCircle,
   PoundSterling, CalendarDays, MessageSquare, Pause, CheckCircle2, 
   Circle, Clock, TrendingUp, Activity, Zap, Shield, Heart,
-  Send, X, MoreHorizontal, Filter, ArrowUpDown, Phone, Eye
+  Send, X, MoreHorizontal, Filter, ArrowUpDown, Phone, Eye,
+  ArrowUp, ArrowDown, ExternalLink, GripVertical
 } from 'lucide-react';
 
 // Data source badge component
@@ -95,6 +96,8 @@ export default function MagpieV2() {
   const [showAddNoteModal, setShowAddNoteModal] = useState(false);
   const [activeShortlistId, setActiveShortlistId] = useState(null);
   const [activePlayerId, setActivePlayerId] = useState(null);
+  const [openShortlistPanel, setOpenShortlistPanel] = useState(null);
+  const [shortlistRankings, setShortlistRankings] = useState({});
   const [playerActivities, setPlayerActivities] = useState({
     'kieran-trippier': [
       { id: 1, type: 'phone_call', date: '2024-12-05', user: 'Steve Nickson', title: 'Call with Trippier\'s agent', content: 'Discussed wage expectations. Agent pushing for £95K/wk, we offered £75K. Will reconvene next week.' },
@@ -1470,6 +1473,13 @@ export default function MagpieV2() {
                   }`}>
                     {shortlist.deadline}d left
                   </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setOpenShortlistPanel(shortlist); }}
+                    className="p-2 hover:bg-gray-200 rounded-lg text-gray-500 hover:text-gray-700 transition-colors"
+                    title="Open Shortlist"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </button>
                   {isExpanded ? <ChevronUp className="h-5 w-5 text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-400" />}
                 </div>
 
@@ -1910,6 +1920,229 @@ export default function MagpieV2() {
           </div>
         </div>
       </aside>
+
+      {openShortlistPanel && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div 
+            className="absolute inset-0 bg-black/30 transition-opacity"
+            onClick={() => setOpenShortlistPanel(null)}
+          />
+          <div className="relative w-[600px] bg-white shadow-2xl flex flex-col animate-slide-in-right overflow-hidden">
+            {(() => {
+              const shortlist = openShortlistPanel;
+              const config = getSeverityConfig(shortlist.severity);
+              const rankingKey = shortlist.id;
+              const currentRankings = shortlistRankings[rankingKey] || shortlist.planB.map((p, i) => ({ ...p, rank: i + 1 }));
+              
+              const movePlayer = (index, direction) => {
+                const newRankings = [...currentRankings];
+                const newIndex = index + direction;
+                if (newIndex < 0 || newIndex >= newRankings.length) return;
+                [newRankings[index], newRankings[newIndex]] = [newRankings[newIndex], newRankings[index]];
+                newRankings.forEach((p, i) => p.rank = i + 1);
+                setShortlistRankings({ ...shortlistRankings, [rankingKey]: newRankings });
+              };
+
+              return (
+                <>
+                  <div className={`p-6 border-b border-gray-200 ${config.bg}`}>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-14 h-14 rounded-xl ${config.bg} ${config.text} flex items-center justify-center font-bold text-lg border-2 ${config.border}`}>
+                          {shortlist.position}
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-gray-900">{shortlist.title}</h2>
+                          <p className="text-sm text-gray-600">{shortlist.trigger}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setOpenShortlistPanel(null)}
+                        className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                      >
+                        <X className="h-5 w-5 text-gray-500" />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-6 mt-4">
+                      <div>
+                        <div className="text-xs text-gray-500 mb-1">Budget</div>
+                        <div className="font-semibold">{formatBudget(shortlist.budget.transfer)} + {formatBudget(shortlist.budget.wages)}/wk</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-gray-500 mb-1">Ball Holder</div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">
+                            {shortlist.ballHolder.avatar}
+                          </div>
+                          <span className="font-medium text-sm">{shortlist.ballHolder.name}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-gray-500 mb-1">Deadline</div>
+                        <div className={`px-3 py-1 rounded-full text-sm font-medium inline-block ${
+                          shortlist.deadline < 30 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                        }`}>
+                          {shortlist.deadline}d left
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-200">
+                      <span className="text-xs font-semibold text-gray-500">GATES:</span>
+                      <GateCheckbox label="Scouting" checked={shortlist.gates.scouting} />
+                      <GateCheckbox label="Manager" checked={shortlist.gates.manager} />
+                      <GateCheckbox label="Budget" checked={shortlist.gates.budget} />
+                      <GateCheckbox label="Medical" checked={shortlist.gates.medical} />
+                    </div>
+                  </div>
+
+                  <div className="flex-1 overflow-auto p-6">
+                    {shortlist.planA && (
+                      <div className="mb-6">
+                        <div className="text-xs font-bold text-gray-500 mb-3 tracking-wider">PLAN A: RETAIN</div>
+                        <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <div className="font-semibold text-lg">{shortlist.planA.player}</div>
+                              <div className="text-sm text-gray-500">Age {shortlist.planA.age}</div>
+                            </div>
+                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(shortlist.planA.statusColor)}`}>
+                              {shortlist.planA.status}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <div className="text-xs text-gray-400 mb-1">BLOCKER</div>
+                              <div className="text-sm text-red-600">{shortlist.planA.issue}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-gray-400 mb-1">NEXT ACTION</div>
+                              <div className="text-sm">{shortlist.planA.nextAction}</div>
+                            </div>
+                          </div>
+                          <div className="mt-3">
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-gray-400">CONFIDENCE</span>
+                              <span className="font-semibold">{shortlist.planA.confidence}%</span>
+                            </div>
+                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full ${
+                                  shortlist.planA.confidence > 60 ? 'bg-green-500' :
+                                  shortlist.planA.confidence > 30 ? 'bg-amber-500' : 'bg-red-500'
+                                }`}
+                                style={{ width: `${shortlist.planA.confidence}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="text-xs font-bold text-gray-500 tracking-wider">PLAN B: CANDIDATES ({currentRankings.length})</div>
+                        <div className="text-xs text-gray-400">Drag or use arrows to rank</div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        {currentRankings.map((candidate, idx) => (
+                          <div
+                            key={candidate.id}
+                            className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="flex flex-col gap-0.5">
+                                <button
+                                  onClick={() => movePlayer(idx, -1)}
+                                  disabled={idx === 0}
+                                  className={`p-1 rounded hover:bg-gray-100 ${idx === 0 ? 'text-gray-200 cursor-not-allowed' : 'text-gray-400 hover:text-gray-600'}`}
+                                >
+                                  <ArrowUp className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => movePlayer(idx, 1)}
+                                  disabled={idx === currentRankings.length - 1}
+                                  className={`p-1 rounded hover:bg-gray-100 ${idx === currentRankings.length - 1 ? 'text-gray-200 cursor-not-allowed' : 'text-gray-400 hover:text-gray-600'}`}
+                                >
+                                  <ArrowDown className="h-4 w-4" />
+                                </button>
+                              </div>
+                              
+                              <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold">
+                                {idx + 1}
+                              </div>
+                              
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold">{candidate.name}</span>
+                                  <StarRating rating={candidate.rating} />
+                                </div>
+                                <div className="text-sm text-gray-500">{candidate.club} • Age {candidate.age}</div>
+                              </div>
+                              
+                              <div className="text-right">
+                                <div className="font-semibold text-sm">{candidate.fee}</div>
+                                <div className="text-xs text-gray-500">{candidate.wages}</div>
+                              </div>
+                              
+                              <div className="pl-3 border-l border-gray-200">
+                                <div className="text-xs text-gray-400 mb-1">Pipeline</div>
+                                <PipelineIndicator stage={candidate.statusStage} />
+                                <div className="text-xs text-gray-600 mt-1">{candidate.status}</div>
+                              </div>
+                              
+                              <div className="flex gap-1 pl-3">
+                                <button
+                                  onClick={() => openPlayerTimeline(candidate.name, shortlist.id)}
+                                  className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-gray-700"
+                                  title="View Timeline"
+                                >
+                                  <Clock className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => { setSelectedPlayer(candidate); setActiveScreen('player-profile'); setOpenShortlistPanel(null); }}
+                                  className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-gray-700"
+                                  title="View Profile"
+                                >
+                                  <User className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 border-t border-gray-200 bg-gray-50">
+                    <div className="flex gap-3">
+                      <button className="flex-1 px-4 py-2 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+                        <Plus className="h-4 w-4" />
+                        Add Candidate
+                      </button>
+                      <button className="px-4 py-2 border border-gray-300 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                        Export
+                      </button>
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes slide-in-right {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+        .animate-slide-in-right {
+          animation: slide-in-right 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
