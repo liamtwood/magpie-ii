@@ -1,0 +1,2034 @@
+import React, { useState } from 'react';
+import { 
+  Users, Search, ClipboardList, User, Target, BarChart3, Video,
+  ChevronDown, ChevronUp, ChevronRight, Plus, Star, AlertCircle,
+  PoundSterling, CalendarDays, MessageSquare, Pause, CheckCircle2, 
+  Circle, Clock, TrendingUp, Activity, Zap, Shield, Heart,
+  Send, X, MoreHorizontal, Filter, ArrowUpDown, Phone, Eye
+} from 'lucide-react';
+
+// ============================================================================
+// MAGPIE II - Newcastle United Recruitment Platform
+// Updated with Shortlist CRM functionality
+// ============================================================================
+
+// Data source badge component
+const SourceBadge = ({ source }) => {
+  const sources = {
+    statsbomb: { label: 'SB', color: 'bg-blue-600', full: 'StatsBomb' },
+    impect: { label: 'IMP', color: 'bg-purple-600', full: 'Impect' },
+    secondspectrum: { label: 'SS', color: 'bg-orange-600', full: 'Second Spectrum' },
+    skillcorner: { label: 'SC', color: 'bg-cyan-600', full: 'SkillCorner' },
+    noisefeed: { label: 'NF', color: 'bg-red-600', full: 'Noisefeed' },
+    scoutastic: { label: 'SCT', color: 'bg-green-600', full: 'Scoutastic' },
+    transferroom: { label: 'TR', color: 'bg-yellow-600', full: 'Transfer Room' },
+  };
+  const s = sources[source] || { label: '?', color: 'bg-gray-600', full: source };
+  return (
+    <span className={`${s.color} text-white px-1.5 py-0.5 rounded text-[10px] font-medium`} title={s.full}>
+      {s.label}
+    </span>
+  );
+};
+
+// Injury risk badge
+const InjuryBadge = ({ risk, daysOut }) => {
+  const colors = {
+    low: 'bg-green-500',
+    medium: 'bg-amber-500',
+    high: 'bg-red-500',
+  };
+  return (
+    <div className={`flex items-center gap-1.5 px-2 py-1 rounded ${colors[risk]} bg-opacity-20`}>
+      <span className={`w-2 h-2 rounded-full ${colors[risk]}`} />
+      <span className="text-xs text-gray-700">{daysOut}d (12m)</span>
+    </div>
+  );
+};
+
+// Star rating component
+const StarRating = ({ rating }) => {
+  const safeRating = Math.max(0, Math.min(4, rating || 0));
+  const fullStars = Math.floor(safeRating);
+  const hasHalf = safeRating % 1 !== 0;
+  const emptyStars = Math.max(0, 4 - Math.ceil(safeRating));
+  return (
+    <div className="flex gap-0.5">
+      {Array.from({ length: fullStars }).map((_, i) => (
+        <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
+      ))}
+      {hasHalf && <Star className="h-3 w-3 fill-amber-200 text-amber-400" />}
+      {Array.from({ length: emptyStars }).map((_, i) => (
+        <Star key={`e-${i}`} className="h-3 w-3 text-gray-200" />
+      ))}
+    </div>
+  );
+};
+
+// Pipeline indicator for recruitment stages
+const PipelineIndicator = ({ stage }) => (
+  <div className="flex gap-1">
+    {[0, 1, 2, 3, 4, 5].map((i) => (
+      <div key={i} className={`w-2 h-2 rounded-sm ${i < stage ? 'bg-blue-500' : 'bg-gray-200'}`} />
+    ))}
+  </div>
+);
+
+// Gate checkbox component
+const GateCheckbox = ({ label, checked }) => (
+  <div className="flex items-center gap-1.5 text-xs text-gray-500">
+    {checked ? (
+      <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+    ) : (
+      <Circle className="h-3.5 w-3.5 text-gray-300" />
+    )}
+    {label}
+  </div>
+);
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+export default function MagpieV2() {
+  const [activeScreen, setActiveScreen] = useState('dashboard');
+  const [expandedShortlist, setExpandedShortlist] = useState('trippier');
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newShortlistData, setNewShortlistData] = useState(null);
+  const [showDismissModal, setShowDismissModal] = useState(false);
+  const [dismissingIssue, setDismissingIssue] = useState(null);
+  const [dismissedIssues, setDismissedIssues] = useState({});
+  const [snoozedIssues, setSnoozedIssues] = useState({});
+  const [showTimelineModal, setShowTimelineModal] = useState(false);
+  const [showAddNoteModal, setShowAddNoteModal] = useState(false);
+  const [activeShortlistId, setActiveShortlistId] = useState(null);
+  const [activePlayerId, setActivePlayerId] = useState(null);
+  const [playerActivities, setPlayerActivities] = useState({
+    // Trippier (current squad - Plan A)
+    'kieran-trippier': [
+      { id: 1, type: 'phone_call', date: '2024-12-05', user: 'Steve Nickson', title: 'Call with Trippier\'s agent', content: 'Discussed wage expectations. Agent pushing for £95K/wk, we offered £75K. Will reconvene next week.' },
+      { id: 2, type: 'discussion', date: '2024-12-01', user: 'Eddie Howe', title: 'Manager review meeting', content: 'Eddie confirmed Trippier remains first choice if wages align. Values his leadership and experience.' },
+      { id: 3, type: 'status_change', date: '2024-11-25', user: 'System', title: 'Added to shortlist', content: 'RB Cover shortlist initiated due to contract situation.' },
+    ],
+    // Tiago Santos (candidate)
+    'tiago-santos': [
+      { id: 1, type: 'scout_visit', date: '2024-12-03', user: 'Mark Thompson', title: 'Live scouting: Santos vs PSG', content: 'Excellent defensive positioning. Won 4/5 aerial duels. Composed on the ball. Looks ready for PL intensity. Recommend progressing to club contact.' },
+      { id: 2, type: 'video_review', date: '2024-11-20', user: 'Analysis Team', title: 'Video analysis: 5 match review', content: 'Reviewed matches vs PSG, Lyon, Marseille, Monaco, Lens. Consistently strong. Progressive passing improving. Weakness: occasional lapses in concentration.' },
+      { id: 3, type: 'phone_call', date: '2024-12-06', user: 'Steve Nickson', title: 'Call with agent (Jorge Mendes)', content: 'Agent confirmed player interested in PL move. Lille want £15M but may accept £12M + add-ons. Player on £35K/wk, expects £55K minimum.' },
+    ],
+    // Vanderson (candidate)
+    'vanderson': [
+      { id: 1, type: 'video_review', date: '2024-11-28', user: 'Analysis Team', title: 'Video analysis: Vanderson (Monaco)', content: 'Reviewed 5 matches. Strong going forward, excellent crossing. Positioning concerns in defensive third - gets caught upfield. Needs more review.' },
+      { id: 2, type: 'discussion', date: '2024-11-30', user: 'Eddie Howe', title: 'Manager feedback', content: 'Eddie has concerns about defensive discipline. Wants to see more before progressing. Prefer Santos at this stage.' },
+    ],
+    // Marc Guéhi (candidate)
+    'marc-guehi': [
+      { id: 1, type: 'scout_visit', date: '2024-12-06', user: 'Mark Thompson', title: 'Live scouting: Guéhi vs Brighton', content: 'Dominant performance. Comfortable on ball, excellent reading of game. Leadership qualities evident. £65M looks justified for this quality.' },
+      { id: 2, type: 'phone_call', date: '2024-12-04', user: 'Steve Nickson', title: 'Call with Crystal Palace DoF', content: 'Palace willing to negotiate but starting price is £65M. Hinted flexibility if we move quickly before January window opens.' },
+      { id: 3, type: 'video_review', date: '2024-11-25', user: 'Analysis Team', title: 'Video analysis: 10 match compilation', content: 'Ball-playing CB with excellent range. Aerial presence strong. Recovery pace adequate. Would slot into our system immediately.' },
+      { id: 4, type: 'meeting', date: '2024-12-02', user: 'Eddie Howe', title: 'Transfer committee meeting', content: 'Committee agreed Guéhi is top target for CB. Approved budget up to £70M if needed. Medical team to prepare due diligence.' },
+    ],
+    // Castello Lukeba (candidate)
+    'castello-lukeba': [
+      { id: 1, type: 'video_review', date: '2024-12-02', user: 'Analysis Team', title: 'Video analysis: Lukeba (Leipzig)', content: 'Excellent ball-playing CB. Quick, agile, reads game well. Some concerns about physicality against PL strikers. Worth pursuing as backup option.' },
+      { id: 2, type: 'scout_visit', date: '2024-11-15', user: 'John Bailey', title: 'Live scouting: Leipzig vs Dortmund', content: 'Impressive on the ball but struggled against Füllkrug physically. Young and developing. Potential but not ready as starter.' },
+    ],
+    // Sean Longstaff (current squad - Plan A)
+    'sean-longstaff': [
+      { id: 1, type: 'discussion', date: '2024-12-04', user: 'Eddie Howe', title: 'Discussion with Sean', content: 'Sean confirmed he\'s happy at the club but flattered by Saudi interest. Family settled in Newcastle. Will reassess in January if offer increases.' },
+      { id: 2, type: 'status_change', date: '2024-12-01', user: 'System', title: 'Added to shortlist', content: 'CM Depth shortlist initiated due to Saudi interest.' },
+    ],
+    // Adam Wharton (candidate)
+    'adam-wharton': [
+      { id: 1, type: 'scout_visit', date: '2024-12-01', user: 'Mark Thompson', title: 'Live scouting: Wharton vs Man City', content: 'Outstanding. Dictated tempo against elite opposition. 15.7 pressures, 91% pass accuracy. The real deal.' },
+      { id: 2, type: 'video_review', date: '2024-11-28', user: 'Analysis Team', title: 'Full season review', content: '20 years old, already looking like complete midfielder. Composure beyond his years. Would be perfect Bruno backup/partner.' },
+      { id: 3, type: 'phone_call', date: '2024-12-05', user: 'Steve Nickson', title: 'Initial contact with Palace', content: 'Palace not keen to sell but acknowledged interest. Would need £45M+ and likely only in summer. Worth monitoring.' },
+    ],
+  });
+  const [chatMessages, setChatMessages] = useState([
+    { role: 'assistant', text: "Hi! I can help you find players, analyze shortlists, or compare candidates. Try: 'Find pressing midfielders under 25'" }
+  ]);
+  const [chatInput, setChatInput] = useState('');
+
+  // Navigation screens
+  const screens = [
+    { id: 'dashboard', name: 'Dashboard', icon: Activity },
+    { id: 'squad', name: 'Squad', icon: Users },
+    { id: 'player-search', name: 'Player Search', icon: Search },
+    { id: 'shortlists', name: 'Shortlists', icon: ClipboardList },
+    { id: 'player-profile', name: 'Player Profile', icon: User },
+  ];
+
+  // Transfer window data
+  const currentWindow = {
+    name: 'Summer 2025',
+    start: 'Jun 10',
+    end: 'Aug 31',
+    daysRemaining: 85,
+  };
+
+  // Current squad data
+  const squad = [
+    { id: 1, name: 'Nick Pope', position: 'GK', age: 32, contract: '2028', value: '€30M', injury: { risk: 'medium', daysOut: 45 }, flag: null, minutes: 2340 },
+    { id: 2, name: 'Kieran Trippier', position: 'RB', age: 34, contract: '2026', value: '€12M', injury: { risk: 'high', daysOut: 67 }, flag: '⚠️ Contract', minutes: 1890 },
+    { id: 3, name: 'Sven Botman', position: 'CB', age: 24, contract: '2029', value: '€45M', injury: { risk: 'high', daysOut: 180 }, flag: '🏥 ACL', minutes: 450 },
+    { id: 4, name: 'Fabian Schär', position: 'CB', age: 32, contract: '2026', value: '€8M', injury: { risk: 'low', daysOut: 12 }, flag: null, minutes: 2100 },
+    { id: 5, name: 'Dan Burn', position: 'CB', age: 32, contract: '2027', value: '€10M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 1980 },
+    { id: 6, name: 'Bruno Guimarães', position: 'CM', age: 26, contract: '2028', value: '€100M', injury: { risk: 'low', daysOut: 4 }, flag: '⭐ Key', minutes: 2520 },
+    { id: 7, name: 'Sandro Tonali', position: 'CM', age: 24, contract: '2029', value: '€50M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 1200 },
+    { id: 8, name: 'Sean Longstaff', position: 'CM', age: 27, contract: '2026', value: '€15M', injury: { risk: 'low', daysOut: 8 }, flag: '⚠️ Saudi Interest', minutes: 1650 },
+    { id: 9, name: 'Alexander Isak', position: 'CF', age: 25, contract: '2030', value: '€120M', injury: { risk: 'low', daysOut: 12 }, flag: '⭐ Key', minutes: 2700 },
+    { id: 10, name: 'Anthony Gordon', position: 'LW', age: 23, contract: '2029', value: '€75M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 2580 },
+  ];
+
+  // Parse value string to number
+  const parseValue = (valueStr) => {
+    const num = parseFloat(valueStr.replace(/[€£M]/g, ''));
+    return num * 1000000;
+  };
+
+  // Parse contract year
+  const getContractYear = (contract) => parseInt(contract) || 2030;
+  const currentYear = 2025;
+
+  // Intelligent shortlist inference
+  const inferShortlistReason = (player) => {
+    const contractYear = getContractYear(player.contract);
+    const yearsLeft = contractYear - currentYear;
+    const isOlder = player.age >= 32;
+    const isExpiring = yearsLeft <= 1;
+    const hasLongInjury = player.injury.daysOut >= 90;
+    const hasTransferInterest = player.flag?.includes('Saudi') || player.flag?.includes('Interest');
+    const lowMinutes = player.minutes < 1000;
+
+    let trigger, severity, reasoning;
+
+    if (isExpiring && isOlder) {
+      trigger = 'Contract expiring';
+      severity = 'critical';
+      reasoning = `${player.name}'s contract expires in ${contractYear} and at ${player.age}, this may be their last major contract. We recommend planning for both renewal and replacement.`;
+    } else if (isExpiring) {
+      trigger = 'Contract expiring';
+      severity = 'critical';
+      reasoning = `${player.name}'s contract expires in ${contractYear}. Starting replacement search now gives negotiating leverage and backup options.`;
+    } else if (hasLongInjury) {
+      trigger = 'Long-term injury cover';
+      severity = 'critical';
+      reasoning = `${player.name} has missed ${player.injury.daysOut} days in the last 12 months. Cover is needed to maintain squad depth.`;
+    } else if (hasTransferInterest) {
+      trigger = 'Transfer interest received';
+      severity = 'moderate';
+      reasoning = `There's external interest in ${player.name}. Identifying replacements now prepares for potential departure.`;
+    } else if (isOlder) {
+      trigger = 'Succession planning';
+      severity = 'moderate';
+      reasoning = `At ${player.age}, ${player.name} has 2-3 peak years remaining. Succession planning ensures smooth transition.`;
+    } else if (lowMinutes) {
+      trigger = 'Performance concerns';
+      severity = 'low';
+      reasoning = `${player.name} has only ${player.minutes} minutes this season. Evaluating alternatives for squad competition.`;
+    } else {
+      trigger = 'Succession planning';
+      severity = 'low';
+      reasoning = `Proactive planning for ${player.name}'s position to maintain long-term squad strength.`;
+    }
+
+    return { trigger, severity, reasoning };
+  };
+
+  // Create shortlist from squad player
+  const handleCreateShortlist = (player) => {
+    const inference = inferShortlistReason(player);
+    
+    setNewShortlistData({
+      player: player,
+      title: `${player.position} - ${player.name} Replacement`,
+      trigger: inference.trigger,
+      severity: inference.severity,
+      reasoning: inference.reasoning,
+      budget: parseValue(player.value),
+      wages: 80000,
+    });
+    setShowCreateModal(true);
+  };
+
+  // Shortlists data (the new CRM model)
+  const shortlists = [
+    {
+      id: 'trippier',
+      severity: 'critical',
+      position: 'RB',
+      title: 'RB Cover - Trippier',
+      trigger: 'Contract expiring',
+      budget: { transfer: 15000000, wages: 80000 },
+      deadline: 82,
+      ballHolder: { name: 'Steve Nickson', role: 'Head of Recruitment', avatar: 'SN' },
+      gates: { scouting: true, manager: true, budget: false, medical: false },
+      planA: {
+        player: 'Kieran Trippier',
+        age: 34,
+        status: 'Negotiating',
+        statusColor: 'amber',
+        issue: 'Wage demands above budget',
+        nextAction: 'Meeting with agent - Dec 12',
+        confidence: 40,
+      },
+      planB: [
+        { id: 1, name: 'Tiago Santos', club: 'Lille', age: 22, rating: 4, status: 'Agent Contacted', statusStage: 5, fee: '£12M', wages: '£55K/wk' },
+        { id: 2, name: 'Vanderson', club: 'Monaco', age: 23, rating: 3.5, status: 'Video Review', statusStage: 2, fee: '£18M', wages: '£70K/wk' },
+        { id: 3, name: 'Alex Fresneda', club: 'Sporting CP', age: 20, rating: 3.5, status: 'Data Scouting', statusStage: 1, fee: '£10M', wages: '£40K/wk' },
+      ],
+    },
+    {
+      id: 'longstaff',
+      severity: 'moderate',
+      position: 'CM',
+      title: 'CM Depth - Longstaff',
+      trigger: 'Interest from Saudi clubs',
+      budget: { transfer: 8000000, wages: 50000 },
+      deadline: 85,
+      ballHolder: { name: 'Eddie Howe', role: 'Manager', avatar: 'EH' },
+      gates: { scouting: true, manager: false, budget: false, medical: false },
+      planA: {
+        player: 'Sean Longstaff',
+        age: 27,
+        status: 'Monitoring',
+        statusColor: 'green',
+        issue: 'Saudi offer on table',
+        nextAction: 'Player meeting - Dec 15',
+        confidence: 65,
+      },
+      planB: [
+        { id: 4, name: 'Sander Berge', club: 'Burnley', age: 26, rating: 3, status: 'Identified', statusStage: 1, fee: '£6M', wages: '£45K/wk' },
+        { id: 5, name: 'Adam Wharton', club: 'Crystal Palace', age: 20, rating: 4, status: 'Video Review', statusStage: 2, fee: '£45M', wages: '£60K/wk' },
+      ],
+    },
+    {
+      id: 'cb',
+      severity: 'moderate',
+      position: 'CB',
+      title: 'CB Cover - Botman ACL',
+      trigger: 'Long-term injury cover',
+      budget: { transfer: 25000000, wages: 70000 },
+      deadline: 45,
+      ballHolder: { name: 'Steve Nickson', role: 'Head of Recruitment', avatar: 'SN' },
+      gates: { scouting: true, manager: true, budget: true, medical: false },
+      planA: null,
+      planB: [
+        { id: 6, name: 'Marc Guéhi', club: 'Crystal Palace', age: 24, rating: 4, status: 'Club Contact', statusStage: 6, fee: '£65M', wages: '£100K/wk' },
+        { id: 7, name: 'Castello Lukeba', club: 'RB Leipzig', age: 21, rating: 3.5, status: 'Live Scouting', statusStage: 3, fee: '£35M', wages: '£60K/wk' },
+      ],
+    },
+  ];
+
+  const deferredShortlists = [
+    { id: 'lw', position: 'LW', title: 'LW Upgrade', reason: 'Market overheated - revisit January', targetWindow: 'January 2026' },
+  ];
+
+  // Player search targets
+  const searchTargets = [
+    { id: 101, name: 'Adam Wharton', team: 'Crystal Palace', position: 'CM', age: 20, value: '€45M', rating: 4, sources: ['statsbomb', 'impect', 'scoutastic'] },
+    { id: 102, name: 'João Neves', team: 'PSG', position: 'CM', age: 20, value: '€80M', rating: 4.5, sources: ['statsbomb', 'secondspectrum', 'noisefeed'] },
+    { id: 103, name: 'Tiago Santos', team: 'Lille', position: 'RB', age: 22, value: '€15M', rating: 4, sources: ['statsbomb', 'impect', 'transferroom'] },
+    { id: 104, name: 'Marc Guéhi', team: 'Crystal Palace', position: 'CB', age: 24, value: '€70M', rating: 4, sources: ['statsbomb', 'skillcorner', 'scoutastic'] },
+    { id: 105, name: 'Malo Gusto', team: 'Chelsea', position: 'RB', age: 21, value: '€35M', rating: 3.5, sources: ['statsbomb', 'impect'] },
+  ];
+
+  // Helper functions
+  const getSeverityConfig = (severity) => {
+    const configs = {
+      critical: { bg: 'bg-red-50', border: 'border-red-500', text: 'text-red-700', dot: 'bg-red-500' },
+      moderate: { bg: 'bg-amber-50', border: 'border-amber-500', text: 'text-amber-700', dot: 'bg-amber-500' },
+      low: { bg: 'bg-green-50', border: 'border-green-500', text: 'text-green-700', dot: 'bg-green-500' },
+    };
+    return configs[severity];
+  };
+
+  const getStatusColor = (color) => {
+    const colors = {
+      green: 'bg-green-100 text-green-700',
+      amber: 'bg-amber-100 text-amber-700',
+      red: 'bg-red-100 text-red-700',
+    };
+    return colors[color];
+  };
+
+  const formatBudget = (amount) => {
+    if (amount >= 1000000) return `£${amount / 1000000}M`;
+    if (amount >= 1000) return `£${amount / 1000}K`;
+    return `£${amount}`;
+  };
+
+  const totalBudget = shortlists.reduce((sum, s) => sum + s.budget.transfer, 0);
+  const totalCandidates = shortlists.reduce((sum, s) => sum + s.planB.length, 0);
+  const criticalCount = shortlists.filter(s => s.severity === 'critical').length;
+
+  // Generate squad issues automatically
+  const generateSquadIssues = () => {
+    const issues = [];
+    
+    squad.forEach(player => {
+      const contractYear = getContractYear(player.contract);
+      const yearsLeft = contractYear - currentYear;
+      const isOlder = player.age >= 32;
+      const isExpiring = yearsLeft <= 1;
+      const hasLongInjury = player.injury.daysOut >= 90;
+      const hasMediumInjury = player.injury.daysOut >= 30 && player.injury.daysOut < 90;
+      const hasTransferInterest = player.flag?.includes('Saudi') || player.flag?.includes('Interest');
+      const isKeyPlayer = player.flag?.includes('Key');
+      const lowMinutes = player.minutes < 1000;
+
+      // Check if already has active shortlist
+      const hasActiveShortlist = shortlists.some(s => 
+        s.title.toLowerCase().includes(player.name.toLowerCase()) ||
+        s.planA?.player === player.name
+      );
+
+      if (isExpiring && isOlder) {
+        issues.push({
+          id: `${player.id}-contract-age`,
+          player,
+          type: 'contract_expiring',
+          severity: 'critical',
+          score: 95,
+          title: 'Contract expiring + Age concern',
+          description: `Contract ends ${contractYear}. At ${player.age}, likely final major contract. High departure risk.`,
+          recommendation: 'Begin succession planning immediately',
+          hasActiveShortlist,
+        });
+      } else if (isExpiring) {
+        issues.push({
+          id: `${player.id}-contract`,
+          player,
+          type: 'contract_expiring',
+          severity: 'critical',
+          score: 85,
+          title: 'Contract expiring',
+          description: `Contract ends ${contractYear}. Decision needed on renewal vs replacement.`,
+          recommendation: 'Open contract discussions or begin replacement search',
+          hasActiveShortlist,
+        });
+      }
+
+      if (hasLongInjury) {
+        issues.push({
+          id: `${player.id}-injury`,
+          player,
+          type: 'long_term_injury',
+          severity: 'critical',
+          score: 90,
+          title: 'Long-term injury',
+          description: `${player.injury.daysOut} days missed in last 12 months. ${player.flag?.includes('ACL') ? 'ACL injury - 6-9 month recovery typical.' : 'Extended absence impacting squad depth.'}`,
+          recommendation: 'Source cover for remainder of season',
+          hasActiveShortlist,
+        });
+      } else if (hasMediumInjury && isKeyPlayer) {
+        issues.push({
+          id: `${player.id}-injury-key`,
+          player,
+          type: 'injury_concern',
+          severity: 'moderate',
+          score: 60,
+          title: 'Key player injury pattern',
+          description: `${player.injury.daysOut} days missed. As a key player, even moderate absence creates risk.`,
+          recommendation: 'Monitor and consider depth options',
+          hasActiveShortlist,
+        });
+      }
+
+      if (hasTransferInterest) {
+        issues.push({
+          id: `${player.id}-transfer`,
+          player,
+          type: 'transfer_interest',
+          severity: 'moderate',
+          score: 70,
+          title: 'External transfer interest',
+          description: `${player.flag}. Player may push for move or be unsettled.`,
+          recommendation: 'Assess player commitment and identify potential replacements',
+          hasActiveShortlist,
+        });
+      }
+
+      if (isOlder && !isExpiring && isKeyPlayer) {
+        issues.push({
+          id: `${player.id}-succession`,
+          player,
+          type: 'succession',
+          severity: 'moderate',
+          score: 50,
+          title: 'Succession planning needed',
+          description: `Key player aged ${player.age}. Contract secure until ${contractYear} but succession planning advisable.`,
+          recommendation: 'Identify and develop long-term replacement',
+          hasActiveShortlist,
+        });
+      }
+
+      if (lowMinutes && !hasLongInjury && player.age < 30) {
+        issues.push({
+          id: `${player.id}-minutes`,
+          player,
+          type: 'low_minutes',
+          severity: 'low',
+          score: 30,
+          title: 'Low playing time',
+          description: `Only ${player.minutes} minutes this season. May seek move for more game time.`,
+          recommendation: 'Discuss role with player, consider loan or sale',
+          hasActiveShortlist,
+        });
+      }
+    });
+
+    // Sort by score descending
+    return issues.sort((a, b) => b.score - a.score);
+  };
+
+  const squadIssues = generateSquadIssues();
+  const activeIssues = squadIssues.filter(i => !dismissedIssues[i.id] && !snoozedIssues[i.id]);
+  const criticalIssues = activeIssues.filter(i => i.severity === 'critical');
+  const moderateIssues = activeIssues.filter(i => i.severity === 'moderate');
+  const lowIssues = activeIssues.filter(i => i.severity === 'low');
+
+  // Handle dismiss
+  const handleDismiss = (issue) => {
+    setDismissingIssue(issue);
+    setShowDismissModal(true);
+  };
+
+  const confirmDismiss = (note, snoozeUntil) => {
+    if (snoozeUntil) {
+      setSnoozedIssues({ ...snoozedIssues, [dismissingIssue.id]: { note, until: snoozeUntil } });
+    } else {
+      setDismissedIssues({ ...dismissedIssues, [dismissingIssue.id]: { note, date: new Date().toISOString() } });
+    }
+    setShowDismissModal(false);
+    setDismissingIssue(null);
+  };
+
+  // Activity type config
+  const activityTypes = {
+    discussion: { label: 'Discussion', icon: MessageSquare, color: 'blue' },
+    phone_call: { label: 'Phone Call', icon: Phone, color: 'green' },
+    scout_visit: { label: 'Scouting Visit', icon: Eye, color: 'purple' },
+    video_review: { label: 'Video Review', icon: Video, color: 'orange' },
+    status_change: { label: 'Status Change', icon: Activity, color: 'gray' },
+    meeting: { label: 'Meeting', icon: Users, color: 'cyan' },
+    email: { label: 'Email', icon: Send, color: 'pink' },
+  };
+
+  // Generate player ID from name
+  const getPlayerId = (name) => name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z-]/g, '');
+
+  // Get activities for a player
+  const getPlayerActivities = (playerName) => {
+    const playerId = getPlayerId(playerName);
+    return playerActivities[playerId] || [];
+  };
+
+  // Get total activities for a shortlist (all candidates + plan A)
+  const getShortlistActivityCount = (shortlist) => {
+    let count = 0;
+    if (shortlist.planA) {
+      count += getPlayerActivities(shortlist.planA.player).length;
+    }
+    shortlist.planB.forEach(candidate => {
+      count += getPlayerActivities(candidate.name).length;
+    });
+    return count;
+  };
+
+  // Get latest activity date for a shortlist
+  const getShortlistLastActivity = (shortlist) => {
+    let latestDate = null;
+    const checkPlayer = (name) => {
+      const activities = getPlayerActivities(name);
+      if (activities.length > 0 && (!latestDate || activities[0].date > latestDate)) {
+        latestDate = activities[0].date;
+      }
+    };
+    if (shortlist.planA) checkPlayer(shortlist.planA.player);
+    shortlist.planB.forEach(candidate => checkPlayer(candidate.name));
+    return latestDate || 'Never';
+  };
+
+  // Open player timeline
+  const openPlayerTimeline = (playerName, shortlistId = null) => {
+    setActivePlayerId(getPlayerId(playerName));
+    setActiveShortlistId(shortlistId);
+    setSelectedPlayer({ name: playerName });
+    setShowTimelineModal(true);
+  };
+
+  // Open add note for player
+  const openAddNoteForPlayer = (playerName, shortlistId = null) => {
+    setActivePlayerId(getPlayerId(playerName));
+    setActiveShortlistId(shortlistId);
+    setSelectedPlayer({ name: playerName });
+    setShowAddNoteModal(true);
+  };
+
+  // Timeline Modal - Now player-centric
+  const TimelineModal = () => {
+    if (!showTimelineModal || !activePlayerId) return null;
+    
+    const activities = playerActivities[activePlayerId] || [];
+    const playerName = selectedPlayer?.name || activePlayerId;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl w-full max-w-2xl mx-4 overflow-hidden shadow-2xl max-h-[80vh] flex flex-col">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500">
+                {playerName.split(' ').map(n => n[0]).join('')}
+              </div>
+              <div>
+                <h2 className="text-lg font-bold">{playerName}</h2>
+                <p className="text-sm text-gray-500">Activity Timeline • {activities.length} activities</p>
+              </div>
+            </div>
+            <button onClick={() => setShowTimelineModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+              <X className="h-5 w-5 text-gray-400" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-auto p-6">
+            {activities.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <Clock className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                <p className="font-medium">No activity recorded yet</p>
+                <p className="text-sm mt-1">Add a note to start tracking this player</p>
+              </div>
+            ) : (
+              <div className="relative">
+                {/* Timeline line */}
+                <div className="absolute left-5 top-2 bottom-2 w-0.5 bg-gray-200" />
+                
+                <div className="space-y-6">
+                  {activities.map((activity) => {
+                    const typeConfig = activityTypes[activity.type] || activityTypes.discussion;
+                    const IconComponent = typeConfig.icon;
+                    
+                    return (
+                      <div key={activity.id} className="relative flex gap-4">
+                        {/* Icon */}
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 z-10 border-2 border-white ${
+                          typeConfig.color === 'blue' ? 'bg-blue-100' :
+                          typeConfig.color === 'green' ? 'bg-green-100' :
+                          typeConfig.color === 'purple' ? 'bg-purple-100' :
+                          typeConfig.color === 'orange' ? 'bg-orange-100' :
+                          typeConfig.color === 'cyan' ? 'bg-cyan-100' :
+                          typeConfig.color === 'pink' ? 'bg-pink-100' : 'bg-gray-100'
+                        }`}>
+                          <IconComponent className={`h-4 w-4 ${
+                            typeConfig.color === 'blue' ? 'text-blue-600' :
+                            typeConfig.color === 'green' ? 'text-green-600' :
+                            typeConfig.color === 'purple' ? 'text-purple-600' :
+                            typeConfig.color === 'orange' ? 'text-orange-600' :
+                            typeConfig.color === 'cyan' ? 'text-cyan-600' :
+                            typeConfig.color === 'pink' ? 'text-pink-600' : 'text-gray-600'
+                          }`} />
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 bg-gray-50 rounded-xl p-4">
+                          <div className="flex items-start justify-between gap-4">
+                            <div>
+                              <div className="font-medium text-gray-900">{activity.title}</div>
+                              <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                                <span>{activity.user}</span>
+                                <span>•</span>
+                                <span>{activity.date}</span>
+                                <span className={`px-2 py-0.5 rounded ${
+                                  typeConfig.color === 'blue' ? 'bg-blue-100 text-blue-700' :
+                                  typeConfig.color === 'green' ? 'bg-green-100 text-green-700' :
+                                  typeConfig.color === 'purple' ? 'bg-purple-100 text-purple-700' :
+                                  typeConfig.color === 'orange' ? 'bg-orange-100 text-orange-700' :
+                                  typeConfig.color === 'cyan' ? 'bg-cyan-100 text-cyan-700' :
+                                  typeConfig.color === 'pink' ? 'bg-pink-100 text-pink-700' : 'bg-gray-100 text-gray-700'
+                                }`}>
+                                  {typeConfig.label}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-2">{activity.content}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex-shrink-0">
+            <button 
+              onClick={() => { setShowTimelineModal(false); setShowAddNoteModal(true); }}
+              className="w-full py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 flex items-center justify-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add Activity for {playerName.split(' ')[1] || playerName}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Add Note Modal - Now player-centric
+  const AddNoteModal = () => {
+    const [noteType, setNoteType] = useState('discussion');
+    const [noteTitle, setNoteTitle] = useState('');
+    const [noteContent, setNoteContent] = useState('');
+    const [noteDate, setNoteDate] = useState(new Date().toISOString().split('T')[0]);
+
+    if (!showAddNoteModal || !activePlayerId) return null;
+
+    const playerName = selectedPlayer?.name || activePlayerId;
+
+    const handleAddNote = () => {
+      if (!noteTitle.trim() || !noteContent.trim()) return;
+
+      const newActivity = {
+        id: Date.now(),
+        type: noteType,
+        date: noteDate,
+        user: 'Steve Nickson',
+        title: noteTitle,
+        content: noteContent,
+      };
+
+      setPlayerActivities({
+        ...playerActivities,
+        [activePlayerId]: [newActivity, ...(playerActivities[activePlayerId] || [])],
+      });
+
+      setNoteTitle('');
+      setNoteContent('');
+      setShowAddNoteModal(false);
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl w-full max-w-lg mx-4 overflow-hidden shadow-2xl">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500 text-sm">
+                {playerName.split(' ').map(n => n[0]).join('')}
+              </div>
+              <div>
+                <h2 className="text-lg font-bold">Add Activity</h2>
+                <p className="text-sm text-gray-500">{playerName}</p>
+              </div>
+            </div>
+            <button onClick={() => setShowAddNoteModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+              <X className="h-5 w-5 text-gray-400" />
+            </button>
+          </div>
+
+          <div className="p-6 space-y-5">
+            {/* Activity Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Activity Type</label>
+              <div className="grid grid-cols-3 gap-2">
+                {Object.entries(activityTypes).filter(([key]) => key !== 'status_change').map(([key, config]) => {
+                  const IconComponent = config.icon;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setNoteType(key)}
+                      className={`py-2.5 px-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+                        noteType === key
+                          ? 'bg-slate-900 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      <IconComponent className="h-4 w-4" />
+                      <span className="hidden sm:inline">{config.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Date */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+              <input
+                type="date"
+                value={noteDate}
+                onChange={(e) => setNoteDate(e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+              <input
+                type="text"
+                value={noteTitle}
+                onChange={(e) => setNoteTitle(e.target.value)}
+                placeholder={
+                  noteType === 'phone_call' ? `e.g., Call with ${playerName.split(' ')[1]}'s agent` :
+                  noteType === 'scout_visit' ? `e.g., Live scouting: ${playerName} vs Liverpool` :
+                  noteType === 'video_review' ? `e.g., Video analysis: ${playerName}` :
+                  noteType === 'meeting' ? `e.g., Transfer committee: ${playerName}` :
+                  `e.g., Discussion about ${playerName}`
+                }
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Content */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+              <textarea
+                value={noteContent}
+                onChange={(e) => setNoteContent(e.target.value)}
+                placeholder="What happened? Key takeaways, next steps, concerns..."
+                rows={4}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-3">
+            <button 
+              onClick={() => setShowAddNoteModal(false)}
+              className="flex-1 py-2.5 border border-gray-300 rounded-xl font-medium hover:bg-gray-100"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleAddNote}
+              disabled={!noteTitle.trim() || !noteContent.trim()}
+              className="flex-1 py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Add Activity
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Dismiss Modal Component
+  const DismissModal = () => {
+    const [note, setNote] = useState('');
+    const [action, setAction] = useState('resolve');
+    const [snoozeUntil, setSnoozeUntil] = useState('jan2026');
+
+    if (!showDismissModal || !dismissingIssue) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl w-full max-w-md mx-4 overflow-hidden shadow-2xl">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-lg font-bold">Resolve Issue</h2>
+            <button onClick={() => setShowDismissModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+              <X className="h-5 w-5 text-gray-400" />
+            </button>
+          </div>
+
+          <div className="p-6 space-y-5">
+            {/* Issue Summary */}
+            <div className="bg-gray-50 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500 text-sm">
+                  {dismissingIssue.player.name.split(' ').map(n => n[0]).join('')}
+                </div>
+                <div>
+                  <div className="font-semibold">{dismissingIssue.player.name}</div>
+                  <div className="text-sm text-gray-500">{dismissingIssue.title}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">What would you like to do?</label>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setAction('resolve')}
+                  className={`flex-1 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+                    action === 'resolve' ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+                  Resolve
+                </button>
+                <button
+                  onClick={() => setAction('snooze')}
+                  className={`flex-1 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+                    action === 'snooze' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <Clock className="h-4 w-4" />
+                  Snooze
+                </button>
+              </div>
+            </div>
+
+            {/* Snooze Until */}
+            {action === 'snooze' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Revisit when?</label>
+                <select
+                  value={snoozeUntil}
+                  onChange={(e) => setSnoozeUntil(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                  <option value="jan2026">January 2026 window</option>
+                  <option value="summer2026">Summer 2026 window</option>
+                  <option value="30days">In 30 days</option>
+                  <option value="90days">In 90 days</option>
+                </select>
+              </div>
+            )}
+
+            {/* Notes */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {action === 'resolve' ? 'Why is this resolved?' : 'Notes for later'}
+              </label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder={action === 'resolve' 
+                  ? "e.g., Player confirmed he's happy to stay, taking pay cut. Kids in local school."
+                  : "e.g., Will reassess after January transfer window opens"
+                }
+                rows={3}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-3">
+            <button 
+              onClick={() => setShowDismissModal(false)}
+              className="flex-1 py-2.5 border border-gray-300 rounded-xl font-medium hover:bg-gray-100"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={() => confirmDismiss(note, action === 'snooze' ? snoozeUntil : null)}
+              className={`flex-1 py-2.5 text-white rounded-xl font-medium ${
+                action === 'resolve' ? 'bg-green-600 hover:bg-green-700' : 'bg-amber-600 hover:bg-amber-700'
+              }`}
+            >
+              {action === 'resolve' ? 'Mark Resolved' : 'Snooze Issue'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Create Shortlist Modal
+  const CreateShortlistModal = () => {
+    if (!showCreateModal || !newShortlistData) return null;
+    
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl w-full max-w-lg mx-4 overflow-hidden shadow-2xl">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-lg font-bold">Create New Shortlist</h2>
+            <button onClick={() => setShowCreateModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+              <X className="h-5 w-5 text-gray-400" />
+            </button>
+          </div>
+          
+          <div className="p-6 space-y-5">
+            {/* Player Being Replaced */}
+            <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-4">
+              <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500">
+                {newShortlistData.player.name.split(' ').map(n => n[0]).join('')}
+              </div>
+              <div className="flex-1">
+                <div className="text-sm text-gray-500">Creating replacement shortlist for</div>
+                <div className="font-semibold">{newShortlistData.player.name}</div>
+                <div className="text-sm text-gray-500">{newShortlistData.player.position} • Age {newShortlistData.player.age} • Contract {newShortlistData.player.contract}</div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm text-gray-500">Current Value</div>
+                <div className="font-bold text-lg">{newShortlistData.player.value}</div>
+              </div>
+            </div>
+
+            {/* AI Inference Box */}
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Zap className="h-4 w-4 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-blue-900 mb-1">We've made some assumptions</div>
+                  <p className="text-sm text-blue-700">{newShortlistData.reasoning}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg text-sm border border-blue-200">
+                      <span className="text-blue-600">Trigger:</span>
+                      <span className="font-medium text-blue-900">{newShortlistData.trigger}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg text-sm border border-blue-200">
+                      <span className="text-blue-600">Priority:</span>
+                      <span className={`font-medium capitalize ${
+                        newShortlistData.severity === 'critical' ? 'text-red-600' : 
+                        newShortlistData.severity === 'moderate' ? 'text-amber-600' : 'text-green-600'
+                      }`}>{newShortlistData.severity}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg text-sm border border-blue-200">
+                      <span className="text-blue-600">Budget:</span>
+                      <span className="font-medium text-blue-900">{formatBudget(newShortlistData.budget)}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Editable Section Header */}
+            <div className="flex items-center gap-2 pt-2">
+              <div className="h-px flex-1 bg-gray-200" />
+              <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">Adjust if needed</span>
+              <div className="h-px flex-1 bg-gray-200" />
+            </div>
+
+            {/* Shortlist Title */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Shortlist Title</label>
+              <input
+                type="text"
+                value={newShortlistData.title}
+                onChange={(e) => setNewShortlistData({...newShortlistData, title: e.target.value})}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Trigger */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Trigger / Reason</label>
+              <select 
+                value={newShortlistData.trigger}
+                onChange={(e) => setNewShortlistData({...newShortlistData, trigger: e.target.value})}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              >
+                <option>Succession planning</option>
+                <option>Contract expiring</option>
+                <option>Long-term injury cover</option>
+                <option>Performance concerns</option>
+                <option>Transfer interest received</option>
+                <option>Age profile upgrade</option>
+              </select>
+            </div>
+
+            {/* Priority */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+              <div className="flex gap-3">
+                {['critical', 'moderate', 'low'].map((sev) => (
+                  <button
+                    key={sev}
+                    onClick={() => setNewShortlistData({...newShortlistData, severity: sev})}
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-medium capitalize transition-colors ${
+                      newShortlistData.severity === sev
+                        ? sev === 'critical' ? 'bg-red-500 text-white' : sev === 'moderate' ? 'bg-amber-500 text-white' : 'bg-green-500 text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {sev}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Budget */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Transfer Budget</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">£</span>
+                  <input
+                    type="text"
+                    value={(newShortlistData.budget / 1000000).toFixed(0) + 'M'}
+                    onChange={(e) => {
+                      const num = parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0;
+                      setNewShortlistData({...newShortlistData, budget: num * 1000000});
+                    }}
+                    className="w-full pl-8 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Max Wages (p/w)</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">£</span>
+                  <input
+                    type="text"
+                    value={(newShortlistData.wages / 1000).toFixed(0) + 'K'}
+                    onChange={(e) => {
+                      const num = parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0;
+                      setNewShortlistData({...newShortlistData, wages: num * 1000});
+                    }}
+                    className="w-full pl-8 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-3">
+            <button 
+              onClick={() => setShowCreateModal(false)}
+              className="flex-1 py-2.5 border border-gray-300 rounded-xl font-medium hover:bg-gray-100"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={() => {
+                setShowCreateModal(false);
+                setActiveScreen('shortlists');
+                // In a real app, this would add to the shortlists array
+              }}
+              className="flex-1 py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800"
+            >
+              Create Shortlist
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Chat handler
+  const handleChat = () => {
+    if (!chatInput.trim()) return;
+    setChatMessages([
+      ...chatMessages,
+      { role: 'user', text: chatInput },
+      { role: 'assistant', text: `Found 5 matches for your query. Top result: Adam Wharton (Crystal Palace) - 15.7 pressures/90, 91% pass accuracy, 0 days injured in 12 months. Would you like me to add him to a shortlist?` }
+    ]);
+    setChatInput('');
+  };
+
+  // ============================================================================
+  // RENDER SCREENS
+  // ============================================================================
+
+  // Dashboard Screen - Proactive Issue Detection
+  const renderDashboardScreen = () => {
+    const IssueCard = ({ issue }) => {
+      const severityConfig = getSeverityConfig(issue.severity);
+      
+      return (
+        <div className={`bg-white rounded-xl border-l-4 ${severityConfig.border} border border-gray-200 p-4 hover:shadow-md transition-shadow`}>
+          <div className="flex items-start gap-4">
+            {/* Player Avatar */}
+            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500 flex-shrink-0">
+              {issue.player.name.split(' ').map(n => n[0]).join('')}
+            </div>
+            
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-gray-900">{issue.player.name}</span>
+                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs font-medium text-gray-600">{issue.player.position}</span>
+                    {issue.hasActiveShortlist && (
+                      <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">Shortlist Active</span>
+                    )}
+                  </div>
+                  <div className={`font-medium ${severityConfig.text} mt-0.5`}>{issue.title}</div>
+                </div>
+                <div className={`px-2.5 py-1 rounded-full text-xs font-bold ${severityConfig.bg} ${severityConfig.text}`}>
+                  {issue.score}% risk
+                </div>
+              </div>
+              
+              <p className="text-sm text-gray-600 mt-2">{issue.description}</p>
+              
+              <div className="flex items-center gap-2 mt-3">
+                <Zap className="h-3.5 w-3.5 text-amber-500" />
+                <span className="text-xs text-gray-500">Recommendation:</span>
+                <span className="text-xs font-medium text-gray-700">{issue.recommendation}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+            <button
+              onClick={() => handleCreateShortlist(issue.player)}
+              className="flex-1 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 flex items-center justify-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Create Shortlist
+            </button>
+            <button
+              onClick={() => handleDismiss(issue)}
+              className="flex-1 py-2 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center justify-center gap-2"
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              Resolve / Snooze
+            </button>
+          </div>
+        </div>
+      );
+    };
+
+    return (
+      <div className="space-y-6">
+        {/* Header Stats */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Squad Health Check</h2>
+              <p className="text-gray-500 mt-1">Proactive risk detection across your squad</p>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Clock className="h-4 w-4" />
+              Last scan: Just now
+            </div>
+          </div>
+
+          <div className="grid grid-cols-4 gap-4">
+            <div className="bg-red-50 rounded-xl p-4 border border-red-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                  <AlertCircle className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-red-700">{criticalIssues.length}</div>
+                  <div className="text-xs text-red-600">Critical Issues</div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <AlertCircle className="h-5 w-5 text-amber-600" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-amber-700">{moderateIssues.length}</div>
+                  <div className="text-xs text-amber-600">Moderate Issues</div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-green-50 rounded-xl p-4 border border-green-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <CheckCircle2 className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-green-700">{Object.keys(dismissedIssues).length}</div>
+                  <div className="text-xs text-green-600">Resolved</div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <Pause className="h-5 w-5 text-gray-600" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-gray-700">{Object.keys(snoozedIssues).length}</div>
+                  <div className="text-xs text-gray-600">Snoozed</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Critical Issues */}
+        {criticalIssues.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <h3 className="font-semibold text-gray-900">Critical - Immediate Action Required</h3>
+              <span className="text-sm text-gray-500">({criticalIssues.length})</span>
+            </div>
+            <div className="space-y-3">
+              {criticalIssues.map(issue => <IssueCard key={issue.id} issue={issue} />)}
+            </div>
+          </div>
+        )}
+
+        {/* Moderate Issues */}
+        {moderateIssues.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full bg-amber-500" />
+              <h3 className="font-semibold text-gray-900">Moderate - Plan Ahead</h3>
+              <span className="text-sm text-gray-500">({moderateIssues.length})</span>
+            </div>
+            <div className="space-y-3">
+              {moderateIssues.map(issue => <IssueCard key={issue.id} issue={issue} />)}
+            </div>
+          </div>
+        )}
+
+        {/* Low Issues */}
+        {lowIssues.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full bg-green-500" />
+              <h3 className="font-semibold text-gray-900">Low Priority - Monitor</h3>
+              <span className="text-sm text-gray-500">({lowIssues.length})</span>
+            </div>
+            <div className="space-y-3">
+              {lowIssues.map(issue => <IssueCard key={issue.id} issue={issue} />)}
+            </div>
+          </div>
+        )}
+
+        {/* All Clear State */}
+        {activeIssues.length === 0 && (
+          <div className="bg-green-50 rounded-xl border border-green-200 p-8 text-center">
+            <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-green-800">All Clear!</h3>
+            <p className="text-green-600 mt-1">No active squad issues detected. All concerns have been addressed or snoozed.</p>
+          </div>
+        )}
+
+        {/* Snoozed Issues Summary */}
+        {Object.keys(snoozedIssues).length > 0 && (
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Pause className="h-4 w-4 text-gray-500" />
+              <span className="font-medium text-gray-700">Snoozed Issues</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {squadIssues.filter(i => snoozedIssues[i.id]).map(issue => (
+                <div key={issue.id} className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg border border-gray-200 text-sm">
+                  <span className="font-medium">{issue.player.name}</span>
+                  <span className="text-gray-400">•</span>
+                  <span className="text-gray-500">{issue.title}</span>
+                  <span className="text-xs text-amber-600 font-medium">
+                    {snoozedIssues[issue.id].until === 'jan2026' ? 'Jan 2026' : snoozedIssues[issue.id].until}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Squad Screen
+  const renderSquadScreen = () => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-gray-900">Current Squad</h2>
+        <div className="flex gap-2">
+          <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">
+            <Filter className="h-4 w-4" />
+            Filter
+          </button>
+          <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">
+            <ArrowUpDown className="h-4 w-4" />
+            Sort
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr className="text-xs font-semibold text-gray-500 uppercase">
+              <th className="px-4 py-3 text-left">Player</th>
+              <th className="px-4 py-3 text-left">Pos</th>
+              <th className="px-4 py-3 text-left">Age</th>
+              <th className="px-4 py-3 text-left">Contract</th>
+              <th className="px-4 py-3 text-left">Value</th>
+              <th className="px-4 py-3 text-left">Injury Risk</th>
+              <th className="px-4 py-3 text-left">Status</th>
+              <th className="px-4 py-3 text-left">Shortlist</th>
+              <th className="px-4 py-3 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {squad.map((player) => (
+              <tr key={player.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => { setSelectedPlayer(player); setActiveScreen('player-profile'); }}>
+                <td className="px-4 py-3">
+                  <div className="font-medium text-gray-900">{player.name}</div>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="px-2 py-1 bg-gray-100 rounded text-xs font-medium">{player.position}</span>
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-600">{player.age}</td>
+                <td className="px-4 py-3 text-sm text-gray-600">{player.contract}</td>
+                <td className="px-4 py-3 text-sm font-medium">{player.value}</td>
+                <td className="px-4 py-3">
+                  <InjuryBadge risk={player.injury.risk} daysOut={player.injury.daysOut} />
+                </td>
+                <td className="px-4 py-3">
+                  {player.flag && <span className="text-sm">{player.flag}</span>}
+                </td>
+                <td className="px-4 py-3">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleCreateShortlist(player); }}
+                    className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100"
+                  >
+                    Create Shortlist
+                  </button>
+                </td>
+                <td className="px-4 py-3">
+                  <button className="p-1 hover:bg-gray-100 rounded">
+                    <MoreHorizontal className="h-4 w-4 text-gray-400" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  // Player Search Screen
+  const renderPlayerSearchScreen = () => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-gray-900">Player Search</h2>
+      </div>
+
+      {/* Search Bar */}
+      <div className="flex gap-3">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search players by name, position, or attributes..."
+            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <button className="px-4 py-2 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800">
+          Search
+        </button>
+      </div>
+
+      {/* Quick Filters */}
+      <div className="flex gap-2">
+        {['All', 'CM', 'CB', 'RB', 'LW', 'CF'].map((pos) => (
+          <button key={pos} className={`px-3 py-1.5 rounded-lg text-sm font-medium ${pos === 'All' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+            {pos}
+          </button>
+        ))}
+      </div>
+
+      {/* Results */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 text-sm text-gray-500">
+          Showing {searchTargets.length} players
+        </div>
+        <div className="divide-y divide-gray-100">
+          {searchTargets.map((player) => (
+            <div key={player.id} className="p-4 hover:bg-gray-50 cursor-pointer flex items-center justify-between" onClick={() => { setSelectedPlayer(player); setActiveScreen('player-profile'); }}>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-medium">
+                  {player.name.split(' ').map(n => n[0]).join('')}
+                </div>
+                <div>
+                  <div className="font-medium text-gray-900">{player.name}</div>
+                  <div className="text-sm text-gray-500">{player.team} • {player.position} • Age {player.age}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex gap-1">
+                  {player.sources.map((s) => <SourceBadge key={s} source={s} />)}
+                </div>
+                <StarRating rating={player.rating} />
+                <div className="font-medium">{player.value}</div>
+                <button 
+                  className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100"
+                  onClick={(e) => { e.stopPropagation(); }}
+                >
+                  + Shortlist
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  // Shortlists Screen (NEW CRM-style)
+  const renderShortlistsScreen = () => (
+    <div className="space-y-6">
+      {/* Window Status Bar */}
+      <div className="bg-slate-900 text-white rounded-xl p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <div>
+              <div className="text-xs text-slate-400 uppercase tracking-wider">Window</div>
+              <div className="text-lg font-semibold">{currentWindow.name}</div>
+            </div>
+            <div className="w-px h-8 bg-slate-700" />
+            <div>
+              <div className="text-xs text-slate-400 uppercase tracking-wider">Closes</div>
+              <div className="text-lg font-semibold">{currentWindow.end}</div>
+            </div>
+            <div className="bg-blue-500 px-3 py-1 rounded-full text-sm font-semibold">
+              {currentWindow.daysRemaining} days left
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary Stats */}
+      <div className="grid grid-cols-4 gap-4">
+        {[
+          { icon: Target, label: 'Active Shortlists', value: shortlists.length, color: 'blue' },
+          { icon: AlertCircle, label: 'Critical', value: criticalCount, color: 'red' },
+          { icon: Users, label: 'Players Tracked', value: totalCandidates, color: 'purple' },
+          { icon: PoundSterling, label: 'Total Budget', value: formatBudget(totalBudget), color: 'green' },
+        ].map((stat, i) => (
+          <div key={i} className="bg-white rounded-xl p-4 border border-gray-200 flex items-center gap-4">
+            <div className={`h-10 w-10 rounded-lg bg-${stat.color}-100 flex items-center justify-center`}>
+              <stat.icon className={`h-5 w-5 text-${stat.color}-600`} />
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+              <div className="text-xs text-gray-500">{stat.label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Active Shortlists */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            Active Shortlists
+          </h2>
+          <button className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-slate-800">
+            <Plus className="h-4 w-4" />
+            New Shortlist
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          {shortlists.map((shortlist) => {
+            const config = getSeverityConfig(shortlist.severity);
+            const isExpanded = expandedShortlist === shortlist.id;
+
+            return (
+              <div
+                key={shortlist.id}
+                className={`bg-white rounded-xl border overflow-hidden transition-all ${
+                  isExpanded ? `${config.border} border-l-4 shadow-lg` : 'border-gray-200'
+                }`}
+              >
+                {/* Header Row */}
+                <div
+                  onClick={() => setExpandedShortlist(isExpanded ? null : shortlist.id)}
+                  className={`p-4 cursor-pointer flex items-center gap-4 ${isExpanded ? config.bg : 'hover:bg-gray-50'}`}
+                >
+                  <div className={`w-10 h-10 rounded-lg ${config.bg} ${config.text} flex items-center justify-center font-bold text-sm border-2 ${config.border}`}>
+                    {shortlist.position}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-gray-900">{shortlist.title}</div>
+                    <div className="text-sm text-gray-500">{shortlist.trigger}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-400">BUDGET</div>
+                    <div className="font-semibold">{formatBudget(shortlist.budget.transfer)} + {formatBudget(shortlist.budget.wages)}/wk</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">
+                      {shortlist.ballHolder.avatar}
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium">{shortlist.ballHolder.name.split(' ')[0]}</div>
+                      <div className="text-xs text-gray-400">{shortlist.ballHolder.role}</div>
+                    </div>
+                  </div>
+                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    shortlist.deadline < 30 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                  }`}>
+                    {shortlist.deadline}d left
+                  </div>
+                  {isExpanded ? <ChevronUp className="h-5 w-5 text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-400" />}
+                </div>
+
+                {/* Expanded Content */}
+                {isExpanded && (
+                  <div className="border-t border-gray-200">
+                    {/* Gates */}
+                    <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-6">
+                      <span className="text-xs font-semibold text-gray-500">GATES:</span>
+                      <GateCheckbox label="Scouting" checked={shortlist.gates.scouting} />
+                      <GateCheckbox label="Manager" checked={shortlist.gates.manager} />
+                      <GateCheckbox label="Budget" checked={shortlist.gates.budget} />
+                      <GateCheckbox label="Medical" checked={shortlist.gates.medical} />
+                    </div>
+
+                    {/* Two Column Layout */}
+                    <div className="grid grid-cols-3">
+                      {/* Plan A */}
+                      <div className="p-4 border-r border-gray-200 bg-gray-50/50">
+                        <div className="text-xs font-bold text-gray-500 mb-3 tracking-wider">PLAN A: RETAIN</div>
+                        
+                        {shortlist.planA ? (
+                          <div className="bg-white rounded-lg border border-gray-200 p-4">
+                            <div className="flex justify-between items-start mb-3">
+                              <div>
+                                <div className="font-semibold">{shortlist.planA.player}</div>
+                                <div className="text-sm text-gray-500">Age {shortlist.planA.age}</div>
+                              </div>
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(shortlist.planA.statusColor)}`}>
+                                {shortlist.planA.status}
+                              </span>
+                            </div>
+                            <div className="space-y-3">
+                              <div>
+                                <div className="text-xs text-gray-400 mb-1">BLOCKER</div>
+                                <div className="text-sm text-red-600">{shortlist.planA.issue}</div>
+                              </div>
+                              <div>
+                                <div className="text-xs text-gray-400 mb-1">NEXT ACTION</div>
+                                <div className="text-sm">{shortlist.planA.nextAction}</div>
+                              </div>
+                              <div>
+                                <div className="flex justify-between text-xs mb-1">
+                                  <span className="text-gray-400">CONFIDENCE</span>
+                                  <span className="font-semibold">{shortlist.planA.confidence}%</span>
+                                </div>
+                                <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                  <div
+                                    className={`h-full rounded-full ${
+                                      shortlist.planA.confidence > 60 ? 'bg-green-500' :
+                                      shortlist.planA.confidence > 30 ? 'bg-amber-500' : 'bg-red-500'
+                                    }`}
+                                    style={{ width: `${shortlist.planA.confidence}%` }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="bg-white rounded-lg border-2 border-dashed border-gray-200 p-6 text-center">
+                            <Users className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                            <div className="text-sm text-gray-500">No incumbent</div>
+                            <div className="text-xs text-gray-400">(New position need)</div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Plan B - Candidates */}
+                      <div className="p-4 col-span-2">
+                        <div className="flex justify-between items-center mb-3">
+                          <div className="text-xs font-bold text-gray-500 tracking-wider">
+                            CANDIDATES ({shortlist.planB.length})
+                          </div>
+                          <button className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
+                            <Plus className="h-3 w-3" />
+                            Add Player
+                          </button>
+                        </div>
+
+                        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                          <div className="grid grid-cols-8 gap-2 px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 border-b border-gray-200">
+                            <div>#</div>
+                            <div className="col-span-2">Player</div>
+                            <div>Rating</div>
+                            <div>Fee</div>
+                            <div>Pipeline</div>
+                            <div>Activity</div>
+                            <div>Actions</div>
+                          </div>
+                          {shortlist.planB.map((candidate, idx) => (
+                            <div
+                              key={candidate.id}
+                              className={`grid grid-cols-8 gap-2 px-4 py-3 items-center hover:bg-gray-50 ${
+                                idx < shortlist.planB.length - 1 ? 'border-b border-gray-100' : ''
+                              }`}
+                            >
+                              <div className="text-sm text-gray-400 font-medium">{idx + 1}</div>
+                              <div 
+                                className="col-span-2 cursor-pointer"
+                                onClick={() => { setSelectedPlayer(candidate); setActiveScreen('player-profile'); }}
+                              >
+                                <div className="font-medium hover:text-blue-600">{candidate.name}</div>
+                                <div className="text-xs text-gray-500">{candidate.club} • Age {candidate.age}</div>
+                              </div>
+                              <div><StarRating rating={candidate.rating} /></div>
+                              <div className="text-sm font-medium">{candidate.fee}</div>
+                              <div><PipelineIndicator stage={candidate.statusStage} /></div>
+                              <div className="text-xs text-gray-500">
+                                {getPlayerActivities(candidate.name).length} notes
+                              </div>
+                              <div className="flex gap-1">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); openPlayerTimeline(candidate.name, shortlist.id); }}
+                                  className="p-1.5 hover:bg-gray-200 rounded text-gray-500 hover:text-gray-700"
+                                  title="View Timeline"
+                                >
+                                  <Clock className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); openAddNoteForPlayer(candidate.name, shortlist.id); }}
+                                  className="p-1.5 hover:bg-gray-200 rounded text-gray-500 hover:text-gray-700"
+                                  title="Add Note"
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Activity Bar */}
+                    <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+                      <div className="flex gap-4 text-xs text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <CalendarDays className="h-3 w-3" />
+                          Last activity: {getShortlistLastActivity(shortlist)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MessageSquare className="h-3 w-3" />
+                          {getShortlistActivityCount(shortlist)} total activities
+                        </span>
+                      </div>
+                      <div className="flex gap-2">
+                        {shortlist.planA && (
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); openPlayerTimeline(shortlist.planA.player, shortlist.id); }}
+                            className="px-3 py-1.5 text-xs border border-gray-300 rounded-lg hover:bg-gray-100"
+                          >
+                            {shortlist.planA.player.split(' ')[1]} Timeline
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Deferred */}
+      <div>
+        <h2 className="text-lg font-semibold flex items-center gap-2 mb-4 text-gray-500">
+          <Pause className="h-4 w-4" />
+          Deferred to Future Windows
+        </h2>
+        <div className="flex gap-3">
+          {deferredShortlists.map((item) => (
+            <div key={item.id} className="bg-white rounded-xl border-2 border-dashed border-gray-200 px-4 py-3 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center font-bold text-sm text-gray-400">
+                {item.position}
+              </div>
+              <div>
+                <div className="font-medium text-gray-500">{item.title}</div>
+                <div className="text-xs text-gray-400">{item.reason}</div>
+              </div>
+              <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium">
+                {item.targetWindow}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  // Player Profile Screen
+  const renderPlayerProfileScreen = () => {
+    const player = selectedPlayer || {
+      name: 'Adam Wharton',
+      team: 'Crystal Palace',
+      position: 'CM',
+      age: 20,
+      value: '€45M',
+      contract: '2029',
+      nationality: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England',
+    };
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-6">
+              <div className="w-24 h-24 bg-gray-200 rounded-xl flex items-center justify-center text-2xl font-bold text-gray-500">
+                {player.name?.split(' ').map(n => n[0]).join('')}
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">{player.name}</h1>
+                <div className="text-gray-500">{player.team} • {player.position} • Age {player.age}</div>
+                <div className="flex gap-2 mt-2">
+                  <SourceBadge source="statsbomb" />
+                  <SourceBadge source="impect" />
+                  <SourceBadge source="scoutastic" />
+                </div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold">{player.value}</div>
+              <div className="text-sm text-gray-500">Contract: {player.contract || '2029'}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Activity className="h-4 w-4 text-blue-500" />
+              <span className="font-semibold text-sm">Performance</span>
+              <SourceBadge source="statsbomb" />
+            </div>
+            <div className="space-y-2">
+              {[
+                { label: 'Pass Accuracy', value: '91.2%' },
+                { label: 'Prog Passes/90', value: '8.4' },
+                { label: 'xG Assisted', value: '0.18' },
+                { label: 'Pressures/90', value: '15.7' },
+              ].map((stat) => (
+                <div key={stat.label} className="flex justify-between text-sm">
+                  <span className="text-gray-500">{stat.label}</span>
+                  <span className="font-medium">{stat.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <TrendingUp className="h-4 w-4 text-purple-500" />
+              <span className="font-semibold text-sm">Packing</span>
+              <SourceBadge source="impect" />
+            </div>
+            <div className="space-y-2">
+              {[
+                { label: 'Bypassed/90', value: '2.9' },
+                { label: 'Packing Value', value: '14.2' },
+                { label: 'Line Breaks', value: '1.8' },
+                { label: 'Space Creation', value: '3.4' },
+              ].map((stat) => (
+                <div key={stat.label} className="flex justify-between text-sm">
+                  <span className="text-gray-500">{stat.label}</span>
+                  <span className="font-medium">{stat.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Heart className="h-4 w-4 text-red-500" />
+              <span className="font-semibold text-sm">Medical</span>
+              <SourceBadge source="noisefeed" />
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Injury Risk</span>
+                <InjuryBadge risk="low" daysOut={0} />
+              </div>
+              {[
+                { label: 'Injuries (12m)', value: '0' },
+                { label: 'Days Missed', value: '0' },
+                { label: 'Availability', value: '100%' },
+              ].map((stat) => (
+                <div key={stat.label} className="flex justify-between text-sm">
+                  <span className="text-gray-500">{stat.label}</span>
+                  <span className="font-medium">{stat.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Scout Reports */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <ClipboardList className="h-4 w-4 text-green-500" />
+            <span className="font-semibold text-sm">Scout Reports</span>
+            <SourceBadge source="scoutastic" />
+            <span className="text-xs text-gray-400 ml-2">15 reports</span>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4">
+            <p className="text-sm text-gray-700 italic">
+              "Exceptional composure on the ball. Dictates tempo from deep positions. Strong progressive passing range. 
+              Would slot into our system immediately. Recommend priority pursuit."
+            </p>
+            <div className="mt-2 text-xs text-gray-400">— Senior Scout, Dec 2024</div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <button className="flex-1 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800">
+            Add to Shortlist
+          </button>
+          <button className="flex-1 py-3 border border-gray-200 rounded-xl font-medium hover:bg-gray-50">
+            Compare Players
+          </button>
+          <button className="flex-1 py-3 border border-gray-200 rounded-xl font-medium hover:bg-gray-50">
+            Share Profile
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // ============================================================================
+  // MAIN RENDER
+  // ============================================================================
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Create Shortlist Modal */}
+      <CreateShortlistModal />
+      
+      {/* Dismiss Modal */}
+      <DismissModal />
+
+      {/* Timeline Modal */}
+      <TimelineModal />
+
+      {/* Add Note Modal */}
+      <AddNoteModal />
+
+      {/* Sidebar */}
+      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
+        {/* Logo */}
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">M</span>
+            </div>
+            <div>
+              <div className="font-bold text-lg tracking-tight text-gray-900">MAGPIE II</div>
+              <div className="text-xs text-gray-500">Recruitment Platform</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-1">
+          {screens.map((screen) => (
+            <button
+              key={screen.id}
+              onClick={() => setActiveScreen(screen.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                activeScreen === screen.id 
+                  ? 'bg-slate-900 text-white' 
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <screen.icon className="h-5 w-5" />
+              <span className="font-medium">{screen.name}</span>
+              {screen.id === 'shortlists' && (
+                <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${activeScreen === screen.id ? 'bg-red-500 text-white' : 'bg-red-100 text-red-700'}`}>{criticalCount}</span>
+              )}
+              {screen.id === 'dashboard' && criticalIssues.length > 0 && (
+                <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${activeScreen === screen.id ? 'bg-red-500 text-white' : 'bg-red-100 text-red-700'}`}>{criticalIssues.length}</span>
+              )}
+            </button>
+          ))}
+        </nav>
+
+        {/* User */}
+        <div className="p-4 border-t border-gray-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
+              SN
+            </div>
+            <div>
+              <div className="text-sm font-medium text-gray-900">Steve Nickson</div>
+              <div className="text-xs text-gray-500">Head of Recruitment</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Top Bar */}
+        <header className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">
+                {screens.find(s => s.id === activeScreen)?.name}
+              </h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-gray-500">
+                Window: <span className="font-medium text-gray-900">{currentWindow.name}</span>
+                <span className="ml-2 text-blue-600">{currentWindow.daysRemaining}d left</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Content Area */}
+        <main className="flex-1 p-6 overflow-auto">
+          {activeScreen === 'dashboard' && renderDashboardScreen()}
+          {activeScreen === 'squad' && renderSquadScreen()}
+          {activeScreen === 'player-search' && renderPlayerSearchScreen()}
+          {activeScreen === 'shortlists' && renderShortlistsScreen()}
+          {activeScreen === 'player-profile' && renderPlayerProfileScreen()}
+        </main>
+      </div>
+
+      {/* AI Chat Panel */}
+      <aside className="w-80 bg-white border-l border-gray-200 flex flex-col">
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-amber-500" />
+            <span className="font-semibold">AI Assistant</span>
+          </div>
+        </div>
+        
+        <div className="flex-1 p-4 overflow-auto space-y-4">
+          {chatMessages.map((msg, i) => (
+            <div key={i} className={`${msg.role === 'user' ? 'text-right' : ''}`}>
+              <div className={`inline-block px-4 py-2 rounded-xl text-sm max-w-[90%] ${
+                msg.role === 'user' 
+                  ? 'bg-slate-900 text-white' 
+                  : 'bg-gray-100 text-gray-700'
+              }`}>
+                {msg.text}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="p-4 border-t border-gray-200">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleChat()}
+              placeholder="Ask about players..."
+              className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button 
+              onClick={handleChat}
+              className="p-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800"
+            >
+              <Send className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  );
+}

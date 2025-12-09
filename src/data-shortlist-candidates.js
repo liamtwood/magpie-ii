@@ -278,21 +278,30 @@ export const shortlistCandidates = {
 };
 
 export const playerActivities = {
+  "kieran-trippier": [
+    { id: 1, type: "phone_call", date: "2024-12-05", user: "Steve Nickson", title: "Call with Trippier's agent", content: "Discussed wage expectations. Agent pushing for £95K/wk, we offered £75K. Will reconvene next week." },
+    { id: 2, type: "discussion", date: "2024-12-01", user: "Eddie Howe", title: "Manager review meeting", content: "Eddie confirmed Trippier remains first choice if wages align. Values his leadership and experience." },
+    { id: 3, type: "status_change", date: "2024-11-25", user: "System", title: "Added to shortlist", content: "RB Cover shortlist initiated due to contract situation." },
+  ],
   "tiago-santos": [
-    { id: 1, type: "scout_visit", date: "2024-12-03", user: "Mark Thompson", title: "Live scouting vs PSG", content: "Excellent defensive positioning. Won 4/5 aerial duels. Recommend progressing." },
-    { id: 2, type: "phone_call", date: "2024-12-06", user: "Steve Nickson", title: "Agent call", content: "Player interested in PL. Lille want 15M." },
+    { id: 1, type: "scout_visit", date: "2024-12-03", user: "Mark Thompson", title: "Live scouting: Santos vs PSG", content: "Excellent defensive positioning. Won 4/5 aerial duels. Composed on the ball. Looks ready for PL intensity. Recommend progressing to club contact." },
+    { id: 2, type: "video_review", date: "2024-11-20", user: "Analysis Team", title: "Video analysis: 5 match review", content: "Reviewed matches vs PSG, Lyon, Marseille, Monaco, Lens. Consistently strong. Progressive passing improving. Weakness: occasional lapses in concentration." },
+    { id: 3, type: "phone_call", date: "2024-12-06", user: "Steve Nickson", title: "Call with agent (Jorge Mendes)", content: "Agent confirmed player interested in PL move. Lille want £15M but may accept £12M + add-ons. Player on £35K/wk, expects £55K minimum." },
   ],
   "marc-guehi": [
-    { id: 1, type: "scout_visit", date: "2024-12-06", user: "Mark Thompson", title: "Guehi vs Brighton", content: "Dominant performance. Leadership evident." },
-    { id: 2, type: "phone_call", date: "2024-12-04", user: "Steve Nickson", title: "Palace DoF call", content: "Starting price 65M but flexible." },
-    { id: 3, type: "meeting", date: "2024-11-28", user: "Dan Ashworth", title: "Transfer committee", content: "Approved as primary CB target. Budget allocated." },
+    { id: 1, type: "scout_visit", date: "2024-12-06", user: "Mark Thompson", title: "Live scouting: Guéhi vs Brighton", content: "Dominant performance. Comfortable on ball, excellent reading of game. Leadership qualities evident. £65M looks justified for this quality." },
+    { id: 2, type: "phone_call", date: "2024-12-04", user: "Steve Nickson", title: "Call with Crystal Palace DoF", content: "Palace willing to negotiate but starting price is £65M. Hinted flexibility if we move quickly before January window opens." },
+    { id: 3, type: "video_review", date: "2024-11-25", user: "Analysis Team", title: "Video analysis: 10 match compilation", content: "Ball-playing CB with excellent range. Aerial presence strong. Recovery pace adequate. Would slot into our system immediately." },
+    { id: 4, type: "meeting", date: "2024-12-02", user: "Eddie Howe", title: "Transfer committee meeting", content: "Committee agreed Guéhi is top target for CB. Approved budget up to £70M if needed. Medical team to prepare due diligence." },
   ],
   "adam-wharton": [
-    { id: 1, type: "scout_visit", date: "2024-12-01", user: "Mark Thompson", title: "Wharton vs Man City", content: "Outstanding. Dictated tempo against elite opposition." },
-    { id: 2, type: "video_review", date: "2024-11-25", user: "Analysis Team", title: "Season analysis", content: "Excellent progressive passing. Needs to improve defensive positioning." },
+    { id: 1, type: "scout_visit", date: "2024-12-01", user: "Mark Thompson", title: "Live scouting: Wharton vs Man City", content: "Outstanding. Dictated tempo against elite opposition. 15.7 pressures, 91% pass accuracy. The real deal." },
+    { id: 2, type: "video_review", date: "2024-11-28", user: "Analysis Team", title: "Full season review", content: "20 years old, already looking like complete midfielder. Composure beyond his years. Would be perfect Bruno backup/partner." },
+    { id: 3, type: "phone_call", date: "2024-12-05", user: "Steve Nickson", title: "Initial contact with Palace", content: "Palace not keen to sell but acknowledged interest. Would need £45M+ and likely only in summer. Worth monitoring." },
   ],
   "malo-gusto": [
     { id: 1, type: "discussion", date: "2024-11-20", user: "Steve Nickson", title: "Initial assessment", content: "Chelsea unlikely to sell. Monitoring only." },
+    { id: 2, type: "video_review", date: "2024-11-28", user: "Analysis Team", title: "Video analysis: Gusto (Chelsea)", content: "Reviewed 5 matches. Strong going forward, excellent crossing. Positioning concerns in defensive third - gets caught upfield. Needs more review." },
   ],
   "devyne-rensch": [
     { id: 1, type: "scout_visit", date: "2024-11-15", user: "Mark Thompson", title: "Ajax vs PSV", content: "Solid performance. Good value option." },
@@ -300,6 +309,23 @@ export const playerActivities = {
   ],
   "goncalo-inacio": [
     { id: 1, type: "scout_visit", date: "2024-11-10", user: "Mark Thompson", title: "Sporting vs Benfica", content: "Excellent on the ball. Good in the air. Left-footed - rare." },
-    { id: 2, type: "discussion", date: "2024-11-18", user: "Dan Ashworth", title: "Alternative to Guehi", content: "Good Plan B if Guehi deal falls through." },
+    { id: 2, type: "discussion", date: "2024-11-18", user: "Dan Ashworth", title: "Alternative to Guéhi", content: "Good Plan B if Guéhi deal falls through." },
+    { id: 3, type: "video_review", date: "2024-12-02", user: "Analysis Team", title: "Video analysis: Lukeba (Leipzig)", content: "Excellent ball-playing CB. Quick, agile, reads game well. Some concerns about physicality against PL strikers. Worth pursuing as backup option." },
+  ],
+  "sean-longstaff": [
+    { id: 1, type: "discussion", date: "2024-12-04", user: "Eddie Howe", title: "Discussion with Sean", content: "Sean confirmed he's happy at the club but flattered by Saudi interest. Family settled in Newcastle. Will reassess in January if offer increases." },
+    { id: 2, type: "status_change", date: "2024-12-01", user: "System", title: "Added to monitoring", content: "CM Depth monitoring initiated due to Saudi interest." },
+  ],
+  "bruno-guimaraes": [
+    { id: 1, type: "discussion", date: "2024-12-03", user: "Eddie Howe", title: "Captain meeting", content: "Bruno reaffirmed commitment to club. Happy in Newcastle but aware of release clause interest." },
+    { id: 2, type: "meeting", date: "2024-11-28", user: "Dan Ashworth", title: "Contract discussions", content: "Discussed potential new contract to remove release clause. Bruno open but wants assurances on squad investment." },
+  ],
+  "anthony-gordon": [
+    { id: 1, type: "discussion", date: "2024-12-02", user: "Steve Nickson", title: "Liverpool interest update", content: "Liverpool still keen. Part of PSR discussions - may need to consider selling if finances require." },
+    { id: 2, type: "meeting", date: "2024-11-30", user: "Dan Ashworth", title: "PSR planning meeting", content: "Gordon identified as potential sale if PSR compliance needed. Value estimated at £70-80M." },
+  ],
+  "sven-botman": [
+    { id: 1, type: "status_change", date: "2024-11-15", user: "System", title: "ACL injury confirmed", content: "Sven Botman confirmed out for 6 months following ACL surgery. CB cover now critical." },
+    { id: 2, type: "meeting", date: "2024-11-16", user: "Dan Ashworth", title: "Emergency CB planning", content: "Transfer committee convened to discuss CB cover options. Guéhi identified as top target." },
   ],
 };
