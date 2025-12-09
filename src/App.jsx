@@ -82,6 +82,55 @@ const GateCheckbox = ({ label, checked }) => (
   </div>
 );
 
+// Player avatar images - add image URLs here for players
+const playerAvatars = {
+  'Kieran Trippier': null,
+  'Fabian Schär': null,
+  'Nick Pope': null,
+  'Sean Longstaff': null,
+  'Tiago Santos': null,
+  'Vanderson': null,
+  'Alex Fresneda': null,
+  'Sander Berge': null,
+  'Adam Wharton': null,
+  'Marc Guéhi': null,
+  'Castello Lukeba': null,
+};
+
+// Player avatar component with image support and initials fallback
+const PlayerAvatar = ({ name, size = 'md', className = '' }) => {
+  const imageUrl = playerAvatars[name];
+  const initials = name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
+  
+  const sizeClasses = {
+    sm: 'w-8 h-8 text-xs',
+    md: 'w-10 h-10 text-sm',
+    lg: 'w-14 h-14 text-lg',
+    xl: 'w-20 h-20 text-2xl',
+  };
+
+  if (imageUrl) {
+    return (
+      <img
+        src={imageUrl}
+        alt={name}
+        className={`${sizeClasses[size]} rounded-full object-cover ${className}`}
+      />
+    );
+  }
+
+  return (
+    <div className={`${sizeClasses[size]} rounded-full bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center font-semibold ${className}`}>
+      {initials}
+    </div>
+  );
+};
+
 export default function MagpieV2() {
   const [activeScreen, setActiveScreen] = useState('dashboard');
   const [expandedShortlist, setExpandedShortlist] = useState('trippier');
@@ -1062,9 +1111,7 @@ export default function MagpieV2() {
       return (
         <div className={`bg-white rounded-xl border-l-4 ${severityConfig.border} border border-gray-200 p-4 hover:shadow-md transition-shadow`}>
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500 flex-shrink-0">
-              {issue.player.name.split(' ').map(n => n[0]).join('')}
-            </div>
+            <PlayerAvatar name={issue.player.name} size="lg" className="flex-shrink-0" />
             
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-4">
@@ -1573,11 +1620,14 @@ export default function MagpieV2() {
                             >
                               <div className="text-sm text-gray-400 font-medium">{idx + 1}</div>
                               <div 
-                                className="col-span-2 cursor-pointer"
+                                className="col-span-2 cursor-pointer flex items-center gap-2"
                                 onClick={() => { setSelectedPlayer(candidate); setActiveScreen('player-profile'); }}
                               >
-                                <div className="font-medium hover:text-blue-600">{candidate.name}</div>
-                                <div className="text-xs text-gray-500">{candidate.club} • Age {candidate.age}</div>
+                                <PlayerAvatar name={candidate.name} size="sm" />
+                                <div>
+                                  <div className="font-medium hover:text-blue-600">{candidate.name}</div>
+                                  <div className="text-xs text-gray-500">{candidate.club} • Age {candidate.age}</div>
+                                </div>
                               </div>
                               <div><StarRating rating={candidate.rating} /></div>
                               <div className="text-sm font-medium">{candidate.fee}</div>
@@ -2070,9 +2120,11 @@ export default function MagpieV2() {
                                 </button>
                               </div>
                               
-                              <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold">
+                              <div className="w-7 h-7 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold">
                                 {idx + 1}
                               </div>
+                              
+                              <PlayerAvatar name={candidate.name} size="md" />
                               
                               <div className="flex-1">
                                 <div className="flex items-center gap-2">
