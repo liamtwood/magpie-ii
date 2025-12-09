@@ -73,8 +73,14 @@ The application follows a client-side only architecture with no backend:
 
 ### 7. Navigation & UI
 - **Light Theme Sidebar**: Clean navigation with badge counts
-- **Multiple Screens**: Dashboard, Squad, Shortlists, Player Profile views
+- **Multiple Screens**: Dashboard, Squad, Shortlists views
+- **Slide-out Panels**: Player profiles and shortlist details open as right-side panels
 - **Responsive Design**: Optimized for desktop recruitment workflow
+
+### 8. Player Avatars
+- **Real Headshots**: Player photos displayed throughout the app
+- **Initials Fallback**: Gradient circles with initials for players without photos
+- **Easy to Add**: Update `playerAvatars` object in App.jsx to add new player photos
 
 ## External Dependencies
 
