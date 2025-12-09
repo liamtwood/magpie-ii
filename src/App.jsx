@@ -1635,7 +1635,7 @@ export default function MagpieV2() {
                               <div className="text-sm text-gray-400 font-medium">{idx + 1}</div>
                               <div 
                                 className="col-span-2 cursor-pointer flex items-center gap-2"
-                                onClick={() => { setSelectedPlayer(candidate); setActiveScreen('player-profile'); }}
+                                onClick={() => setOpenPlayerPanel(candidate)}
                               >
                                 <PlayerAvatar name={candidate.name} size="sm" />
                                 <div>
@@ -2168,7 +2168,7 @@ export default function MagpieV2() {
                                   <Clock className="h-4 w-4" />
                                 </button>
                                 <button
-                                  onClick={() => { setSelectedPlayer(candidate); setActiveScreen('player-profile'); setOpenShortlistPanel(null); }}
+                                  onClick={() => { setOpenPlayerPanel(candidate); setOpenShortlistPanel(null); }}
                                   className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-gray-700"
                                   title="View Profile"
                                 >
