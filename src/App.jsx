@@ -1746,6 +1746,15 @@ export default function MagpieV2() {
     valueMax: 150,
     contractMin: 6,
     contractMax: 60,
+    ovrMin: 0,
+    disMin: 0,
+    proMin: 0,
+    fcMin: 0,
+    phyInMin: 0,
+    phyOutMin: 0,
+    phyMin: 0,
+    defMin: 0,
+    preMin: 0,
   });
   const [searchSort, setSearchSort] = useState({ field: 'overall', direction: 'desc' });
 
@@ -1789,7 +1798,7 @@ export default function MagpieV2() {
     };
     return (
       <span className={`px-2 py-0.5 rounded border text-xs font-medium ${colors[tier] || colors[3]}`}>
-        Tier {tier}
+        {tier}
       </span>
     );
   };
@@ -1893,6 +1902,111 @@ export default function MagpieV2() {
               onChange={(e) => setSearchFilters({...searchFilters, contractMax: parseInt(e.target.value)})}
               className="w-16 px-2 py-1 border border-gray-200 rounded text-sm"
             />
+          </div>
+        </div>
+
+        <div className="pt-2 border-t border-gray-200">
+          <label className="block text-xs font-semibold text-gray-500 mb-2">Minimum Metrics</label>
+          
+          <div className="space-y-2">
+            <div>
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>OVR</span>
+                <span>{searchFilters.ovrMin.toFixed(1)}</span>
+              </div>
+              <input type="range" min="0" max="10" step="0.5" value={searchFilters.ovrMin}
+                onChange={(e) => setSearchFilters({...searchFilters, ovrMin: parseFloat(e.target.value)})}
+                className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-gray-200"
+              />
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>DIS</span>
+                <span>{searchFilters.disMin.toFixed(1)}</span>
+              </div>
+              <input type="range" min="0" max="10" step="0.5" value={searchFilters.disMin}
+                onChange={(e) => setSearchFilters({...searchFilters, disMin: parseFloat(e.target.value)})}
+                className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-gray-200"
+              />
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>PRO</span>
+                <span>{searchFilters.proMin.toFixed(1)}</span>
+              </div>
+              <input type="range" min="0" max="10" step="0.5" value={searchFilters.proMin}
+                onChange={(e) => setSearchFilters({...searchFilters, proMin: parseFloat(e.target.value)})}
+                className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-gray-200"
+              />
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>F&C</span>
+                <span>{searchFilters.fcMin.toFixed(1)}</span>
+              </div>
+              <input type="range" min="0" max="10" step="0.5" value={searchFilters.fcMin}
+                onChange={(e) => setSearchFilters({...searchFilters, fcMin: parseFloat(e.target.value)})}
+                className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-gray-200"
+              />
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>PHY(I)</span>
+                <span>{searchFilters.phyInMin.toFixed(1)}</span>
+              </div>
+              <input type="range" min="0" max="10" step="0.5" value={searchFilters.phyInMin}
+                onChange={(e) => setSearchFilters({...searchFilters, phyInMin: parseFloat(e.target.value)})}
+                className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-gray-200"
+              />
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>PHY(O)</span>
+                <span>{searchFilters.phyOutMin.toFixed(1)}</span>
+              </div>
+              <input type="range" min="0" max="10" step="0.5" value={searchFilters.phyOutMin}
+                onChange={(e) => setSearchFilters({...searchFilters, phyOutMin: parseFloat(e.target.value)})}
+                className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-gray-200"
+              />
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>PHY</span>
+                <span>{searchFilters.phyMin.toFixed(1)}</span>
+              </div>
+              <input type="range" min="0" max="10" step="0.5" value={searchFilters.phyMin}
+                onChange={(e) => setSearchFilters({...searchFilters, phyMin: parseFloat(e.target.value)})}
+                className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-gray-200"
+              />
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>DEF</span>
+                <span>{searchFilters.defMin.toFixed(1)}</span>
+              </div>
+              <input type="range" min="0" max="10" step="0.5" value={searchFilters.defMin}
+                onChange={(e) => setSearchFilters({...searchFilters, defMin: parseFloat(e.target.value)})}
+                className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-gray-200"
+              />
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>PRE</span>
+                <span>{searchFilters.preMin.toFixed(1)}</span>
+              </div>
+              <input type="range" min="0" max="10" step="0.5" value={searchFilters.preMin}
+                onChange={(e) => setSearchFilters({...searchFilters, preMin: parseFloat(e.target.value)})}
+                className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-gray-200"
+              />
+            </div>
           </div>
         </div>
 
