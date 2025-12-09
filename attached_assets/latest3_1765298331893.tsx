@@ -7,6 +7,11 @@ import {
   Send, X, MoreHorizontal, Filter, ArrowUpDown, Phone, Eye
 } from 'lucide-react';
 
+// ============================================================================
+// MAGPIE II - Newcastle United Recruitment Platform
+// Updated with Shortlist CRM functionality
+// ============================================================================
+
 // Data source badge component
 const SourceBadge = ({ source }) => {
   const sources = {
@@ -81,6 +86,10 @@ const GateCheckbox = ({ label, checked }) => (
   </div>
 );
 
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
 export default function MagpieV2() {
   const [activeScreen, setActiveScreen] = useState('dashboard');
   const [expandedShortlist, setExpandedShortlist] = useState('trippier');
@@ -96,34 +105,41 @@ export default function MagpieV2() {
   const [activeShortlistId, setActiveShortlistId] = useState(null);
   const [activePlayerId, setActivePlayerId] = useState(null);
   const [playerActivities, setPlayerActivities] = useState({
+    // Trippier (current squad - Plan A)
     'kieran-trippier': [
       { id: 1, type: 'phone_call', date: '2024-12-05', user: 'Steve Nickson', title: 'Call with Trippier\'s agent', content: 'Discussed wage expectations. Agent pushing for £95K/wk, we offered £75K. Will reconvene next week.' },
       { id: 2, type: 'discussion', date: '2024-12-01', user: 'Eddie Howe', title: 'Manager review meeting', content: 'Eddie confirmed Trippier remains first choice if wages align. Values his leadership and experience.' },
       { id: 3, type: 'status_change', date: '2024-11-25', user: 'System', title: 'Added to shortlist', content: 'RB Cover shortlist initiated due to contract situation.' },
     ],
+    // Tiago Santos (candidate)
     'tiago-santos': [
       { id: 1, type: 'scout_visit', date: '2024-12-03', user: 'Mark Thompson', title: 'Live scouting: Santos vs PSG', content: 'Excellent defensive positioning. Won 4/5 aerial duels. Composed on the ball. Looks ready for PL intensity. Recommend progressing to club contact.' },
       { id: 2, type: 'video_review', date: '2024-11-20', user: 'Analysis Team', title: 'Video analysis: 5 match review', content: 'Reviewed matches vs PSG, Lyon, Marseille, Monaco, Lens. Consistently strong. Progressive passing improving. Weakness: occasional lapses in concentration.' },
       { id: 3, type: 'phone_call', date: '2024-12-06', user: 'Steve Nickson', title: 'Call with agent (Jorge Mendes)', content: 'Agent confirmed player interested in PL move. Lille want £15M but may accept £12M + add-ons. Player on £35K/wk, expects £55K minimum.' },
     ],
+    // Vanderson (candidate)
     'vanderson': [
       { id: 1, type: 'video_review', date: '2024-11-28', user: 'Analysis Team', title: 'Video analysis: Vanderson (Monaco)', content: 'Reviewed 5 matches. Strong going forward, excellent crossing. Positioning concerns in defensive third - gets caught upfield. Needs more review.' },
       { id: 2, type: 'discussion', date: '2024-11-30', user: 'Eddie Howe', title: 'Manager feedback', content: 'Eddie has concerns about defensive discipline. Wants to see more before progressing. Prefer Santos at this stage.' },
     ],
+    // Marc Guéhi (candidate)
     'marc-guehi': [
       { id: 1, type: 'scout_visit', date: '2024-12-06', user: 'Mark Thompson', title: 'Live scouting: Guéhi vs Brighton', content: 'Dominant performance. Comfortable on ball, excellent reading of game. Leadership qualities evident. £65M looks justified for this quality.' },
       { id: 2, type: 'phone_call', date: '2024-12-04', user: 'Steve Nickson', title: 'Call with Crystal Palace DoF', content: 'Palace willing to negotiate but starting price is £65M. Hinted flexibility if we move quickly before January window opens.' },
       { id: 3, type: 'video_review', date: '2024-11-25', user: 'Analysis Team', title: 'Video analysis: 10 match compilation', content: 'Ball-playing CB with excellent range. Aerial presence strong. Recovery pace adequate. Would slot into our system immediately.' },
       { id: 4, type: 'meeting', date: '2024-12-02', user: 'Eddie Howe', title: 'Transfer committee meeting', content: 'Committee agreed Guéhi is top target for CB. Approved budget up to £70M if needed. Medical team to prepare due diligence.' },
     ],
+    // Castello Lukeba (candidate)
     'castello-lukeba': [
       { id: 1, type: 'video_review', date: '2024-12-02', user: 'Analysis Team', title: 'Video analysis: Lukeba (Leipzig)', content: 'Excellent ball-playing CB. Quick, agile, reads game well. Some concerns about physicality against PL strikers. Worth pursuing as backup option.' },
       { id: 2, type: 'scout_visit', date: '2024-11-15', user: 'John Bailey', title: 'Live scouting: Leipzig vs Dortmund', content: 'Impressive on the ball but struggled against Füllkrug physically. Young and developing. Potential but not ready as starter.' },
     ],
+    // Sean Longstaff (current squad - Plan A)
     'sean-longstaff': [
       { id: 1, type: 'discussion', date: '2024-12-04', user: 'Eddie Howe', title: 'Discussion with Sean', content: 'Sean confirmed he\'s happy at the club but flattered by Saudi interest. Family settled in Newcastle. Will reassess in January if offer increases.' },
       { id: 2, type: 'status_change', date: '2024-12-01', user: 'System', title: 'Added to shortlist', content: 'CM Depth shortlist initiated due to Saudi interest.' },
     ],
+    // Adam Wharton (candidate)
     'adam-wharton': [
       { id: 1, type: 'scout_visit', date: '2024-12-01', user: 'Mark Thompson', title: 'Live scouting: Wharton vs Man City', content: 'Outstanding. Dictated tempo against elite opposition. 15.7 pressures, 91% pass accuracy. The real deal.' },
       { id: 2, type: 'video_review', date: '2024-11-28', user: 'Analysis Team', title: 'Full season review', content: '20 years old, already looking like complete midfielder. Composure beyond his years. Would be perfect Bruno backup/partner.' },
@@ -135,6 +151,7 @@ export default function MagpieV2() {
   ]);
   const [chatInput, setChatInput] = useState('');
 
+  // Navigation screens
   const screens = [
     { id: 'dashboard', name: 'Dashboard', icon: Activity },
     { id: 'squad', name: 'Squad', icon: Users },
@@ -143,6 +160,7 @@ export default function MagpieV2() {
     { id: 'player-profile', name: 'Player Profile', icon: User },
   ];
 
+  // Transfer window data
   const currentWindow = {
     name: 'Summer 2025',
     start: 'Jun 10',
@@ -150,6 +168,7 @@ export default function MagpieV2() {
     daysRemaining: 85,
   };
 
+  // Current squad data
   const squad = [
     { id: 1, name: 'Nick Pope', position: 'GK', age: 32, contract: '2028', value: '€30M', injury: { risk: 'medium', daysOut: 45 }, flag: null, minutes: 2340 },
     { id: 2, name: 'Kieran Trippier', position: 'RB', age: 34, contract: '2026', value: '€12M', injury: { risk: 'high', daysOut: 67 }, flag: '⚠️ Contract', minutes: 1890 },
@@ -163,14 +182,17 @@ export default function MagpieV2() {
     { id: 10, name: 'Anthony Gordon', position: 'LW', age: 23, contract: '2029', value: '€75M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 2580 },
   ];
 
+  // Parse value string to number
   const parseValue = (valueStr) => {
     const num = parseFloat(valueStr.replace(/[€£M]/g, ''));
     return num * 1000000;
   };
 
+  // Parse contract year
   const getContractYear = (contract) => parseInt(contract) || 2030;
   const currentYear = 2025;
 
+  // Intelligent shortlist inference
   const inferShortlistReason = (player) => {
     const contractYear = getContractYear(player.contract);
     const yearsLeft = contractYear - currentYear;
@@ -215,6 +237,7 @@ export default function MagpieV2() {
     return { trigger, severity, reasoning };
   };
 
+  // Create shortlist from squad player
   const handleCreateShortlist = (player) => {
     const inference = inferShortlistReason(player);
     
@@ -230,6 +253,7 @@ export default function MagpieV2() {
     setShowCreateModal(true);
   };
 
+  // Shortlists data (the new CRM model)
   const shortlists = [
     {
       id: 'trippier',
@@ -302,6 +326,7 @@ export default function MagpieV2() {
     { id: 'lw', position: 'LW', title: 'LW Upgrade', reason: 'Market overheated - revisit January', targetWindow: 'January 2026' },
   ];
 
+  // Player search targets
   const searchTargets = [
     { id: 101, name: 'Adam Wharton', team: 'Crystal Palace', position: 'CM', age: 20, value: '€45M', rating: 4, sources: ['statsbomb', 'impect', 'scoutastic'] },
     { id: 102, name: 'João Neves', team: 'PSG', position: 'CM', age: 20, value: '€80M', rating: 4.5, sources: ['statsbomb', 'secondspectrum', 'noisefeed'] },
@@ -310,6 +335,7 @@ export default function MagpieV2() {
     { id: 105, name: 'Malo Gusto', team: 'Chelsea', position: 'RB', age: 21, value: '€35M', rating: 3.5, sources: ['statsbomb', 'impect'] },
   ];
 
+  // Helper functions
   const getSeverityConfig = (severity) => {
     const configs = {
       critical: { bg: 'bg-red-50', border: 'border-red-500', text: 'text-red-700', dot: 'bg-red-500' },
@@ -338,6 +364,7 @@ export default function MagpieV2() {
   const totalCandidates = shortlists.reduce((sum, s) => sum + s.planB.length, 0);
   const criticalCount = shortlists.filter(s => s.severity === 'critical').length;
 
+  // Generate squad issues automatically
   const generateSquadIssues = () => {
     const issues = [];
     
@@ -352,6 +379,7 @@ export default function MagpieV2() {
       const isKeyPlayer = player.flag?.includes('Key');
       const lowMinutes = player.minutes < 1000;
 
+      // Check if already has active shortlist
       const hasActiveShortlist = shortlists.some(s => 
         s.title.toLowerCase().includes(player.name.toLowerCase()) ||
         s.planA?.player === player.name
@@ -452,6 +480,7 @@ export default function MagpieV2() {
       }
     });
 
+    // Sort by score descending
     return issues.sort((a, b) => b.score - a.score);
   };
 
@@ -461,6 +490,7 @@ export default function MagpieV2() {
   const moderateIssues = activeIssues.filter(i => i.severity === 'moderate');
   const lowIssues = activeIssues.filter(i => i.severity === 'low');
 
+  // Handle dismiss
   const handleDismiss = (issue) => {
     setDismissingIssue(issue);
     setShowDismissModal(true);
@@ -476,6 +506,7 @@ export default function MagpieV2() {
     setDismissingIssue(null);
   };
 
+  // Activity type config
   const activityTypes = {
     discussion: { label: 'Discussion', icon: MessageSquare, color: 'blue' },
     phone_call: { label: 'Phone Call', icon: Phone, color: 'green' },
@@ -486,13 +517,16 @@ export default function MagpieV2() {
     email: { label: 'Email', icon: Send, color: 'pink' },
   };
 
+  // Generate player ID from name
   const getPlayerId = (name) => name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z-]/g, '');
 
+  // Get activities for a player
   const getPlayerActivities = (playerName) => {
     const playerId = getPlayerId(playerName);
     return playerActivities[playerId] || [];
   };
 
+  // Get total activities for a shortlist (all candidates + plan A)
   const getShortlistActivityCount = (shortlist) => {
     let count = 0;
     if (shortlist.planA) {
@@ -504,6 +538,7 @@ export default function MagpieV2() {
     return count;
   };
 
+  // Get latest activity date for a shortlist
   const getShortlistLastActivity = (shortlist) => {
     let latestDate = null;
     const checkPlayer = (name) => {
@@ -517,6 +552,7 @@ export default function MagpieV2() {
     return latestDate || 'Never';
   };
 
+  // Open player timeline
   const openPlayerTimeline = (playerName, shortlistId = null) => {
     setActivePlayerId(getPlayerId(playerName));
     setActiveShortlistId(shortlistId);
@@ -524,6 +560,7 @@ export default function MagpieV2() {
     setShowTimelineModal(true);
   };
 
+  // Open add note for player
   const openAddNoteForPlayer = (playerName, shortlistId = null) => {
     setActivePlayerId(getPlayerId(playerName));
     setActiveShortlistId(shortlistId);
@@ -531,6 +568,7 @@ export default function MagpieV2() {
     setShowAddNoteModal(true);
   };
 
+  // Timeline Modal - Now player-centric
   const TimelineModal = () => {
     if (!showTimelineModal || !activePlayerId) return null;
     
@@ -564,6 +602,7 @@ export default function MagpieV2() {
               </div>
             ) : (
               <div className="relative">
+                {/* Timeline line */}
                 <div className="absolute left-5 top-2 bottom-2 w-0.5 bg-gray-200" />
                 
                 <div className="space-y-6">
@@ -573,6 +612,7 @@ export default function MagpieV2() {
                     
                     return (
                       <div key={activity.id} className="relative flex gap-4">
+                        {/* Icon */}
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 z-10 border-2 border-white ${
                           typeConfig.color === 'blue' ? 'bg-blue-100' :
                           typeConfig.color === 'green' ? 'bg-green-100' :
@@ -591,6 +631,7 @@ export default function MagpieV2() {
                           }`} />
                         </div>
                         
+                        {/* Content */}
                         <div className="flex-1 bg-gray-50 rounded-xl p-4">
                           <div className="flex items-start justify-between gap-4">
                             <div>
@@ -636,6 +677,7 @@ export default function MagpieV2() {
     );
   };
 
+  // Add Note Modal - Now player-centric
   const AddNoteModal = () => {
     const [noteType, setNoteType] = useState('discussion');
     const [noteTitle, setNoteTitle] = useState('');
@@ -687,6 +729,7 @@ export default function MagpieV2() {
           </div>
 
           <div className="p-6 space-y-5">
+            {/* Activity Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Activity Type</label>
               <div className="grid grid-cols-3 gap-2">
@@ -710,6 +753,7 @@ export default function MagpieV2() {
               </div>
             </div>
 
+            {/* Date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
               <input
@@ -720,6 +764,7 @@ export default function MagpieV2() {
               />
             </div>
 
+            {/* Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
               <input
@@ -737,6 +782,7 @@ export default function MagpieV2() {
               />
             </div>
 
+            {/* Content */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
               <textarea
@@ -749,6 +795,7 @@ export default function MagpieV2() {
             </div>
           </div>
 
+          {/* Actions */}
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-3">
             <button 
               onClick={() => setShowAddNoteModal(false)}
@@ -769,6 +816,7 @@ export default function MagpieV2() {
     );
   };
 
+  // Dismiss Modal Component
   const DismissModal = () => {
     const [note, setNote] = useState('');
     const [action, setAction] = useState('resolve');
@@ -787,6 +835,7 @@ export default function MagpieV2() {
           </div>
 
           <div className="p-6 space-y-5">
+            {/* Issue Summary */}
             <div className="bg-gray-50 rounded-xl p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500 text-sm">
@@ -799,6 +848,7 @@ export default function MagpieV2() {
               </div>
             </div>
 
+            {/* Action Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">What would you like to do?</label>
               <div className="flex gap-3">
@@ -823,6 +873,7 @@ export default function MagpieV2() {
               </div>
             </div>
 
+            {/* Snooze Until */}
             {action === 'snooze' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Revisit when?</label>
@@ -839,6 +890,7 @@ export default function MagpieV2() {
               </div>
             )}
 
+            {/* Notes */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {action === 'resolve' ? 'Why is this resolved?' : 'Notes for later'}
@@ -856,6 +908,7 @@ export default function MagpieV2() {
             </div>
           </div>
 
+          {/* Actions */}
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-3">
             <button 
               onClick={() => setShowDismissModal(false)}
@@ -877,6 +930,7 @@ export default function MagpieV2() {
     );
   };
 
+  // Create Shortlist Modal
   const CreateShortlistModal = () => {
     if (!showCreateModal || !newShortlistData) return null;
     
@@ -891,6 +945,7 @@ export default function MagpieV2() {
           </div>
           
           <div className="p-6 space-y-5">
+            {/* Player Being Replaced */}
             <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-4">
               <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500">
                 {newShortlistData.player.name.split(' ').map(n => n[0]).join('')}
@@ -906,6 +961,7 @@ export default function MagpieV2() {
               </div>
             </div>
 
+            {/* AI Inference Box */}
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -935,12 +991,14 @@ export default function MagpieV2() {
               </div>
             </div>
 
+            {/* Editable Section Header */}
             <div className="flex items-center gap-2 pt-2">
               <div className="h-px flex-1 bg-gray-200" />
               <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">Adjust if needed</span>
               <div className="h-px flex-1 bg-gray-200" />
             </div>
 
+            {/* Shortlist Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Shortlist Title</label>
               <input
@@ -951,6 +1009,7 @@ export default function MagpieV2() {
               />
             </div>
 
+            {/* Trigger */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Trigger / Reason</label>
               <select 
@@ -967,6 +1026,7 @@ export default function MagpieV2() {
               </select>
             </div>
 
+            {/* Priority */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
               <div className="flex gap-3">
@@ -986,6 +1046,7 @@ export default function MagpieV2() {
               </div>
             </div>
 
+            {/* Budget */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Transfer Budget</label>
@@ -1020,6 +1081,7 @@ export default function MagpieV2() {
             </div>
           </div>
 
+          {/* Actions */}
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-3">
             <button 
               onClick={() => setShowCreateModal(false)}
@@ -1031,6 +1093,7 @@ export default function MagpieV2() {
               onClick={() => {
                 setShowCreateModal(false);
                 setActiveScreen('shortlists');
+                // In a real app, this would add to the shortlists array
               }}
               className="flex-1 py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800"
             >
@@ -1042,6 +1105,7 @@ export default function MagpieV2() {
     );
   };
 
+  // Chat handler
   const handleChat = () => {
     if (!chatInput.trim()) return;
     setChatMessages([
@@ -1052,6 +1116,11 @@ export default function MagpieV2() {
     setChatInput('');
   };
 
+  // ============================================================================
+  // RENDER SCREENS
+  // ============================================================================
+
+  // Dashboard Screen - Proactive Issue Detection
   const renderDashboardScreen = () => {
     const IssueCard = ({ issue }) => {
       const severityConfig = getSeverityConfig(issue.severity);
@@ -1059,10 +1128,12 @@ export default function MagpieV2() {
       return (
         <div className={`bg-white rounded-xl border-l-4 ${severityConfig.border} border border-gray-200 p-4 hover:shadow-md transition-shadow`}>
           <div className="flex items-start gap-4">
+            {/* Player Avatar */}
             <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500 flex-shrink-0">
               {issue.player.name.split(' ').map(n => n[0]).join('')}
             </div>
             
+            {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -1090,6 +1161,7 @@ export default function MagpieV2() {
             </div>
           </div>
 
+          {/* Actions */}
           <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
             <button
               onClick={() => handleCreateShortlist(issue.player)}
@@ -1112,6 +1184,7 @@ export default function MagpieV2() {
 
     return (
       <div className="space-y-6">
+        {/* Header Stats */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -1172,6 +1245,7 @@ export default function MagpieV2() {
           </div>
         </div>
 
+        {/* Critical Issues */}
         {criticalIssues.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -1185,6 +1259,7 @@ export default function MagpieV2() {
           </div>
         )}
 
+        {/* Moderate Issues */}
         {moderateIssues.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -1198,6 +1273,7 @@ export default function MagpieV2() {
           </div>
         )}
 
+        {/* Low Issues */}
         {lowIssues.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -1211,6 +1287,7 @@ export default function MagpieV2() {
           </div>
         )}
 
+        {/* All Clear State */}
         {activeIssues.length === 0 && (
           <div className="bg-green-50 rounded-xl border border-green-200 p-8 text-center">
             <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
@@ -1219,6 +1296,7 @@ export default function MagpieV2() {
           </div>
         )}
 
+        {/* Snoozed Issues Summary */}
         {Object.keys(snoozedIssues).length > 0 && (
           <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
             <div className="flex items-center gap-2 mb-3">
@@ -1243,6 +1321,7 @@ export default function MagpieV2() {
     );
   };
 
+  // Squad Screen
   const renderSquadScreen = () => (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -1313,12 +1392,14 @@ export default function MagpieV2() {
     </div>
   );
 
+  // Player Search Screen
   const renderPlayerSearchScreen = () => (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-900">Player Search</h2>
       </div>
 
+      {/* Search Bar */}
       <div className="flex gap-3">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -1333,6 +1414,7 @@ export default function MagpieV2() {
         </button>
       </div>
 
+      {/* Quick Filters */}
       <div className="flex gap-2">
         {['All', 'CM', 'CB', 'RB', 'LW', 'CF'].map((pos) => (
           <button key={pos} className={`px-3 py-1.5 rounded-lg text-sm font-medium ${pos === 'All' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
@@ -1341,6 +1423,7 @@ export default function MagpieV2() {
         ))}
       </div>
 
+      {/* Results */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 text-sm text-gray-500">
           Showing {searchTargets.length} players
@@ -1377,8 +1460,10 @@ export default function MagpieV2() {
     </div>
   );
 
+  // Shortlists Screen (NEW CRM-style)
   const renderShortlistsScreen = () => (
     <div className="space-y-6">
+      {/* Window Status Bar */}
       <div className="bg-slate-900 text-white rounded-xl p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
@@ -1398,6 +1483,7 @@ export default function MagpieV2() {
         </div>
       </div>
 
+      {/* Summary Stats */}
       <div className="grid grid-cols-4 gap-4">
         {[
           { icon: Target, label: 'Active Shortlists', value: shortlists.length, color: 'blue' },
@@ -1417,6 +1503,7 @@ export default function MagpieV2() {
         ))}
       </div>
 
+      {/* Active Shortlists */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold flex items-center gap-2">
@@ -1441,6 +1528,7 @@ export default function MagpieV2() {
                   isExpanded ? `${config.border} border-l-4 shadow-lg` : 'border-gray-200'
                 }`}
               >
+                {/* Header Row */}
                 <div
                   onClick={() => setExpandedShortlist(isExpanded ? null : shortlist.id)}
                   className={`p-4 cursor-pointer flex items-center gap-4 ${isExpanded ? config.bg : 'hover:bg-gray-50'}`}
@@ -1473,8 +1561,10 @@ export default function MagpieV2() {
                   {isExpanded ? <ChevronUp className="h-5 w-5 text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-400" />}
                 </div>
 
+                {/* Expanded Content */}
                 {isExpanded && (
                   <div className="border-t border-gray-200">
+                    {/* Gates */}
                     <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-6">
                       <span className="text-xs font-semibold text-gray-500">GATES:</span>
                       <GateCheckbox label="Scouting" checked={shortlist.gates.scouting} />
@@ -1483,7 +1573,9 @@ export default function MagpieV2() {
                       <GateCheckbox label="Medical" checked={shortlist.gates.medical} />
                     </div>
 
+                    {/* Two Column Layout */}
                     <div className="grid grid-cols-3">
+                      {/* Plan A */}
                       <div className="p-4 border-r border-gray-200 bg-gray-50/50">
                         <div className="text-xs font-bold text-gray-500 mb-3 tracking-wider">PLAN A: RETAIN</div>
                         
@@ -1533,6 +1625,7 @@ export default function MagpieV2() {
                         )}
                       </div>
 
+                      {/* Plan B - Candidates */}
                       <div className="p-4 col-span-2">
                         <div className="flex justify-between items-center mb-3">
                           <div className="text-xs font-bold text-gray-500 tracking-wider">
@@ -1597,6 +1690,7 @@ export default function MagpieV2() {
                       </div>
                     </div>
 
+                    {/* Activity Bar */}
                     <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
                       <div className="flex gap-4 text-xs text-gray-500">
                         <span className="flex items-center gap-1">
@@ -1627,6 +1721,7 @@ export default function MagpieV2() {
         </div>
       </div>
 
+      {/* Deferred */}
       <div>
         <h2 className="text-lg font-semibold flex items-center gap-2 mb-4 text-gray-500">
           <Pause className="h-4 w-4" />
@@ -1652,6 +1747,7 @@ export default function MagpieV2() {
     </div>
   );
 
+  // Player Profile Screen
   const renderPlayerProfileScreen = () => {
     const player = selectedPlayer || {
       name: 'Adam Wharton',
@@ -1660,11 +1756,12 @@ export default function MagpieV2() {
       age: 20,
       value: '€45M',
       contract: '2029',
-      nationality: 'England',
+      nationality: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England',
     };
 
     return (
       <div className="space-y-6">
+        {/* Header */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-6">
@@ -1688,6 +1785,7 @@ export default function MagpieV2() {
           </div>
         </div>
 
+        {/* Stats Grid */}
         <div className="grid grid-cols-3 gap-4">
           <div className="bg-white rounded-xl border border-gray-200 p-4">
             <div className="flex items-center gap-2 mb-3">
@@ -1756,6 +1854,7 @@ export default function MagpieV2() {
           </div>
         </div>
 
+        {/* Scout Reports */}
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex items-center gap-2 mb-3">
             <ClipboardList className="h-4 w-4 text-green-500" />
@@ -1772,6 +1871,7 @@ export default function MagpieV2() {
           </div>
         </div>
 
+        {/* Actions */}
         <div className="flex gap-3">
           <button className="flex-1 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800">
             Add to Shortlist
@@ -1787,14 +1887,27 @@ export default function MagpieV2() {
     );
   };
 
+  // ============================================================================
+  // MAIN RENDER
+  // ============================================================================
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
+      {/* Create Shortlist Modal */}
       <CreateShortlistModal />
+      
+      {/* Dismiss Modal */}
       <DismissModal />
+
+      {/* Timeline Modal */}
       <TimelineModal />
+
+      {/* Add Note Modal */}
       <AddNoteModal />
 
+      {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
+        {/* Logo */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
@@ -1807,6 +1920,7 @@ export default function MagpieV2() {
           </div>
         </div>
 
+        {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1">
           {screens.map((screen) => (
             <button
@@ -1830,6 +1944,7 @@ export default function MagpieV2() {
           ))}
         </nav>
 
+        {/* User */}
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
@@ -1843,7 +1958,9 @@ export default function MagpieV2() {
         </div>
       </aside>
 
+      {/* Main Content */}
       <div className="flex-1 flex flex-col">
+        {/* Top Bar */}
         <header className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -1860,6 +1977,7 @@ export default function MagpieV2() {
           </div>
         </header>
 
+        {/* Content Area */}
         <main className="flex-1 p-6 overflow-auto">
           {activeScreen === 'dashboard' && renderDashboardScreen()}
           {activeScreen === 'squad' && renderSquadScreen()}
@@ -1869,6 +1987,7 @@ export default function MagpieV2() {
         </main>
       </div>
 
+      {/* AI Chat Panel */}
       <aside className="w-80 bg-white border-l border-gray-200 flex flex-col">
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center gap-2">
