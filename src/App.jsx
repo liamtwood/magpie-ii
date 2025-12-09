@@ -3,7 +3,8 @@ import {
   Users, Search, ClipboardList, Activity, Star, AlertCircle,
   ChevronDown, ChevronUp, Plus, Clock, TrendingUp,
   Send, Play, Eye, Phone, FileText, Video, MapPin,
-  ChevronRight, Sparkles, Zap, X, CheckCircle2, Circle, MessageSquare
+  ChevronRight, Sparkles, Zap, X, CheckCircle2, Circle, MessageSquare,
+  EyeOff, BellOff
 } from 'lucide-react';
 
 // Import components
@@ -42,9 +43,52 @@ export default function App() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newShortlistData, setNewShortlistData] = useState(null);
   
-  // Dismiss/Snooze state for issues
-  const [dismissedIssues, setDismissedIssues] = useState({});
-  const [snoozedIssues, setSnoozedIssues] = useState({});
+  // Dismiss/Snooze state for issues (persisted to localStorage)
+  const [dismissedIssues, setDismissedIssues] = useState(() => {
+    try {
+      const saved = localStorage.getItem('dismissedIssues');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+  const [snoozedIssues, setSnoozedIssues] = useState(() => {
+    try {
+      const saved = localStorage.getItem('snoozedIssues');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const now = Date.now();
+        const SNOOZE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+        const active = {};
+        Object.entries(parsed).forEach(([id, timestamp]) => {
+          if (now - timestamp < SNOOZE_DURATION) {
+            active[id] = timestamp;
+          }
+        });
+        return active;
+      }
+      return {};
+    } catch (e) {
+      return {};
+    }
+  });
+
+  // Persist dismiss/snooze to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('dismissedIssues', JSON.stringify(dismissedIssues));
+    } catch (e) {
+      console.error('Failed to save dismissedIssues:', e);
+    }
+  }, [dismissedIssues]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('snoozedIssues', JSON.stringify(snoozedIssues));
+    } catch (e) {
+      console.error('Failed to save snoozedIssues:', e);
+    }
+  }, [snoozedIssues]);
   
   // Player Timeline Modal state
   const [showTimelineModal, setShowTimelineModal] = useState(false);
@@ -273,7 +317,14 @@ export default function App() {
 
   // Generate squad issues
   const squadIssues = generateSquadIssues(squad);
-  const activeIssues = squadIssues.filter(i => !dismissedIssues[i.id] && !snoozedIssues[i.id]);
+  const SNOOZE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+  const now = Date.now();
+  const activeIssues = squadIssues.filter(i => {
+    if (dismissedIssues[i.id]) return false;
+    const snoozeTime = snoozedIssues[i.id];
+    if (snoozeTime && (now - snoozeTime < SNOOZE_DURATION)) return false;
+    return true;
+  });
 
   // ============================================================================
   // RENDER FUNCTIONS
@@ -432,64 +483,64 @@ export default function App() {
 
       {/* Critical alerts */}
       <div className="space-y-4">
-        {[
-          { severity: 'critical', title: 'CB Cover Required', subtitle: 'Sven Botman - ACL injury', detail: '6 months out. Only Schär and Burn available.', action: 'Find Replacement', playerId: 4, shortlistId: 'cb-cover' },
-          { severity: 'high', title: 'Contract Expiring', subtitle: 'Kieran Trippier - June 2026', detail: 'Age 34, 67 injury days this season. Need succession plan.', action: 'Find Replacement', playerId: 2, shortlistId: 'trippier' },
-          { severity: 'medium', title: 'Transfer Interest', subtitle: 'Bruno Guimaraes - Saudi & PSG', detail: '£100M release clause. Need contingency.', action: 'Find Replacement', playerId: 39, shortlistId: 'cm-depth' },
-          { severity: 'medium', title: 'Transfer Interest', subtitle: 'Anthony Gordon - Liverpool', detail: 'Part of PSR discussions. May need to sell.', action: 'Find Replacement', playerId: 10, shortlistId: null },
-        ].map((alert, i) => (
-          <div key={i} className={`bg-white border-l-4 rounded-lg p-4 shadow-sm ${
-            alert.severity === 'critical' ? 'border-red-500' :
-            alert.severity === 'high' ? 'border-orange-500' : 'border-amber-500'
-          }`}>
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`px-2 py-0.5 text-xs font-semibold rounded ${
-                    alert.severity === 'critical' ? 'bg-red-100 text-red-700' :
-                    alert.severity === 'high' ? 'bg-orange-100 text-orange-700' : 'bg-amber-100 text-amber-700'
-                  }`}>
-                    {alert.severity.toUpperCase()}
-                  </span>
-                  <span className="font-semibold text-gray-900">{alert.title}</span>
+        {activeIssues.length === 0 ? (
+          <div className="bg-white rounded-lg p-6 text-center text-gray-500">
+            <CheckCircle2 className="h-8 w-8 mx-auto mb-2 text-green-500" />
+            <p className="font-medium text-gray-700">All clear!</p>
+            <p className="text-sm">No active issues requiring attention.</p>
+          </div>
+        ) : (
+          activeIssues.map((issue) => (
+            <div key={issue.id} className={`bg-white border-l-4 rounded-lg p-4 shadow-sm ${
+              issue.severity === 'critical' ? 'border-red-500' : 'border-amber-500'
+            }`}>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`px-2 py-0.5 text-xs font-semibold rounded ${
+                      issue.severity === 'critical' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                    }`}>
+                      {issue.severity.toUpperCase()}
+                    </span>
+                    <span className="font-semibold text-gray-900">{issue.title}</span>
+                  </div>
+                  <div className="text-sm text-gray-700 mb-1">{issue.player.name} - {issue.player.position}</div>
+                  <div className="text-xs text-gray-500">{issue.description} {issue.recommendation}</div>
                 </div>
-                <div className="text-sm text-gray-700 mb-1">{alert.subtitle}</div>
-                <div className="text-xs text-gray-500">{alert.detail}</div>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => openAiReplacement(alert.playerId)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  <Zap className="h-3 w-3" />
-                  {alert.action}
-                </button>
-                {alert.shortlistId ? (
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={() => {
-                      setActiveScreen('shortlists');
-                      setExpandedShortlist(alert.shortlistId);
-                    }}
-                    className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                    onClick={() => openAiReplacement(issue.player.id)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition-colors"
                   >
-                    View Shortlist
+                    <Zap className="h-3 w-3" />
+                    Find Replacement
                   </button>
-                ) : (
                   <button
-                    onClick={() => {
-                      const player = squad.find(p => p.id === alert.playerId);
-                      if (player) handleCreateShortlist(player);
-                    }}
+                    onClick={() => handleCreateShortlist(issue.player)}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors"
                   >
                     <Plus className="h-3 w-3" />
                     Create Shortlist
                   </button>
-                )}
+                  <button
+                    onClick={() => setSnoozedIssues(prev => ({ ...prev, [issue.id]: Date.now() }))}
+                    className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
+                    title="Snooze for 24 hours"
+                  >
+                    <BellOff className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setDismissedIssues(prev => ({ ...prev, [issue.id]: true }))}
+                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    title="Dismiss this issue"
+                  >
+                    <EyeOff className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Window countdown */}

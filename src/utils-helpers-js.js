@@ -169,6 +169,12 @@ export const inferShortlistReason = (player) => {
   const isOlder = player.age >= 32;
   const isExpiring = yearsLeft <= 1;
   const hasLongInjury = player.injury && player.injury.daysOut >= 90;
+  const hasMediumInjury = player.injury && player.injury.daysOut >= 30 && player.injury.daysOut < 90;
+  const isHighInjuryRisk = player.injury && player.injury.risk === 'high';
+  const hasTransferInterest = player.flag === 'Saudi Interest' || player.flag === 'Key';
+  const isLoanPlayer = player.flag === 'Loan';
+  const hasLowMinutes = player.minutes !== undefined && player.minutes < 500 && player.position !== 'GK';
+  const isHighValue = player.value && parseValue(player.value) >= 40000000;
 
   if (isExpiring && isOlder) {
     return { 
@@ -189,6 +195,41 @@ export const inferShortlistReason = (player) => {
       trigger: 'Long-term injury cover', 
       severity: 'critical', 
       reasoning: `${player.injury.daysOut} days missed. Cover needed.` 
+    };
+  }
+  if (hasTransferInterest) {
+    return { 
+      trigger: 'Transfer interest', 
+      severity: 'high', 
+      reasoning: `External interest reported. Contingency planning recommended.` 
+    };
+  }
+  if (isLoanPlayer) {
+    return { 
+      trigger: 'Loan decision', 
+      severity: 'moderate', 
+      reasoning: `Loan player - decision needed on permanent signing or replacement.` 
+    };
+  }
+  if (isOlder && isHighInjuryRisk) {
+    return { 
+      trigger: 'Injury risk management', 
+      severity: 'high', 
+      reasoning: `Age ${player.age} with high injury risk. Consider succession.` 
+    };
+  }
+  if (hasMediumInjury && isHighValue) {
+    return { 
+      trigger: 'Injury concern', 
+      severity: 'moderate', 
+      reasoning: `${player.injury.daysOut} days missed. Monitor and consider cover.` 
+    };
+  }
+  if (hasLowMinutes && !isLoanPlayer) {
+    return { 
+      trigger: 'Low game time', 
+      severity: 'low', 
+      reasoning: `Only ${player.minutes} minutes played. Assess role or consider move.` 
     };
   }
   if (isOlder) {
