@@ -1377,65 +1377,258 @@ export default function MagpieV2() {
     </div>
   );
 
-  const renderPlayerSearchScreen = () => (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900">Player Search</h2>
-      </div>
+  const [searchFilters, setSearchFilters] = useState({
+    position: 'CM',
+    ageMin: 18,
+    ageMax: 35,
+    valueMin: 0,
+    valueMax: 150,
+    contractMin: 6,
+    contractMax: 60,
+  });
+  const [searchSort, setSearchSort] = useState({ field: 'overall', direction: 'desc' });
 
-      <div className="flex gap-3">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search players by name, position, or attributes..."
-            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+  const searchPlayersData = [
+    { id: 1, name: 'Pedri', age: 23, club: 'Barcelona', value: '€140M', tier: 1, overall: 9.08, distribution: 6.88, progression: 8.07, finishing: 6.52, physicalIn: 4.37, physicalOut: 6.59, physicalOther: 6.46, defending: 2.49, pressing: 3.95 },
+    { id: 2, name: 'Vitinha', age: 25.8, club: 'Paris Saint-Ger...', value: '€90M', tier: 1, overall: 8.25, distribution: 8.43, progression: 7.86, finishing: 5.78, physicalIn: 4.00, physicalOut: 5.12, physicalOther: 9.22, defending: 2.09, pressing: 1.59 },
+    { id: 3, name: 'Ismael Saibari', age: 23, club: 'PSV Eindhoven', value: '€27M', tier: 2, overall: 8.03, distribution: 5.18, progression: 3.49, finishing: 7.82, physicalIn: 4.07, physicalOut: 5.10, physicalOther: 8.89, defending: 3.43, pressing: 3.85 },
+    { id: 4, name: 'Bruno Guimarães', age: 26, club: 'Newcastle United', value: '€100M', tier: 1, overall: 7.61, distribution: 6.06, progression: 4.85, finishing: 3.77, physicalIn: 4.31, physicalOut: 5.86, physicalOther: 6.55, defending: 3.08, pressing: 2.13 },
+    { id: 5, name: 'Florian Wirtz', age: 21, club: 'Bayer Leverkusen', value: '€130M', tier: 1, overall: 8.89, distribution: 7.12, progression: 7.54, finishing: 7.21, physicalIn: 3.89, physicalOut: 4.78, physicalOther: 7.88, defending: 2.11, pressing: 2.87 },
+    { id: 6, name: 'Jamal Musiala', age: 21, club: 'Bayern Munich', value: '€120M', tier: 1, overall: 8.76, distribution: 6.95, progression: 7.23, finishing: 6.89, physicalIn: 4.12, physicalOut: 5.01, physicalOther: 8.12, defending: 2.34, pressing: 2.45 },
+    { id: 7, name: 'Declan Rice', age: 25.9, club: 'Arsenal', value: '€120M', tier: 1, overall: 7.26, distribution: 5.71, progression: 3.67, finishing: 5.34, physicalIn: 3.86, physicalOut: 4.84, physicalOther: 8.14, defending: 3.75, pressing: 2.13 },
+    { id: 8, name: 'Joshua Kimmich', age: 30.8, club: 'Bayern Munich', value: '€45M', tier: 2, overall: 7.24, distribution: 7.18, progression: 5.64, finishing: 5.38, physicalIn: 3.48, physicalOut: 5.34, physicalOther: 8.06, defending: 4.30, pressing: 1.50 },
+    { id: 9, name: 'Frenkie de Jong', age: 28.5, club: 'Barcelona', value: '€45M', tier: 2, overall: 7.21, distribution: 5.50, progression: 6.60, finishing: 3.08, physicalIn: 2.97, physicalOut: 4.74, physicalOther: 9.28, defending: 1.99, pressing: 1.86 },
+    { id: 10, name: 'Martin Ødegaard', age: 25.9, club: 'Arsenal', value: '€80M', tier: 1, overall: 7.18, distribution: 6.12, progression: 4.94, finishing: 6.25, physicalIn: 3.09, physicalOut: 4.97, physicalOther: 8.00, defending: 0.92, pressing: 1.99 },
+    { id: 11, name: 'Sandro Tonali', age: 24.5, club: 'Newcastle United', value: '€55M', tier: 2, overall: 6.82, distribution: 4.91, progression: 3.90, finishing: 4.02, physicalIn: 4.57, physicalOut: 5.70, physicalOther: 7.02, defending: 9.01, pressing: 4.47 },
+    { id: 12, name: 'Adam Wharton', age: 20, club: 'Crystal Palace', value: '€45M', tier: 2, overall: 7.05, distribution: 5.65, progression: 4.20, finishing: 4.60, physicalIn: 3.86, physicalOut: 5.02, physicalOther: 8.34, defending: 2.21, pressing: 2.20 },
+  ];
+
+  const getMetricColor = (value, max = 10) => {
+    const percentage = (value / max) * 100;
+    if (percentage >= 70) return 'bg-green-500';
+    if (percentage >= 50) return 'bg-green-300';
+    if (percentage >= 30) return 'bg-yellow-200';
+    if (percentage >= 15) return 'bg-red-200';
+    return 'bg-red-400';
+  };
+
+  const MetricCell = ({ value, max = 10 }) => (
+    <td className="px-2 py-2 text-center">
+      <div className={`px-2 py-1 rounded text-xs font-medium ${getMetricColor(value, max)} ${value >= 7 ? 'text-white' : 'text-gray-800'}`}>
+        {value.toFixed(2)}
+      </div>
+    </td>
+  );
+
+  const TierBadge = ({ tier }) => {
+    const colors = {
+      1: 'bg-green-100 text-green-800 border-green-300',
+      2: 'bg-blue-100 text-blue-800 border-blue-300',
+      3: 'bg-gray-100 text-gray-800 border-gray-300',
+    };
+    return (
+      <span className={`px-2 py-0.5 rounded border text-xs font-medium ${colors[tier] || colors[3]}`}>
+        Tier {tier}
+      </span>
+    );
+  };
+
+  const sortedPlayers = [...searchPlayersData].sort((a, b) => {
+    const aVal = a[searchSort.field];
+    const bVal = b[searchSort.field];
+    return searchSort.direction === 'desc' ? bVal - aVal : aVal - bVal;
+  });
+
+  const renderPlayerSearchScreen = () => (
+    <div className="flex gap-4 h-full">
+      <div className="w-64 bg-white rounded-xl border border-gray-200 p-4 space-y-4 flex-shrink-0 overflow-auto">
+        <h3 className="font-bold text-gray-900">Filters</h3>
+        
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Position</label>
+          <select 
+            value={searchFilters.position}
+            onChange={(e) => setSearchFilters({...searchFilters, position: e.target.value})}
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="CM">CM - Centre Mid</option>
+            <option value="CB">CB - Centre Back</option>
+            <option value="RB">RB - Right Back</option>
+            <option value="LB">LB - Left Back</option>
+            <option value="LW">LW - Left Wing</option>
+            <option value="RW">RW - Right Wing</option>
+            <option value="CF">CF - Centre Forward</option>
+            <option value="GK">GK - Goalkeeper</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Player Age</label>
+          <div className="flex items-center gap-2">
+            <input 
+              type="number" 
+              value={searchFilters.ageMin}
+              onChange={(e) => setSearchFilters({...searchFilters, ageMin: parseInt(e.target.value)})}
+              className="w-16 px-2 py-1 border border-gray-200 rounded text-sm"
+            />
+            <span className="text-gray-400">-</span>
+            <input 
+              type="number" 
+              value={searchFilters.ageMax}
+              onChange={(e) => setSearchFilters({...searchFilters, ageMax: parseInt(e.target.value)})}
+              className="w-16 px-2 py-1 border border-gray-200 rounded text-sm"
+            />
+          </div>
+          <input 
+            type="range" 
+            min="16" 
+            max="42" 
+            value={searchFilters.ageMax}
+            onChange={(e) => setSearchFilters({...searchFilters, ageMax: parseInt(e.target.value)})}
+            className="w-full mt-2"
           />
         </div>
-        <button className="px-4 py-2 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800">
-          Search
-        </button>
-      </div>
 
-      <div className="flex gap-2">
-        {['All', 'CM', 'CB', 'RB', 'LW', 'CF'].map((pos) => (
-          <button key={pos} className={`px-3 py-1.5 rounded-lg text-sm font-medium ${pos === 'All' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-            {pos}
-          </button>
-        ))}
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 text-sm text-gray-500">
-          Showing {searchTargets.length} players
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Transfer Value (€M)</label>
+          <div className="flex items-center gap-2">
+            <input 
+              type="number" 
+              value={searchFilters.valueMin}
+              onChange={(e) => setSearchFilters({...searchFilters, valueMin: parseInt(e.target.value)})}
+              className="w-16 px-2 py-1 border border-gray-200 rounded text-sm"
+            />
+            <span className="text-gray-400">-</span>
+            <input 
+              type="number" 
+              value={searchFilters.valueMax}
+              onChange={(e) => setSearchFilters({...searchFilters, valueMax: parseInt(e.target.value)})}
+              className="w-16 px-2 py-1 border border-gray-200 rounded text-sm"
+            />
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="200" 
+            value={searchFilters.valueMax}
+            onChange={(e) => setSearchFilters({...searchFilters, valueMax: parseInt(e.target.value)})}
+            className="w-full mt-2"
+          />
         </div>
-        <div className="divide-y divide-gray-100">
-          {searchTargets.map((player) => (
-            <div key={player.id} className="p-4 hover:bg-gray-50 cursor-pointer flex items-center justify-between" onClick={() => { setSelectedPlayer(player); setActiveScreen('player-profile'); }}>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-medium">
-                  {player.name.split(' ').map(n => n[0]).join('')}
-                </div>
-                <div>
-                  <div className="font-medium text-gray-900">{player.name}</div>
-                  <div className="text-sm text-gray-500">{player.team} • {player.position} • Age {player.age}</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex gap-1">
-                  {player.sources.map((s) => <SourceBadge key={s} source={s} />)}
-                </div>
-                <StarRating rating={player.rating} />
-                <div className="font-medium">{player.value}</div>
-                <button 
-                  className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100"
-                  onClick={(e) => { e.stopPropagation(); }}
-                >
-                  + Shortlist
-                </button>
-              </div>
-            </div>
-          ))}
+
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Contract Months Left</label>
+          <div className="flex items-center gap-2">
+            <input 
+              type="number" 
+              value={searchFilters.contractMin}
+              onChange={(e) => setSearchFilters({...searchFilters, contractMin: parseInt(e.target.value)})}
+              className="w-16 px-2 py-1 border border-gray-200 rounded text-sm"
+            />
+            <span className="text-gray-400">-</span>
+            <input 
+              type="number" 
+              value={searchFilters.contractMax}
+              onChange={(e) => setSearchFilters({...searchFilters, contractMax: parseInt(e.target.value)})}
+              className="w-16 px-2 py-1 border border-gray-200 rounded text-sm"
+            />
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-gray-200">
+          <button className="w-full py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800">
+            Apply Filters
+          </button>
+          <button className="w-full py-2 mt-2 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50">
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 space-y-4 overflow-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Player Search: Centre Mids</h2>
+            <p className="text-sm text-gray-500">Showing {sortedPlayers.length} players</p>
+          </div>
+          <div className="flex gap-2">
+            <select 
+              value={`${searchSort.field}-${searchSort.direction}`}
+              onChange={(e) => {
+                const [field, direction] = e.target.value.split('-');
+                setSearchSort({ field, direction });
+              }}
+              className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+            >
+              <option value="overall-desc">Overall (High to Low)</option>
+              <option value="overall-asc">Overall (Low to High)</option>
+              <option value="age-asc">Age (Young to Old)</option>
+              <option value="age-desc">Age (Old to Young)</option>
+              <option value="pressing-desc">Pressing (High to Low)</option>
+              <option value="defending-desc">Defending (High to Low)</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr className="text-xs font-semibold text-gray-500">
+                  <th className="px-3 py-3 text-left">#</th>
+                  <th className="px-3 py-3 text-left">Player</th>
+                  <th className="px-3 py-3 text-left">Age</th>
+                  <th className="px-3 py-3 text-left">Club</th>
+                  <th className="px-3 py-3 text-left">Value</th>
+                  <th className="px-3 py-3 text-center">Tier</th>
+                  <th className="px-2 py-3 text-center bg-blue-50">OVR</th>
+                  <th className="px-2 py-3 text-center">DIS</th>
+                  <th className="px-2 py-3 text-center">PRO</th>
+                  <th className="px-2 py-3 text-center">F&C</th>
+                  <th className="px-2 py-3 text-center">PHY(I)</th>
+                  <th className="px-2 py-3 text-center">PHY(O)</th>
+                  <th className="px-2 py-3 text-center">PHY</th>
+                  <th className="px-2 py-3 text-center">DEF</th>
+                  <th className="px-2 py-3 text-center">PRE</th>
+                  <th className="px-3 py-3 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {sortedPlayers.map((player, idx) => (
+                  <tr key={player.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setOpenPlayerPanel(player)}>
+                    <td className="px-3 py-2 text-gray-500 font-medium">{idx + 1}</td>
+                    <td className="px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <PlayerAvatar name={player.name} size="sm" />
+                        <span className="font-medium text-gray-900">{player.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 text-gray-600">{player.age}</td>
+                    <td className="px-3 py-2 text-gray-600 max-w-[100px] truncate">{player.club}</td>
+                    <td className="px-3 py-2 font-medium">{player.value}</td>
+                    <td className="px-3 py-2 text-center"><TierBadge tier={player.tier} /></td>
+                    <MetricCell value={player.overall} />
+                    <MetricCell value={player.distribution} />
+                    <MetricCell value={player.progression} />
+                    <MetricCell value={player.finishing} />
+                    <MetricCell value={player.physicalIn} />
+                    <MetricCell value={player.physicalOut} />
+                    <MetricCell value={player.physicalOther} />
+                    <MetricCell value={player.defending} />
+                    <MetricCell value={player.pressing} />
+                    <td className="px-3 py-2 text-center">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); }}
+                        className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium hover:bg-blue-100"
+                      >
+                        + Shortlist
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
