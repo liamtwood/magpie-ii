@@ -1,5 +1,5 @@
-import React from 'react';
-import { Star, CheckCircle2, Circle } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import { Star, CheckCircle2, Circle, Camera } from 'lucide-react';
 import { getFCRatingColor } from '../utils-helpers-js.js';
 
 // FC Rating Badge
@@ -171,7 +171,14 @@ export const MatchScoreBadge = ({ score }) => {
 };
 
 // Player Avatar
-export const PlayerAvatar = ({ src, name, number, size = 'md', className = '' }) => {
+export const PlayerAvatar = ({ src, name, number, size = 'md', className = '', editable = false, onAvatarChange, playerId }) => {
+  const fileInputRef = useRef(null);
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [src]);
+  
   const sizeClasses = {
     sm: 'w-8 h-8 text-xs',
     md: 'w-10 h-10 text-sm',
@@ -179,26 +186,73 @@ export const PlayerAvatar = ({ src, name, number, size = 'md', className = '' })
     xl: 'w-16 h-16 text-lg',
     '2xl': 'w-24 h-24 text-2xl',
   };
+
+  const iconSizes = {
+    sm: 'w-3 h-3',
+    md: 'w-4 h-4',
+    lg: 'w-4 h-4',
+    xl: 'w-5 h-5',
+    '2xl': 'w-6 h-6',
+  };
   
   const initials = name ? name.split(' ').map(n => n[0]).join('') : number || '?';
-  
-  if (src) {
-    return (
-      <img 
-        src={src} 
-        alt={name} 
-        className={`${sizeClasses[size]} rounded-full object-cover ${className}`}
-        onError={(e) => {
-          e.target.style.display = 'none';
-          e.target.nextSibling.style.display = 'flex';
-        }}
-      />
-    );
-  }
-  
-  return (
-    <div className={`${sizeClasses[size]} bg-gradient-to-br from-slate-600 to-slate-800 rounded-full flex items-center justify-center text-white font-bold ${className}`}>
+
+  const handleClick = () => {
+    if (editable && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file && onAvatarChange && playerId) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageError(false);
+        onAvatarChange(playerId, reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+    e.target.value = '';
+  };
+
+  const initialsElement = (
+    <div className={`${sizeClasses[size]} bg-gradient-to-br from-slate-600 to-slate-800 rounded-full flex items-center justify-center text-white font-bold`}>
       {initials}
+    </div>
+  );
+
+  const avatarContent = (src && !imageError) ? (
+    <img 
+      src={src} 
+      alt={name} 
+      className={`${sizeClasses[size]} rounded-full object-cover`}
+      onError={() => setImageError(true)}
+    />
+  ) : initialsElement;
+
+  if (!editable) {
+    return <div className={className}>{avatarContent}</div>;
+  }
+
+  return (
+    <div className={`relative group ${className}`}>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+      <div 
+        onClick={handleClick}
+        className="cursor-pointer"
+      >
+        {avatarContent}
+        <div className={`absolute inset-0 ${sizeClasses[size]} rounded-full bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center transition-all`}>
+          <Camera className={`${iconSizes[size]} text-white opacity-0 group-hover:opacity-100 transition-opacity`} />
+        </div>
+      </div>
     </div>
   );
 };

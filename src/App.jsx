@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, Search, ClipboardList, Activity, Star, AlertCircle,
   ChevronDown, ChevronUp, Plus, Clock, TrendingUp,
@@ -50,6 +50,34 @@ export default function App() {
   const [showTimelineModal, setShowTimelineModal] = useState(false);
   const [activePlayerId, setActivePlayerId] = useState(null);
   const [playerActivities, setPlayerActivities] = useState(initialPlayerActivities);
+
+  // Player Avatar state
+  const [playerAvatars, setPlayerAvatars] = useState({});
+
+  // Load avatars from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedAvatars = localStorage.getItem('playerAvatars');
+      if (savedAvatars) {
+        setPlayerAvatars(JSON.parse(savedAvatars));
+      }
+    } catch (e) {
+      console.error('Failed to load avatars from localStorage:', e);
+    }
+  }, []);
+
+  // Handle avatar change
+  const handleAvatarChange = (playerId, base64Image) => {
+    setPlayerAvatars(prev => {
+      const updated = { ...prev, [playerId]: base64Image };
+      try {
+        localStorage.setItem('playerAvatars', JSON.stringify(updated));
+      } catch (e) {
+        console.error('Failed to save avatar to localStorage:', e);
+      }
+      return updated;
+    });
+  };
 
   // ============================================================================
   // DATA
@@ -265,7 +293,14 @@ export default function App() {
         {/* Player header */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
           <div className="flex items-start gap-6">
-            <PlayerAvatar name={player.fullName} size="xl" />
+            <PlayerAvatar 
+                  name={player.fullName} 
+                  size="xl" 
+                  src={playerAvatars[selectedPlayer]}
+                  editable={true}
+                  playerId={selectedPlayer}
+                  onAvatarChange={handleAvatarChange}
+                />
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <h2 className="text-2xl font-bold text-gray-900">{player.fullName}</h2>
@@ -502,7 +537,14 @@ export default function App() {
               <tr key={player.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <PlayerAvatar name={player.name} size="sm" />
+                    <PlayerAvatar 
+                      name={player.name} 
+                      size="sm" 
+                      src={playerAvatars[player.id]}
+                      editable={true}
+                      playerId={player.id}
+                      onAvatarChange={handleAvatarChange}
+                    />
                     <span className="font-medium text-gray-900">{player.name}</span>
                   </div>
                 </td>
@@ -591,7 +633,7 @@ export default function App() {
                   <div className="text-xs font-semibold text-gray-500 uppercase mb-2">Plan A: {shortlist.planA.action}</div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <PlayerAvatar name={shortlist.planA.player} size="sm" />
+                      <PlayerAvatar name={shortlist.planA.player} size="sm" src={playerAvatars[getPlayerId(shortlist.planA.player)]} />
                       <div>
                         <div className="font-medium text-gray-900">{shortlist.planA.player}</div>
                         <div className="text-xs text-gray-500">{shortlist.planA.note}</div>
@@ -618,7 +660,7 @@ export default function App() {
                         onClick={() => setSelectedPlayer(candidate.id)}
                       >
                         <div className="flex items-center gap-4">
-                          <PlayerAvatar name={candidate.name} size="md" />
+                          <PlayerAvatar name={candidate.name} size="md" src={playerAvatars[candidate.id]} />
                           <div>
                             <div className="flex items-center gap-2">
                               <span className="font-medium text-gray-900">{candidate.name}</span>
@@ -715,7 +757,7 @@ export default function App() {
                 <tr key={player.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <PlayerAvatar name={player.name} size="sm" />
+                      <PlayerAvatar name={player.name} size="sm" src={playerAvatars[player.id]} />
                       <span className="font-medium text-gray-900">{player.name}</span>
                     </div>
                   </td>
