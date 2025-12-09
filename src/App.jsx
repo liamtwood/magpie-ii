@@ -95,6 +95,14 @@ const playerAvatars = {
   'Adam Wharton': null,
   'Marc Guéhi': null,
   'Castello Lukeba': null,
+  'Harvey Barnes': '/players/barnes_1765315308119.png',
+  'Sven Botman': '/players/botman_1765315308120.png',
+  'Dan Burn': '/players/burn_1765315308120.png',
+  'Anthony Elanga': '/players/elanga_1765315308121.png',
+  'Anthony Gordon': '/players/gordon_1765315308121.png',
+  'Bruno Guimarães': '/players/guimaraes_1765315308121.png',
+  'Lewis Hall': '/players/hall_1765315308122.png',
+  'Joelinton': '/players/joelinton_1765315308122.png',
 };
 
 // Player avatar component with image support and initials fallback
