@@ -1,6 +1,6 @@
 import React from 'react';
 import { Star, CheckCircle2, Circle } from 'lucide-react';
-import { getFCRatingColor } from 'utils-helpers-js.js';
+import { getFCRatingColor } from '../utils-helpers-js.js';
 
 // FC Rating Badge
 export const FCRatingBadge = ({ rating, size = 'md' }) => {
