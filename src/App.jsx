@@ -165,6 +165,8 @@ export default function MagpieV2() {
   const [openPlayerPanel, setOpenPlayerPanel] = useState(null);
   const [showWhatsAppPanel, setShowWhatsAppPanel] = useState(false);
   const [activeWhatsAppShortlist, setActiveWhatsAppShortlist] = useState(null);
+  const [showEnhancedProfile, setShowEnhancedProfile] = useState(false);
+  const [enhancedPlayerId, setEnhancedPlayerId] = useState(null);
   const [whatsAppGroups, setWhatsAppGroups] = useState({
     'trippier': {
       hasGroup: true,
@@ -236,6 +238,11 @@ export default function MagpieV2() {
     { role: 'assistant', text: "Hi! I can help you find players, analyze shortlists, or compare candidates. Try: 'Find pressing midfielders under 25'" }
   ]);
   const [chatInput, setChatInput] = useState('');
+
+  const openEnhancedProfile = (playerName) => {
+    setEnhancedPlayerId(playerName);
+    setShowEnhancedProfile(true);
+  };
 
   const screens = [
     { id: 'dashboard', name: 'Dashboard', icon: Activity },
@@ -1890,7 +1897,7 @@ export default function MagpieV2() {
                               <div className="text-sm text-gray-400 font-medium">{idx + 1}</div>
                               <div 
                                 className="col-span-2 cursor-pointer flex items-center gap-2"
-                                onClick={() => setOpenPlayerPanel(candidate)}
+                                onClick={() => openEnhancedProfile(candidate.name)}
                               >
                                 <PlayerAvatar name={candidate.name} size="sm" />
                                 <div>
@@ -2434,7 +2441,7 @@ export default function MagpieV2() {
                                   <Clock className="h-4 w-4" />
                                 </button>
                                 <button
-                                  onClick={() => { setOpenPlayerPanel(candidate); setOpenShortlistPanel(null); }}
+                                  onClick={() => { openEnhancedProfile(candidate.name); setOpenShortlistPanel(null); }}
                                   className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-gray-700"
                                   title="View Profile"
                                 >
@@ -2583,6 +2590,12 @@ export default function MagpieV2() {
           </div>
         </div>
       )}
+
+      <EnhancedPlayerProfile
+        show={showEnhancedProfile}
+        onClose={() => setShowEnhancedProfile(false)}
+        playerId={enhancedPlayerId}
+      />
 
       <WhatsAppPanel
         show={showWhatsAppPanel}
