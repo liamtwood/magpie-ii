@@ -112,7 +112,27 @@ const TabButton = ({ active, onClick, children }) => (
   </button>
 );
 
+const playerAvatars = {
+  'Kieran Trippier': '/players/trippier_1765315479138.png',
+  'Fabian Schär': '/players/schar_1765315479138.png',
+  'Nick Pope': '/players/pope_1765315479137.png',
+  'Sean Longstaff': '/players/longstaff_1765315600236.png',
+  'Tiago Santos': '/players/santos_1765321431388.webp',
+  'Harvey Barnes': '/players/barnes_1765315308119.png',
+  'Sven Botman': '/players/botman_1765315308120.png',
+  'Dan Burn': '/players/burn_1765315308120.png',
+  'Anthony Elanga': '/players/elanga_1765315308121.png',
+  'Anthony Gordon': '/players/gordon_1765315308121.png',
+  'Bruno Guimarães': '/players/guimaraes_1765315308121.png',
+  'Lewis Hall': '/players/hall_1765315308122.png',
+  'Joelinton': '/players/joelinton_1765315308122.png',
+  'Tino Livramento': '/players/livramento_1765315479137.png',
+  'Jacob Murphy': '/players/murphy_1765315479137.png',
+  'Sandro Tonali': '/players/tonali_1765315479138.png',
+};
+
 const PlayerAvatar = ({ name, size = 'md', className = '' }) => {
+  const imageUrl = playerAvatars[name];
   const sizeClasses = {
     sm: 'h-8 w-8 text-xs',
     md: 'h-12 w-12 text-sm',
@@ -120,6 +140,16 @@ const PlayerAvatar = ({ name, size = 'md', className = '' }) => {
     xl: 'h-24 w-24 text-2xl',
   };
   const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2);
+  
+  if (imageUrl) {
+    return (
+      <img
+        src={imageUrl}
+        alt={name}
+        className={`${sizeClasses[size]} rounded-full object-cover ${className}`}
+      />
+    );
+  }
   
   return (
     <div className={`${sizeClasses[size]} rounded-full bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center font-semibold ${className}`}>
