@@ -19,6 +19,7 @@ Preferred communication style: Simple, everyday language.
 ### Application Structure
 The application follows a client-side only architecture with no backend:
 - `/src` - Main source directory containing React components and data files
+- `/src/App.jsx` - Main application component with all screens and features
 - `/src/main.jsx` - Application entry point
 - `/src/index.css` - Tailwind CSS imports
 - `/src/data-*.js` - Static data files for squad and shortlist information
@@ -35,11 +36,45 @@ The application follows a client-side only architecture with no backend:
 - Reusable badge components for ratings, sources, and status indicators
 - Rating systems include FC ratings (numerical) and star ratings (visual)
 
-### Key Features
-1. **Squad Management** - View and manage current squad with detailed player profiles
-2. **Shortlist/CRM** - Track transfer targets through recruitment pipeline stages
-3. **Player Profiles** - Comprehensive player data including stats, contract info, and injury tracking
-4. **Data Visualization** - Rating badges, injury indicators, and performance metrics
+## Key Features
+
+### 1. Dashboard with Squad Health Check
+- **Proactive Risk Detection**: Auto-generates issues from squad data analysis
+- **Issue Cards**: Critical/moderate/low priority categorization with risk scores
+- **Smart Recommendations**: Each issue includes actionable suggestions
+- **Quick Actions**: "Create Shortlist" and "Resolve/Snooze" buttons on each issue
+
+### 2. CRM-style Shortlists
+- **Plan A + Plan B Layout**: Retain current player vs. replacement candidates view
+- **Ball Holder Assignment**: Track who owns each recruitment action
+- **Gates Workflow**: Four-stage pipeline (Scouting → Manager → Budget → Medical)
+- **Pipeline Stage Indicators**: Visual progress through recruitment stages
+- **Budget Tracking**: Transfer fee and wages tracking per shortlist
+- **Severity Levels**: Priority indicators with deadline tracking
+
+### 3. Rich Player Activity Timeline
+- **Pre-populated Activities**: Seven players with realistic activity histories
+- **Activity Types**: Phone calls, scout visits, video reviews, meetings, discussions, status changes, emails
+- **Timeline Modal**: Visual timeline display with chronological activity log
+
+### 4. Smart Create Shortlist Modal
+- **AI Inference Box**: Shows reasoning and assumptions for auto-populated fields
+- **Auto-population**: Title, trigger, severity, and budget derived from player data
+- **Quick Creation**: Streamlined workflow from issue to actionable shortlist
+
+### 5. Dismiss/Snooze Modal
+- **Resolve Option**: Mark issues as addressed
+- **Snooze Duration**: Multiple timeframe options (1 day, 1 week, 1 month, etc.)
+- **Issue Management**: Clean workflow for handling non-urgent items
+
+### 6. AI Assistant Chat Panel
+- **Side Panel Interface**: Slide-out panel for queries
+- **Natural Language**: Ask questions about squad, players, or recruitment
+
+### 7. Navigation & UI
+- **Light Theme Sidebar**: Clean navigation with badge counts
+- **Multiple Screens**: Dashboard, Squad, Shortlists, Player Profile views
+- **Responsive Design**: Optimized for desktop recruitment workflow
 
 ## External Dependencies
 
