@@ -87,7 +87,7 @@ const playerAvatars = {
   'Kieran Trippier': '/players/trippier_1765315479138.png',
   'Fabian Schär': '/players/schar_1765315479138.png',
   'Nick Pope': '/players/pope_1765315479137.png',
-  'Sean Longstaff': null,
+  'Sean Longstaff': '/players/longstaff_1765315600236.png',
   'Tiago Santos': null,
   'Vanderson': null,
   'Alex Fresneda': null,
