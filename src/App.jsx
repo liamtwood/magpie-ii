@@ -8,6 +8,7 @@ import {
   ArrowUp, ArrowDown, ExternalLink, GripVertical, MessageCircle
 } from 'lucide-react';
 import WhatsAppPanel from './ui/WhatsAppPanel';
+import EnhancedPlayerProfile from './ui/EnhancedPlayerProfile';
 
 // Data source badge component
 const SourceBadge = ({ source }) => {
