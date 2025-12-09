@@ -2201,6 +2201,46 @@ export default function MagpieV2() {
           ))}
         </nav>
 
+        <div className="border-t border-gray-200 flex flex-col flex-1 min-h-0">
+          <div className="p-3 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <Zap className="h-4 w-4 text-amber-500" />
+              <span className="text-sm font-semibold">AI Assistant</span>
+            </div>
+          </div>
+          <div className="flex-1 p-3 overflow-auto space-y-2 min-h-0" style={{ maxHeight: '200px' }}>
+            {chatMessages.map((msg, i) => (
+              <div key={i} className={`${msg.role === 'user' ? 'text-right' : ''}`}>
+                <div className={`inline-block px-3 py-1.5 rounded-lg text-xs max-w-[95%] ${
+                  msg.role === 'user' 
+                    ? 'bg-slate-900 text-white' 
+                    : 'bg-gray-100 text-gray-700'
+                }`}>
+                  {msg.text}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="p-3 border-t border-gray-100">
+            <div className="flex gap-1.5">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleChat()}
+                placeholder="Ask about players..."
+                className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button 
+                onClick={handleChat}
+                className="p-1.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800"
+              >
+                <Send className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
@@ -2239,48 +2279,6 @@ export default function MagpieV2() {
           {activeScreen === 'player-profile' && renderPlayerProfileScreen()}
         </main>
       </div>
-
-      <aside className="w-80 bg-white border-l border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-amber-500" />
-            <span className="font-semibold">AI Assistant</span>
-          </div>
-        </div>
-        
-        <div className="flex-1 p-4 overflow-auto space-y-4">
-          {chatMessages.map((msg, i) => (
-            <div key={i} className={`${msg.role === 'user' ? 'text-right' : ''}`}>
-              <div className={`inline-block px-4 py-2 rounded-xl text-sm max-w-[90%] ${
-                msg.role === 'user' 
-                  ? 'bg-slate-900 text-white' 
-                  : 'bg-gray-100 text-gray-700'
-              }`}>
-                {msg.text}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="p-4 border-t border-gray-200">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleChat()}
-              placeholder="Ask about players..."
-              className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button 
-              onClick={handleChat}
-              className="p-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800"
-            >
-              <Send className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </aside>
 
       {openShortlistPanel && (
         <div className="fixed inset-0 z-50 flex justify-end">
