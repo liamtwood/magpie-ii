@@ -5,8 +5,9 @@ import {
   PoundSterling, CalendarDays, MessageSquare, Pause, CheckCircle2, 
   Circle, Clock, TrendingUp, Activity, Zap, Shield, Heart,
   Send, X, MoreHorizontal, Filter, ArrowUpDown, Phone, Eye,
-  ArrowUp, ArrowDown, ExternalLink, GripVertical
+  ArrowUp, ArrowDown, ExternalLink, GripVertical, MessageCircle
 } from 'lucide-react';
+import WhatsAppPanel from './ui/WhatsAppPanel';
 
 // Data source badge component
 const SourceBadge = ({ source }) => {
@@ -161,6 +162,40 @@ export default function MagpieV2() {
   const [openShortlistPanel, setOpenShortlistPanel] = useState(null);
   const [shortlistRankings, setShortlistRankings] = useState({});
   const [openPlayerPanel, setOpenPlayerPanel] = useState(null);
+  const [showWhatsAppPanel, setShowWhatsAppPanel] = useState(false);
+  const [activeWhatsAppShortlist, setActiveWhatsAppShortlist] = useState(null);
+  const [whatsAppGroups, setWhatsAppGroups] = useState({
+    'trippier': {
+      hasGroup: true,
+      groupName: 'RB Recruitment Team',
+      participants: ['Steve Nickson', 'Eddie Howe', 'Mark Thompson', 'Dan Ashworth'],
+      messages: [
+        { sender: 'Steve Nickson', text: 'Just spoke with Trippier\'s agent. Wage demands still high at £95K/wk.', time: '10:32', isOwn: false },
+        { sender: 'Eddie Howe', text: 'That\'s above budget. What about Santos as backup?', time: '10:45', isOwn: false },
+        { sender: 'Mark Thompson', text: 'Santos looked great against PSG. I\'d recommend we accelerate contact.', time: '11:02', isOwn: false },
+        { sender: 'You', text: 'Agreed. I\'ll set up a call with Gestifute for tomorrow.', time: '11:15', isOwn: true },
+        { sender: 'Dan Ashworth', text: 'Good plan. Let\'s have backup options ready for the board meeting Friday.', time: '11:23', isOwn: false },
+      ]
+    },
+    'cb': {
+      hasGroup: true,
+      groupName: 'CB Emergency Cover',
+      participants: ['Steve Nickson', 'Eddie Howe', 'Medical Team', 'Dan Ashworth'],
+      messages: [
+        { sender: 'Medical Team', text: 'Botman update: ACL surgery successful. Looking at 6-8 month recovery.', time: '09:15', isOwn: false },
+        { sender: 'Eddie Howe', text: 'We need to move fast. Guéhi is the priority - can we get a meeting with Palace?', time: '09:32', isOwn: false },
+        { sender: 'Steve Nickson', text: 'Palace willing to talk. They want £65M but there\'s room to negotiate.', time: '10:01', isOwn: false },
+        { sender: 'You', text: 'I\'ll coordinate with legal on contract structure. Can we do installments?', time: '10:18', isOwn: true },
+        { sender: 'Dan Ashworth', text: 'Board approved up to £70M. Let\'s get this done before the window opens.', time: '10:45', isOwn: false },
+      ]
+    },
+    'longstaff': {
+      hasGroup: false,
+      groupName: null,
+      participants: [],
+      messages: []
+    }
+  });
   const [playerActivities, setPlayerActivities] = useState({
     'kieran-trippier': [
       { id: 1, type: 'phone_call', date: '2024-12-05', user: 'Steve Nickson', title: 'Call with Trippier\'s agent', content: 'Discussed wage expectations. Agent pushing for £95K/wk, we offered £75K. Will reconvene next week.' },
@@ -595,6 +630,32 @@ export default function MagpieV2() {
     setActiveShortlistId(shortlistId);
     setSelectedPlayer({ name: playerName });
     setShowAddNoteModal(true);
+  };
+
+  const openWhatsApp = (shortlist) => {
+    setActiveWhatsAppShortlist(shortlist);
+    setShowWhatsAppPanel(true);
+  };
+
+  const handleInitiateWhatsAppGroup = () => {
+    if (activeWhatsAppShortlist) {
+      const newGroup = {
+        hasGroup: true,
+        groupName: `${activeWhatsAppShortlist.title} Team`,
+        participants: [activeWhatsAppShortlist.ballHolder.name, 'Eddie Howe', 'Dan Ashworth'],
+        messages: [
+          { sender: 'System', text: 'Group created. Start collaborating on this shortlist!', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), isOwn: false }
+        ]
+      };
+      setWhatsAppGroups(prev => ({
+        ...prev,
+        [activeWhatsAppShortlist.id]: newGroup
+      }));
+    }
+  };
+
+  const getWhatsAppGroup = (shortlistId) => {
+    return whatsAppGroups[shortlistId] || { hasGroup: false, groupName: null, participants: [], messages: [] };
   };
 
   const TimelineModal = () => {
@@ -1876,6 +1937,17 @@ export default function MagpieV2() {
                         </span>
                       </div>
                       <div className="flex gap-2">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); openWhatsApp(shortlist); }}
+                          className={`px-3 py-1.5 text-xs rounded-lg flex items-center gap-1.5 ${
+                            getWhatsAppGroup(shortlist.id).hasGroup 
+                              ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                              : 'border border-gray-300 text-gray-600 hover:bg-gray-100'
+                          }`}
+                        >
+                          <MessageCircle className="h-3.5 w-3.5" />
+                          {getWhatsAppGroup(shortlist.id).hasGroup ? 'WhatsApp' : 'Start Chat'}
+                        </button>
                         {shortlist.planA && (
                           <button 
                             onClick={(e) => { e.stopPropagation(); openPlayerTimeline(shortlist.planA.player, shortlist.id); }}
@@ -2510,6 +2582,17 @@ export default function MagpieV2() {
           </div>
         </div>
       )}
+
+      <WhatsAppPanel
+        show={showWhatsAppPanel}
+        onClose={() => setShowWhatsAppPanel(false)}
+        shortlistTitle={activeWhatsAppShortlist?.title || ''}
+        groupName={activeWhatsAppShortlist ? getWhatsAppGroup(activeWhatsAppShortlist.id).groupName : null}
+        hasGroup={activeWhatsAppShortlist ? getWhatsAppGroup(activeWhatsAppShortlist.id).hasGroup : false}
+        messages={activeWhatsAppShortlist ? getWhatsAppGroup(activeWhatsAppShortlist.id).messages : []}
+        participants={activeWhatsAppShortlist ? getWhatsAppGroup(activeWhatsAppShortlist.id).participants : []}
+        onInitiateGroup={handleInitiateWhatsAppGroup}
+      />
 
       <style>{`
         @keyframes slide-in-right {
