@@ -84,9 +84,9 @@ const GateCheckbox = ({ label, checked }) => (
 
 // Player avatar images - add image URLs here for players
 const playerAvatars = {
-  'Kieran Trippier': null,
-  'Fabian Schär': null,
-  'Nick Pope': null,
+  'Kieran Trippier': '/players/trippier_1765315479138.png',
+  'Fabian Schär': '/players/schar_1765315479138.png',
+  'Nick Pope': '/players/pope_1765315479137.png',
   'Sean Longstaff': null,
   'Tiago Santos': null,
   'Vanderson': null,
@@ -103,6 +103,11 @@ const playerAvatars = {
   'Bruno Guimarães': '/players/guimaraes_1765315308121.png',
   'Lewis Hall': '/players/hall_1765315308122.png',
   'Joelinton': '/players/joelinton_1765315308122.png',
+  'Tino Livramento': '/players/livramento_1765315479137.png',
+  'Jacob Murphy': '/players/murphy_1765315479137.png',
+  'Sandro Tonali': '/players/tonali_1765315479138.png',
+  'Miguel Almirón': '/players/lasalles_1765315479136.png',
+  'Will Osula': '/players/woltemade_1765315479138.png',
 };
 
 // Player avatar component with image support and initials fallback
