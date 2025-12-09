@@ -1398,19 +1398,118 @@ export default function MagpieV2() {
     );
   };
 
-  const renderSquadScreen = () => (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900">Current Squad</h2>
-        <div className="flex gap-2">
-          <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">
-            <Filter className="h-4 w-4" />
-            Filter
-          </button>
-          <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">
-            <ArrowUpDown className="h-4 w-4" />
-            Sort
-          </button>
+  const renderSquadScreen = () => {
+    const positionCounts = squad.reduce((acc, player) => {
+      acc[player.position] = (acc[player.position] || 0) + 1;
+      return acc;
+    }, {});
+    
+    const totalValue = squad.reduce((sum, p) => sum + parseValue(p.value), 0);
+    const avgAge = (squad.reduce((sum, p) => sum + p.age, 0) / squad.length).toFixed(1);
+    const injuredCount = squad.filter(p => p.injury.daysOut > 30).length;
+    
+    return (
+    <div className="space-y-6">
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Squad Overview</h2>
+            <p className="text-gray-500 mt-1">Current squad composition and status</p>
+          </div>
+          <div className="flex gap-2">
+            <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">
+              <Filter className="h-4 w-4" />
+              Filter
+            </button>
+            <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">
+              <ArrowUpDown className="h-4 w-4" />
+              Sort
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-6 gap-4 mb-6">
+          <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                <Users className="h-5 w-5 text-slate-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-slate-700">{squad.length}</div>
+                <div className="text-xs text-slate-500">Total Players</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-green-50 rounded-xl p-4 border border-green-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <Target className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-green-700">{positionCounts['GK'] || 0}</div>
+                <div className="text-xs text-green-600">Goalkeepers</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Shield className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-blue-700">{(positionCounts['CB'] || 0) + (positionCounts['RB'] || 0) + (positionCounts['LB'] || 0)}</div>
+                <div className="text-xs text-blue-600">Defenders</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-purple-50 rounded-xl p-4 border border-purple-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Activity className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-purple-700">{positionCounts['CM'] || 0}</div>
+                <div className="text-xs text-purple-600">Midfielders</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                <Zap className="h-5 w-5 text-amber-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-amber-700">{(positionCounts['LW'] || 0) + (positionCounts['RW'] || 0) + (positionCounts['CF'] || 0)}</div>
+                <div className="text-xs text-amber-600">Attackers</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-red-50 rounded-xl p-4 border border-red-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <Heart className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-red-700">{injuredCount}</div>
+                <div className="text-xs text-red-600">Long-term Injured</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+            <div className="text-xs text-gray-500 mb-1">Squad Value</div>
+            <div className="text-lg font-bold text-gray-900">€{(totalValue / 1000000).toFixed(0)}M</div>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+            <div className="text-xs text-gray-500 mb-1">Average Age</div>
+            <div className="text-lg font-bold text-gray-900">{avgAge} years</div>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+            <div className="text-xs text-gray-500 mb-1">Players with Flags</div>
+            <div className="text-lg font-bold text-gray-900">{squad.filter(p => p.flag).length}</div>
+          </div>
         </div>
       </div>
 
@@ -1467,6 +1566,7 @@ export default function MagpieV2() {
       </div>
     </div>
   );
+  };
 
   const [searchFilters, setSearchFilters] = useState({
     position: 'CM',
