@@ -93,7 +93,8 @@ const playerAvatars = {
   'Sean Longstaff': '/players/longstaff_1765315600236.png',
   'Tiago Santos': '/players/santos_1765321431388.webp',
   'Vanderson': null,
-  'Alex Fresneda': null,
+  'Malo Gusto': null,
+  'Devyne Rensch': null,
   'Sander Berge': null,
   'Adam Wharton': null,
   'Marc Guéhi': null,
@@ -383,7 +384,8 @@ export default function MagpieV2() {
       planB: [
         { id: 1, name: 'Tiago Santos', club: 'Lille', age: 22, rating: 4, status: 'Agent Contacted', statusStage: 5, fee: '£12M', wages: '£55K/wk' },
         { id: 2, name: 'Vanderson', club: 'Monaco', age: 23, rating: 3.5, status: 'Video Review', statusStage: 2, fee: '£18M', wages: '£70K/wk' },
-        { id: 3, name: 'Alex Fresneda', club: 'Sporting CP', age: 20, rating: 3.5, status: 'Data Scouting', statusStage: 1, fee: '£10M', wages: '£40K/wk' },
+        { id: 3, name: 'Malo Gusto', club: 'Chelsea', age: 21, rating: 3, status: 'Video Review', statusStage: 2, fee: '£35M', wages: '£65K/wk' },
+        { id: 4, name: 'Devyne Rensch', club: 'Ajax', age: 21, rating: 3, status: 'Data Scouting', statusStage: 1, fee: '£17M', wages: '£40K/wk' },
       ],
     },
     {
