@@ -131,8 +131,8 @@ const playerAvatars = {
   'Sandro Tonali': '/players/tonali_1765315479138.png',
 };
 
-const PlayerAvatar = ({ name, size = 'md', className = '' }) => {
-  const imageUrl = playerAvatars[name];
+const PlayerAvatar = ({ name, image, size = 'md', className = '' }) => {
+  const imageUrl = image || playerAvatars[name];
   const sizeClasses = {
     sm: 'h-8 w-8 text-xs',
     md: 'h-12 w-12 text-sm',
@@ -147,6 +147,7 @@ const PlayerAvatar = ({ name, size = 'md', className = '' }) => {
         src={imageUrl}
         alt={name}
         className={`${sizeClasses[size]} rounded-full object-cover ${className}`}
+        onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
       />
     );
   }
@@ -169,7 +170,7 @@ const getStatusBadge = (status) => {
   return configs[status] || { bg: 'bg-gray-100', text: 'text-gray-600', label: status };
 };
 
-export default function EnhancedPlayerProfile({ show, onClose, playerId, gates, activities, whatsAppData }) {
+export default function EnhancedPlayerProfile({ show, onClose, playerId, playerImage, gates, activities, whatsAppData }) {
   const [activeTab, setActiveTab] = useState('overview');
   
   if (!show || !playerId) return null;
@@ -207,7 +208,7 @@ export default function EnhancedPlayerProfile({ show, onClose, playerId, gates, 
               <ChevronRight className="h-5 w-5 rotate-180" />
             </button>
             <div className="flex-1 flex items-center gap-5 ml-2">
-              <PlayerAvatar name={player.name} size="xl" />
+              <PlayerAvatar name={player.name} image={playerImage || player.image} size="xl" />
               <div className="text-white flex-1">
                 <div className="flex items-center gap-3 mb-1">
                   <h2 className="text-2xl font-bold">{player.name}</h2>

@@ -167,6 +167,7 @@ export default function MagpieV2() {
   const [activeWhatsAppShortlist, setActiveWhatsAppShortlist] = useState(null);
   const [showEnhancedProfile, setShowEnhancedProfile] = useState(false);
   const [enhancedPlayerId, setEnhancedPlayerId] = useState(null);
+  const [enhancedPlayerImage, setEnhancedPlayerImage] = useState(null);
   const [enhancedPlayerShortlistId, setEnhancedPlayerShortlistId] = useState(null);
   const [openActionMenuId, setOpenActionMenuId] = useState(null);
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -257,8 +258,9 @@ export default function MagpieV2() {
   ]);
   const [chatInput, setChatInput] = useState('');
 
-  const openEnhancedProfile = (playerName, shortlistId = null) => {
+  const openEnhancedProfile = (playerName, shortlistId = null, playerImage = null) => {
     setEnhancedPlayerId(playerName);
+    setEnhancedPlayerImage(playerImage);
     setEnhancedPlayerShortlistId(shortlistId);
     setShowEnhancedProfile(true);
   };
@@ -2920,7 +2922,7 @@ export default function MagpieV2() {
                   <ChevronRight className="h-5 w-5 rotate-180" />
                 </button>
                 <div className="flex-1 flex items-center gap-4 ml-2">
-                  <PlayerAvatar name={openPlayerPanel.name} size="xl" />
+                  <PlayerAvatar name={openPlayerPanel.name} src={openPlayerPanel.image} size="xl" />
                   <div className="text-white">
                     <h2 className="text-xl font-bold">{openPlayerPanel.name}</h2>
                     <p className="text-white/70">{openPlayerPanel.position} • Age {openPlayerPanel.age}</p>
@@ -3026,6 +3028,7 @@ export default function MagpieV2() {
         show={showEnhancedProfile}
         onClose={() => setShowEnhancedProfile(false)}
         playerId={enhancedPlayerId}
+        playerImage={enhancedPlayerImage}
         gates={enhancedProfileData.gates}
         activities={enhancedProfileData.activities}
         whatsAppData={enhancedProfileData.whatsAppData}
