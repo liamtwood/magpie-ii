@@ -1964,6 +1964,10 @@ export default function MagpieV2() {
 
   const [searchFilters, setSearchFilters] = useState({
     position: 'CM',
+    name: '',
+    country: '',
+    league: '',
+    club: '',
     ageMin: 18,
     ageMax: 35,
     valueMin: 0,
@@ -2027,7 +2031,21 @@ export default function MagpieV2() {
     );
   };
 
-  const sortedPlayers = [...searchPlayersData].sort((a, b) => {
+  // Get unique values for dropdowns
+  const uniqueCountries = [...new Set(searchPlayersData.map(p => p.country))].sort();
+  const uniqueLeagues = [...new Set(searchPlayersData.map(p => p.league))].sort();
+  const uniqueClubs = [...new Set(searchPlayersData.map(p => p.club))].sort();
+
+  // Filter and sort players
+  const filteredPlayers = searchPlayersData.filter(player => {
+    if (searchFilters.name && !player.name.toLowerCase().includes(searchFilters.name.toLowerCase())) return false;
+    if (searchFilters.country && player.country !== searchFilters.country) return false;
+    if (searchFilters.league && player.league !== searchFilters.league) return false;
+    if (searchFilters.club && player.club !== searchFilters.club) return false;
+    return true;
+  });
+
+  const sortedPlayers = [...filteredPlayers].sort((a, b) => {
     const aVal = a[searchSort.field];
     const bVal = b[searchSort.field];
     return searchSort.direction === 'desc' ? bVal - aVal : aVal - bVal;
@@ -2251,35 +2269,40 @@ export default function MagpieV2() {
             <Search className="h-4 w-4" />
           </div>
           <ChevronRight className="h-3 w-3 text-white/50" />
+          <input 
+            type="text"
+            placeholder="Player name..."
+            value={searchFilters.name}
+            onChange={(e) => setSearchFilters({...searchFilters, name: e.target.value})}
+            className="px-2 py-1 bg-slate-600 rounded text-white/90 text-sm border-none focus:outline-none focus:ring-1 focus:ring-white/30 placeholder-white/50 w-32"
+          />
+          <ChevronRight className="h-3 w-3 text-white/50" />
           <select 
-            value={searchFilters.position}
-            onChange={(e) => setSearchFilters({...searchFilters, position: e.target.value})}
+            value={searchFilters.country}
+            onChange={(e) => setSearchFilters({...searchFilters, country: e.target.value})}
             className="px-2 py-1 bg-slate-600 rounded text-white/90 text-sm border-none focus:outline-none focus:ring-1 focus:ring-white/30 cursor-pointer"
           >
-            <option value="CM">CM - Centre Mid</option>
-            <option value="CB">CB - Centre Back</option>
-            <option value="RB">RB - Right Back</option>
-            <option value="LB">LB - Left Back</option>
-            <option value="LW">LW - Left Wing</option>
-            <option value="RW">RW - Right Wing</option>
-            <option value="CF">CF - Centre Forward</option>
-            <option value="GK">GK - Goalkeeper</option>
+            <option value="">All Countries</option>
+            {uniqueCountries.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
           <ChevronRight className="h-3 w-3 text-white/50" />
-          <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-600 rounded text-white/90">
-            <Calendar className="h-3 w-3" />
-            <span>Age: {searchFilters.ageMin}-{searchFilters.ageMax}</span>
-          </div>
+          <select 
+            value={searchFilters.league}
+            onChange={(e) => setSearchFilters({...searchFilters, league: e.target.value})}
+            className="px-2 py-1 bg-slate-600 rounded text-white/90 text-sm border-none focus:outline-none focus:ring-1 focus:ring-white/30 cursor-pointer"
+          >
+            <option value="">All Leagues</option>
+            {uniqueLeagues.map(l => <option key={l} value={l}>{l}</option>)}
+          </select>
           <ChevronRight className="h-3 w-3 text-white/50" />
-          <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-600 rounded text-white/90">
-            <TrendingUp className="h-3 w-3" />
-            <span>€{searchFilters.valueMin}M-€{searchFilters.valueMax}M</span>
-          </div>
-          <ChevronRight className="h-3 w-3 text-white/50" />
-          <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-600 rounded text-white/90">
-            <FileText className="h-3 w-3" />
-            <span>{searchFilters.contractMin}-{searchFilters.contractMax}mo</span>
-          </div>
+          <select 
+            value={searchFilters.club}
+            onChange={(e) => setSearchFilters({...searchFilters, club: e.target.value})}
+            className="px-2 py-1 bg-slate-600 rounded text-white/90 text-sm border-none focus:outline-none focus:ring-1 focus:ring-white/30 cursor-pointer"
+          >
+            <option value="">All Clubs</option>
+            {uniqueClubs.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
           <div className="ml-auto flex items-center gap-2">
             <div className="px-2 py-1 bg-blue-500 rounded text-white font-medium text-xs">
               {sortedPlayers.length} results
