@@ -2061,7 +2061,7 @@ export default function MagpieV2() {
                   <th className="px-3 py-3 text-left">Club</th>
                   <th className="px-3 py-3 text-left">Value</th>
                   <th className="px-3 py-3 text-center">Tier</th>
-                  <th className="px-2 py-3 text-center bg-blue-50">OVR</th>
+                  <th className="px-2 py-3 text-center bg-blue-50">Rating</th>
                   <th className="px-3 py-3 text-center">Actions</th>
                 </tr>
               </thead>
