@@ -91,6 +91,15 @@ The application follows a client-side only architecture with no backend:
 - **State Management**: `whatsAppGroups` state in App.jsx tracks group data per shortlist
 - **Component**: `src/ui/WhatsAppPanel.jsx` - reusable WhatsApp-style modal
 
+### 10. Interactive Pitch View
+- **View Toggle**: Switch between List and Pitch views on Squad screen
+- **4-3-3 Formation**: Visual soccer pitch with positioned player markers
+- **Player Avatars**: Real player photos displayed on pitch positions
+- **Shortlist Indicators**: Red badges show candidate count per position
+- **Position Panel**: Click any position to see current player(s) vs replacement candidates
+- **Quick Navigation**: Links to player profiles and full shortlists from pitch view
+- **State Management**: `squadViewMode` and `selectedPitchPosition` in App.jsx
+
 ## External Dependencies
 
 ### NPM Packages
