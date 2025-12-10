@@ -2284,36 +2284,39 @@ export default function MagpieV2() {
             <Filter className="h-4 w-4" />
           </div>
           <ChevronRight className="h-3 w-3 text-white/50" />
-          <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-600 rounded text-white/90">
-            <Flag className="h-3 w-3" />
+          <div className="flex items-center gap-1.5 bg-slate-600 rounded text-white/90">
+            <Flag className="h-3 w-3 ml-2 flex-shrink-0" />
             <select 
               value={searchFilters.country}
               onChange={(e) => setSearchFilters({...searchFilters, country: e.target.value, league: '', club: ''})}
-              className="bg-transparent text-white/90 text-sm border-none focus:outline-none cursor-pointer"
+              className="px-2 py-1 bg-slate-600 text-white text-sm rounded border-none focus:outline-none cursor-pointer appearance-none pr-6"
+              style={{backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 4px center', backgroundSize: '16px'}}
             >
               <option value="">All Countries</option>
               {uniqueCountries.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <ChevronRight className="h-3 w-3 text-white/50" />
-          <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-600 rounded text-white/90">
-            <Trophy className="h-3 w-3" />
+          <div className="flex items-center gap-1.5 bg-slate-600 rounded text-white/90">
+            <Trophy className="h-3 w-3 ml-2 flex-shrink-0" />
             <select 
               value={searchFilters.league}
               onChange={(e) => setSearchFilters({...searchFilters, league: e.target.value, club: ''})}
-              className="bg-transparent text-white/90 text-sm border-none focus:outline-none cursor-pointer"
+              className="px-2 py-1 bg-slate-600 text-white text-sm rounded border-none focus:outline-none cursor-pointer appearance-none pr-6"
+              style={{backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 4px center', backgroundSize: '16px'}}
             >
               <option value="">All Leagues</option>
               {uniqueLeagues.map(l => <option key={l} value={l}>{l}</option>)}
             </select>
           </div>
           <ChevronRight className="h-3 w-3 text-white/50" />
-          <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-600 rounded text-white/90">
-            <Shield className="h-3 w-3" />
+          <div className="flex items-center gap-1.5 bg-slate-600 rounded text-white/90">
+            <Shield className="h-3 w-3 ml-2 flex-shrink-0" />
             <select 
               value={searchFilters.club}
               onChange={(e) => setSearchFilters({...searchFilters, club: e.target.value})}
-              className="bg-transparent text-white/90 text-sm border-none focus:outline-none cursor-pointer"
+              className="px-2 py-1 bg-slate-600 text-white text-sm rounded border-none focus:outline-none cursor-pointer appearance-none pr-6"
+              style={{backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 4px center', backgroundSize: '16px'}}
             >
               <option value="">All Clubs</option>
               {uniqueClubs.map(c => <option key={c} value={c}>{c}</option>)}
