@@ -5,7 +5,8 @@ import {
   PoundSterling, CalendarDays, MessageSquare, Pause, CheckCircle2, 
   Circle, Clock, TrendingUp, Activity, Zap, Shield, Heart,
   Send, X, MoreHorizontal, Filter, ArrowUpDown, Phone, Eye,
-  ArrowUp, ArrowDown, ExternalLink, GripVertical, MessageCircle
+  ArrowUp, ArrowDown, ExternalLink, GripVertical, MessageCircle,
+  Home, Trophy, Flag
 } from 'lucide-react';
 import WhatsAppPanel from './ui/WhatsAppPanel';
 import EnhancedPlayerProfile from './ui/EnhancedPlayerProfile';
@@ -2055,18 +2056,12 @@ export default function MagpieV2() {
                   <th className="px-3 py-3 text-left">#</th>
                   <th className="px-3 py-3 text-left">Player</th>
                   <th className="px-3 py-3 text-left">Age</th>
+                  <th className="px-3 py-3 text-left">Country</th>
+                  <th className="px-3 py-3 text-left">League</th>
                   <th className="px-3 py-3 text-left">Club</th>
                   <th className="px-3 py-3 text-left">Value</th>
                   <th className="px-3 py-3 text-center">Tier</th>
                   <th className="px-2 py-3 text-center bg-blue-50">OVR</th>
-                  <th className="px-2 py-3 text-center">DIS</th>
-                  <th className="px-2 py-3 text-center">PRO</th>
-                  <th className="px-2 py-3 text-center">F&C</th>
-                  <th className="px-2 py-3 text-center">PHY(I)</th>
-                  <th className="px-2 py-3 text-center">PHY(O)</th>
-                  <th className="px-2 py-3 text-center">PHY</th>
-                  <th className="px-2 py-3 text-center">DEF</th>
-                  <th className="px-2 py-3 text-center">PRE</th>
                   <th className="px-3 py-3 text-center">Actions</th>
                 </tr>
               </thead>
@@ -2097,26 +2092,12 @@ export default function MagpieV2() {
                       </div>
                     </td>
                     <td className="px-3 py-2 text-gray-600">{player.age}</td>
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-1 text-xs text-gray-500">
-                        <span>{player.country}</span>
-                        <ChevronRight className="h-3 w-3" />
-                        <span>{player.league}</span>
-                        <ChevronRight className="h-3 w-3" />
-                        <span className="text-gray-700 font-medium">{player.club}</span>
-                      </div>
-                    </td>
+                    <td className="px-3 py-2 text-gray-600">{player.country}</td>
+                    <td className="px-3 py-2 text-gray-600">{player.league}</td>
+                    <td className="px-3 py-2 text-gray-700 font-medium">{player.club}</td>
                     <td className="px-3 py-2 font-medium">{player.value}</td>
                     <td className="px-3 py-2 text-center"><TierBadge tier={player.tier} /></td>
                     <MetricCell value={player.overall} />
-                    <MetricCell value={player.distribution} />
-                    <MetricCell value={player.progression} />
-                    <MetricCell value={player.finishing} />
-                    <MetricCell value={player.physicalIn} />
-                    <MetricCell value={player.physicalOut} />
-                    <MetricCell value={player.physicalOther} />
-                    <MetricCell value={player.defending} />
-                    <MetricCell value={player.pressing} />
                     <td className="px-3 py-2 text-center">
                       <button 
                         onClick={(e) => { e.stopPropagation(); }}
@@ -2939,6 +2920,32 @@ export default function MagpieV2() {
                 >
                   <X className="h-5 w-5" />
                 </button>
+              </div>
+            </div>
+
+            <div className="bg-slate-700 px-4 py-2 flex items-center gap-2 text-sm">
+              <div className="flex items-center gap-2 text-white/80">
+                <Home className="h-4 w-4" />
+              </div>
+              <ChevronRight className="h-3 w-3 text-white/50" />
+              <div className="flex items-center gap-2 px-2 py-1 bg-slate-600 rounded text-white/90">
+                <Flag className="h-3 w-3" />
+                <span>{openPlayerPanel.country || 'England'}</span>
+              </div>
+              <ChevronRight className="h-3 w-3 text-white/50" />
+              <div className="flex items-center gap-2 px-2 py-1 bg-slate-600 rounded text-white/90">
+                <Trophy className="h-3 w-3" />
+                <span>{openPlayerPanel.league || 'Premier League'}</span>
+              </div>
+              <ChevronRight className="h-3 w-3 text-white/50" />
+              <div className="flex items-center gap-2 px-2 py-1 bg-slate-600 rounded text-white/90">
+                <Shield className="h-3 w-3" />
+                <span>{openPlayerPanel.club}</span>
+              </div>
+              <ChevronRight className="h-3 w-3 text-white/50" />
+              <div className="flex items-center gap-2 px-2 py-1 bg-slate-600 rounded text-white font-medium">
+                <User className="h-3 w-3" />
+                <span>({openPlayerPanel.number || '-'}) {openPlayerPanel.name}</span>
               </div>
             </div>
 
