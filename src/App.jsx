@@ -114,7 +114,7 @@ const playerAvatars = {
   'Anthony Elanga': '/players/elanga.webp',
   'Jacob Murphy': '/players/murphy_1765339295871.png',
   'Nick Woltemade': '/players/woltemade_1765339295873.png',
-  'Yoane Wissa': 'https://img.a.transfermarkt.technology/portrait/medium/451694-1694417878.jpg',
+  'Yoane Wissa': '/players/wissa.webp',
   'William Osula': '/players/osula.webp',
   'Tiago Santos': '/players/santos_1765321431388.webp',
   'Malo Gusto': '/players/gusto_1765337067.jpg',
