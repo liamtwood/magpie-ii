@@ -118,6 +118,8 @@ const playerAvatars = {
   'Nick Pope': '/players/pope_1765315479137.png',
   'Sean Longstaff': '/players/longstaff_1765315600236.png',
   'Tiago Santos': '/players/santos_1765321431388.webp',
+  'Malo Gusto': '/players/gusto_1765337067.jpg',
+  'Devyne Rensch': '/players/rensch_1765337091.jpg',
   'Harvey Barnes': '/players/barnes_1765315308119.png',
   'Sven Botman': '/players/botman_1765315308120.png',
   'Dan Burn': '/players/burn_1765315308120.png',
