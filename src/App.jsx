@@ -296,35 +296,35 @@ export default function MagpieV2() {
   };
 
   const squad = [
-    { id: 1, name: 'Nick Pope', position: 'GK', age: 33, contract: '2026', value: '€7M', injury: { risk: 'medium', daysOut: 45 }, flag: '⚠️ Contract', minutes: 2340 },
-    { id: 32, name: 'Aaron Ramsdale', position: 'GK', age: 27, contract: '2029', value: '€12M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 900 },
-    { id: 31, name: 'Max Thompson', position: 'GK', age: 21, contract: '2027', value: '€0.25M', injury: { risk: 'low', daysOut: 0 }, flag: '🎓 U21', minutes: 0 },
-    { id: 29, name: 'Mark Gillespie', position: 'GK', age: 33, contract: '2026', value: '€0.15M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 0 },
-    { id: 26, name: 'John Ruddy', position: 'GK', age: 39, contract: '2026', value: '€0.1M', injury: { risk: 'low', daysOut: 0 }, flag: '⚠️ Contract', minutes: 0 },
-    { id: 12, name: 'Malick Thiaw', position: 'CB', age: 24, contract: '2030', value: '€40M', injury: { risk: 'low', daysOut: 0 }, flag: '🆕 New', minutes: 0 },
-    { id: 4, name: 'Sven Botman', position: 'CB', age: 25, contract: '2027', value: '€35M', injury: { risk: 'high', daysOut: 180 }, flag: '🏥 ACL', minutes: 450 },
-    { id: 5, name: 'Fabian Schär', position: 'CB', age: 33, contract: '2026', value: '€6M', injury: { risk: 'low', daysOut: 12 }, flag: '⚠️ Contract', minutes: 2100 },
-    { id: 33, name: 'Dan Burn', position: 'CB', age: 33, contract: '2027', value: '€5M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 1980 },
-    { id: 6, name: 'Jamaal Lascelles', position: 'CB', age: 32, contract: '2026', value: '€2M', injury: { risk: 'medium', daysOut: 30 }, flag: '⚠️ Contract', minutes: 360 },
-    { id: 3, name: 'Lewis Hall', position: 'LB', age: 21, contract: '2029', value: '€32M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 2250 },
-    { id: 37, name: 'Alex Murphy', position: 'LB', age: 21, contract: '2027', value: '€0.3M', injury: { risk: 'low', daysOut: 0 }, flag: '🎓 U21', minutes: 0 },
-    { id: 21, name: 'Tino Livramento', position: 'RB', age: 23, contract: '2028', value: '€40M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 2100 },
-    { id: 2, name: 'Kieran Trippier', position: 'RB', age: 35, contract: '2026', value: '€2.5M', injury: { risk: 'high', daysOut: 67 }, flag: '⚠️ Contract', minutes: 1890 },
-    { id: 17, name: 'Emil Krafth', position: 'RB', age: 31, contract: '2026', value: '€1.5M', injury: { risk: 'low', daysOut: 0 }, flag: '⚠️ Contract', minutes: 540 },
-    { id: 30, name: 'Harrison Ashby', position: 'RB', age: 24, contract: '2027', value: '€1.4M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 180 },
-    { id: 8, name: 'Sandro Tonali', position: 'DM', age: 25, contract: '2028', value: '€75M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 1800 },
-    { id: 39, name: 'Bruno Guimarães', position: 'CM', age: 28, contract: '2028', value: '€75M', injury: { risk: 'low', daysOut: 4 }, flag: '⭐ Key', minutes: 2520 },
-    { id: 41, name: 'Jacob Ramsey', position: 'CM', age: 24, contract: '2030', value: '€35M', injury: { risk: 'low', daysOut: 0 }, flag: '🆕 New', minutes: 0 },
-    { id: 7, name: 'Joelinton', position: 'CM', age: 29, contract: '2028', value: '€30M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 2340 },
-    { id: 67, name: 'Lewis Miley', position: 'CM', age: 19, contract: '2029', value: '€20M', injury: { risk: 'low', daysOut: 0 }, flag: '🌟 Prospect', minutes: 900 },
-    { id: 28, name: 'Joe Willock', position: 'CM', age: 26, contract: '2027', value: '€16M', injury: { risk: 'medium', daysOut: 60 }, flag: '🏥 Injury', minutes: 720 },
-    { id: 10, name: 'Anthony Gordon', position: 'LW', age: 24, contract: '2029', value: '€60M', injury: { risk: 'low', daysOut: 0 }, flag: '⭐ Key', minutes: 2580 },
-    { id: 11, name: 'Harvey Barnes', position: 'LW', age: 28, contract: '2028', value: '€32M', injury: { risk: 'medium', daysOut: 20 }, flag: null, minutes: 1800 },
-    { id: 20, name: 'Anthony Elanga', position: 'RW', age: 23, contract: '2030', value: '€50M', injury: { risk: 'low', daysOut: 0 }, flag: '🆕 New', minutes: 0 },
-    { id: 23, name: 'Jacob Murphy', position: 'RW', age: 30, contract: '2027', value: '€15M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 1950 },
-    { id: 27, name: 'Nick Woltemade', position: 'CF', age: 23, contract: '2031', value: '€70M', injury: { risk: 'low', daysOut: 0 }, flag: '⭐ Key', minutes: 720 },
-    { id: 9, name: 'Yoane Wissa', position: 'CF', age: 29, contract: '2030', value: '€35M', injury: { risk: 'low', daysOut: 0 }, flag: '🆕 New', minutes: 0 },
-    { id: 18, name: 'William Osula', position: 'CF', age: 22, contract: '2030', value: '€15M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 360 },
+    { id: 1, number: 1, name: 'Nick Pope', position: 'GK', age: 33, contract: '2026', value: '€7M', injury: { risk: 'medium', daysOut: 45 }, flag: '⚠️ Contract', minutes: 2340 },
+    { id: 32, number: 32, name: 'Aaron Ramsdale', position: 'GK', age: 27, contract: '2029', value: '€12M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 900 },
+    { id: 31, number: 31, name: 'Max Thompson', position: 'GK', age: 21, contract: '2027', value: '€0.25M', injury: { risk: 'low', daysOut: 0 }, flag: '🎓 U21', minutes: 0 },
+    { id: 29, number: 29, name: 'Mark Gillespie', position: 'GK', age: 33, contract: '2026', value: '€0.15M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 0 },
+    { id: 26, number: 26, name: 'John Ruddy', position: 'GK', age: 39, contract: '2026', value: '€0.1M', injury: { risk: 'low', daysOut: 0 }, flag: '⚠️ Contract', minutes: 0 },
+    { id: 12, number: 12, name: 'Malick Thiaw', position: 'CB', age: 24, contract: '2030', value: '€40M', injury: { risk: 'low', daysOut: 0 }, flag: '🆕 New', minutes: 0 },
+    { id: 4, number: 4, name: 'Sven Botman', position: 'CB', age: 25, contract: '2027', value: '€35M', injury: { risk: 'high', daysOut: 180 }, flag: '🏥 ACL', minutes: 450 },
+    { id: 5, number: 5, name: 'Fabian Schär', position: 'CB', age: 33, contract: '2026', value: '€6M', injury: { risk: 'low', daysOut: 12 }, flag: '⚠️ Contract', minutes: 2100 },
+    { id: 33, number: 33, name: 'Dan Burn', position: 'CB', age: 33, contract: '2027', value: '€5M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 1980 },
+    { id: 6, number: 6, name: 'Jamaal Lascelles', position: 'CB', age: 32, contract: '2026', value: '€2M', injury: { risk: 'medium', daysOut: 30 }, flag: '⚠️ Contract', minutes: 360 },
+    { id: 3, number: 3, name: 'Lewis Hall', position: 'LB', age: 21, contract: '2029', value: '€32M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 2250 },
+    { id: 37, number: 37, name: 'Alex Murphy', position: 'LB', age: 21, contract: '2027', value: '€0.3M', injury: { risk: 'low', daysOut: 0 }, flag: '🎓 U21', minutes: 0 },
+    { id: 21, number: 21, name: 'Tino Livramento', position: 'RB', age: 23, contract: '2028', value: '€40M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 2100 },
+    { id: 2, number: 2, name: 'Kieran Trippier', position: 'RB', age: 35, contract: '2026', value: '€2.5M', injury: { risk: 'high', daysOut: 67 }, flag: '⚠️ Contract', minutes: 1890 },
+    { id: 17, number: 17, name: 'Emil Krafth', position: 'RB', age: 31, contract: '2026', value: '€1.5M', injury: { risk: 'low', daysOut: 0 }, flag: '⚠️ Contract', minutes: 540 },
+    { id: 30, number: 30, name: 'Harrison Ashby', position: 'RB', age: 24, contract: '2027', value: '€1.4M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 180 },
+    { id: 8, number: 8, name: 'Sandro Tonali', position: 'DM', age: 25, contract: '2028', value: '€75M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 1800 },
+    { id: 39, number: 39, name: 'Bruno Guimarães', position: 'CM', age: 28, contract: '2028', value: '€75M', injury: { risk: 'low', daysOut: 4 }, flag: '⭐ Key', minutes: 2520 },
+    { id: 41, number: 41, name: 'Jacob Ramsey', position: 'CM', age: 24, contract: '2030', value: '€35M', injury: { risk: 'low', daysOut: 0 }, flag: '🆕 New', minutes: 0 },
+    { id: 7, number: 7, name: 'Joelinton', position: 'CM', age: 29, contract: '2028', value: '€30M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 2340 },
+    { id: 67, number: 67, name: 'Lewis Miley', position: 'CM', age: 19, contract: '2029', value: '€20M', injury: { risk: 'low', daysOut: 0 }, flag: '🌟 Prospect', minutes: 900 },
+    { id: 28, number: 28, name: 'Joe Willock', position: 'CM', age: 26, contract: '2027', value: '€16M', injury: { risk: 'medium', daysOut: 60 }, flag: '🏥 Injury', minutes: 720 },
+    { id: 10, number: 10, name: 'Anthony Gordon', position: 'LW', age: 24, contract: '2029', value: '€60M', injury: { risk: 'low', daysOut: 0 }, flag: '⭐ Key', minutes: 2580 },
+    { id: 11, number: 11, name: 'Harvey Barnes', position: 'LW', age: 28, contract: '2028', value: '€32M', injury: { risk: 'medium', daysOut: 20 }, flag: null, minutes: 1800 },
+    { id: 20, number: 20, name: 'Anthony Elanga', position: 'RW', age: 23, contract: '2030', value: '€50M', injury: { risk: 'low', daysOut: 0 }, flag: '🆕 New', minutes: 0 },
+    { id: 23, number: 23, name: 'Jacob Murphy', position: 'RW', age: 30, contract: '2027', value: '€15M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 1950 },
+    { id: 27, number: 27, name: 'Nick Woltemade', position: 'CF', age: 23, contract: '2031', value: '€70M', injury: { risk: 'low', daysOut: 0 }, flag: '⭐ Key', minutes: 720 },
+    { id: 9, number: 9, name: 'Yoane Wissa', position: 'CF', age: 29, contract: '2030', value: '€35M', injury: { risk: 'low', daysOut: 0 }, flag: '🆕 New', minutes: 0 },
+    { id: 18, number: 18, name: 'William Osula', position: 'CF', age: 22, contract: '2030', value: '€15M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 360 },
   ];
 
   const parseValue = (valueStr) => {
@@ -1698,6 +1698,7 @@ export default function MagpieV2() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr className="text-xs font-semibold text-gray-500 uppercase">
+                <th className="px-3 py-3 text-center w-12">#</th>
                 <th className="px-4 py-3 text-left">Player</th>
                 <th className="px-4 py-3 text-left">Pos</th>
                 <th className="px-4 py-3 text-left">Age</th>
@@ -1711,6 +1712,9 @@ export default function MagpieV2() {
             <tbody className="divide-y divide-gray-100">
               {squad.map((player) => (
                 <tr key={player.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setOpenPlayerPanel(player)}>
+                  <td className="px-3 py-3 text-center">
+                    <span className="text-sm font-bold text-gray-700">{player.number}</span>
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <PlayerAvatar name={player.name} size="sm" />
