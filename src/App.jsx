@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { 
   Users, Search, ClipboardList, User, Target, BarChart3, Video,
   ChevronDown, ChevronUp, ChevronRight, Plus, Star, AlertCircle,
-  PoundSterling, CalendarDays, MessageSquare, Pause, CheckCircle2, 
+  PoundSterling, CalendarDays, Calendar, MessageSquare, Pause, CheckCircle2, 
   Circle, Clock, TrendingUp, Activity, Zap, Shield, Heart,
   Send, X, MoreHorizontal, Filter, ArrowUpDown, Phone, Eye,
   ArrowUp, ArrowDown, ExternalLink, GripVertical, MessageCircle,
-  Home, Trophy, Flag, List, LayoutGrid
+  Home, Trophy, Flag, List, LayoutGrid, FileText
 } from 'lucide-react';
 import WhatsAppPanel from './ui/WhatsAppPanel';
 import EnhancedPlayerProfile from './ui/EnhancedPlayerProfile';
@@ -2245,27 +2245,67 @@ export default function MagpieV2() {
       </div>
 
       <div className="flex-1 space-y-4 overflow-auto">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">Player Search: Centre Mids</h2>
-            <p className="text-sm text-gray-500">Showing {sortedPlayers.length} players</p>
+        {/* Breadcrumb-style Filter Bar */}
+        <div className="bg-slate-700 px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm flex-wrap">
+          <div className="flex items-center gap-2 text-white/80">
+            <Search className="h-4 w-4" />
           </div>
-          <div className="flex gap-2">
+          <ChevronRight className="h-3 w-3 text-white/50" />
+          <select 
+            value={searchFilters.position}
+            onChange={(e) => setSearchFilters({...searchFilters, position: e.target.value})}
+            className="px-2 py-1 bg-slate-600 rounded text-white/90 text-sm border-none focus:outline-none focus:ring-1 focus:ring-white/30 cursor-pointer"
+          >
+            <option value="CM">CM - Centre Mid</option>
+            <option value="CB">CB - Centre Back</option>
+            <option value="RB">RB - Right Back</option>
+            <option value="LB">LB - Left Back</option>
+            <option value="LW">LW - Left Wing</option>
+            <option value="RW">RW - Right Wing</option>
+            <option value="CF">CF - Centre Forward</option>
+            <option value="GK">GK - Goalkeeper</option>
+          </select>
+          <ChevronRight className="h-3 w-3 text-white/50" />
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-600 rounded text-white/90">
+            <Calendar className="h-3 w-3" />
+            <span>Age: {searchFilters.ageMin}-{searchFilters.ageMax}</span>
+          </div>
+          <ChevronRight className="h-3 w-3 text-white/50" />
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-600 rounded text-white/90">
+            <TrendingUp className="h-3 w-3" />
+            <span>€{searchFilters.valueMin}M-€{searchFilters.valueMax}M</span>
+          </div>
+          <ChevronRight className="h-3 w-3 text-white/50" />
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-600 rounded text-white/90">
+            <FileText className="h-3 w-3" />
+            <span>{searchFilters.contractMin}-{searchFilters.contractMax}mo</span>
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            <div className="px-2 py-1 bg-blue-500 rounded text-white font-medium text-xs">
+              {sortedPlayers.length} results
+            </div>
             <select 
               value={`${searchSort.field}-${searchSort.direction}`}
               onChange={(e) => {
                 const [field, direction] = e.target.value.split('-');
                 setSearchSort({ field, direction });
               }}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+              className="px-2 py-1 bg-slate-600 rounded text-white/90 text-sm border-none focus:outline-none focus:ring-1 focus:ring-white/30 cursor-pointer"
             >
-              <option value="overall-desc">Overall (High to Low)</option>
-              <option value="overall-asc">Overall (Low to High)</option>
-              <option value="age-asc">Age (Young to Old)</option>
-              <option value="age-desc">Age (Old to Young)</option>
-              <option value="pressing-desc">Pressing (High to Low)</option>
-              <option value="defending-desc">Defending (High to Low)</option>
+              <option value="overall-desc">Overall ↓</option>
+              <option value="overall-asc">Overall ↑</option>
+              <option value="age-asc">Age ↑</option>
+              <option value="age-desc">Age ↓</option>
+              <option value="pressing-desc">Pressing ↓</option>
+              <option value="defending-desc">Defending ↓</option>
             </select>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Player Search: {searchFilters.position}</h2>
+            <p className="text-sm text-gray-500">Showing {sortedPlayers.length} players matching filters</p>
           </div>
         </div>
 
