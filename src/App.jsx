@@ -311,11 +311,11 @@ export default function MagpieV2() {
     { id: 28, name: 'Joe Willock', position: 'CM', age: 26, contract: '2027', value: '€20M', injury: { risk: 'medium', daysOut: 60 }, flag: '🏥 Injury', minutes: 720 },
     { id: 10, name: 'Anthony Gordon', position: 'LW', age: 24, contract: '2029', value: '€70M', injury: { risk: 'low', daysOut: 0 }, flag: '⭐ Key', minutes: 2580 },
     { id: 15, name: 'Harvey Barnes', position: 'LW', age: 27, contract: '2028', value: '€35M', injury: { risk: 'medium', daysOut: 20 }, flag: null, minutes: 1800 },
+    { id: 11, name: 'Nick Woltemade', position: 'CF', age: 23, contract: '2031', value: '€65M', injury: { risk: 'low', daysOut: 0 }, flag: '⭐ Key', minutes: 720 },
     { id: 9, name: 'Callum Wilson', position: 'CF', age: 33, contract: '2025', value: '€5M', injury: { risk: 'high', daysOut: 90 }, flag: '🏥 Injury', minutes: 540 },
+    { id: 18, name: 'William Osula', position: 'CF', age: 21, contract: '2030', value: '€8M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 360 },
     { id: 23, name: 'Jacob Murphy', position: 'RW', age: 30, contract: '2027', value: '€12M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 1950 },
     { id: 24, name: 'Miguel Almirón', position: 'RW', age: 31, contract: '2026', value: '€8M', injury: { risk: 'low', daysOut: 0 }, flag: '⚠️ Contract', minutes: 1620 },
-    { id: 18, name: 'William Osula', position: 'CF', age: 21, contract: '2030', value: '€8M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 360 },
-    { id: 11, name: 'Nick Woltemade', position: 'CF', age: 23, contract: '2031', value: '€65M', injury: { risk: 'low', daysOut: 0 }, flag: '🆕 New', minutes: 720 },
   ];
 
   const parseValue = (valueStr) => {
