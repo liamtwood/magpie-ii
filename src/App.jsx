@@ -1666,7 +1666,10 @@ export default function MagpieV2() {
             {squad.map((player) => (
               <tr key={player.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setOpenPlayerPanel(player)}>
                 <td className="px-4 py-3">
-                  <div className="font-medium text-gray-900">{player.name}</div>
+                  <div className="flex items-center gap-3">
+                    <PlayerAvatar name={player.name} size="sm" />
+                    <span className="font-medium text-gray-900">{player.name}</span>
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <span className="px-2 py-1 bg-gray-100 rounded text-xs font-medium">{player.position}</span>
