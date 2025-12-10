@@ -111,7 +111,7 @@ const playerAvatars = {
   'Joe Willock': '/players/willock.webp',
   'Anthony Gordon': '/players/gordon_1765339295868.png',
   'Harvey Barnes': '/players/barnes_1765339295866.png',
-  'Anthony Elanga': '/players/elanga_1765339295867.png',
+  'Anthony Elanga': '/players/elanga.webp',
   'Jacob Murphy': '/players/murphy_1765339295871.png',
   'Nick Woltemade': '/players/woltemade_1765339295873.png',
   'Yoane Wissa': 'https://img.a.transfermarkt.technology/portrait/medium/451694-1694417878.jpg',
