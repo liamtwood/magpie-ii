@@ -3,7 +3,8 @@ import {
   X, ChevronRight, MapPin, Calendar, Ruler, Flag, User, 
   Briefcase, FileText, TrendingUp, Activity, Shield, Zap,
   Target, Clock, AlertCircle, CheckCircle, ChevronDown,
-  Circle, Phone, Eye, Video, MessageSquare, Search, Send
+  Circle, Phone, Eye, Video, MessageSquare, Search, Send,
+  Home, Trophy
 } from 'lucide-react';
 import { shortlistCandidates } from '../data-shortlist-candidates';
 
@@ -247,6 +248,32 @@ export default function EnhancedPlayerProfile({ show, onClose, playerId, playerI
             >
               <X className="h-5 w-5" />
             </button>
+          </div>
+        </div>
+
+        <div className="bg-slate-700 px-4 py-2 flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-2 text-white/80">
+            <Home className="h-4 w-4" />
+          </div>
+          <ChevronRight className="h-3 w-3 text-white/50" />
+          <div className="flex items-center gap-2 px-2 py-1 bg-slate-600 rounded text-white/90">
+            <Flag className="h-3 w-3" />
+            <span>{player.nation}</span>
+          </div>
+          <ChevronRight className="h-3 w-3 text-white/50" />
+          <div className="flex items-center gap-2 px-2 py-1 bg-slate-600 rounded text-white/90">
+            <Trophy className="h-3 w-3" />
+            <span>{player.league}</span>
+          </div>
+          <ChevronRight className="h-3 w-3 text-white/50" />
+          <div className="flex items-center gap-2 px-2 py-1 bg-slate-600 rounded text-white/90">
+            <Shield className="h-3 w-3" />
+            <span>{player.club}</span>
+          </div>
+          <ChevronRight className="h-3 w-3 text-white/50" />
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-600 rounded text-white font-medium">
+            <PlayerAvatar name={player.name} image={playerImage || player.image} size="sm" className="h-5 w-5" />
+            <span>({player.number || '-'}) {player.name}</span>
           </div>
         </div>
 
