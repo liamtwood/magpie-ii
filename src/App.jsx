@@ -93,7 +93,7 @@ const playerAvatars = {
   'Sean Longstaff': '/players/longstaff_1765315600236.png',
   'Tiago Santos': '/players/santos_1765321431388.webp',
   'Malo Gusto': '/players/gusto_1765337067.jpg',
-  'Devyne Rensch': null,
+  'Devyne Rensch': '/players/rensch_1765337091.jpg',
   'Sander Berge': null,
   'Adam Wharton': null,
   'Marc Guéhi': null,
