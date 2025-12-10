@@ -2263,6 +2263,13 @@ export default function MagpieV2() {
       </div>
 
       <div className="flex-1 space-y-4 overflow-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Player Search: {searchFilters.position}</h2>
+            <p className="text-sm text-gray-500">Showing {sortedPlayers.length} players matching filters</p>
+          </div>
+        </div>
+
         {/* Breadcrumb-style Filter Bar */}
         <div className="bg-slate-700 px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm flex-wrap">
           <div className="flex items-center gap-2 text-white/80">
@@ -2322,13 +2329,6 @@ export default function MagpieV2() {
               <option value="pressing-desc">Pressing ↓</option>
               <option value="defending-desc">Defending ↓</option>
             </select>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">Player Search: {searchFilters.position}</h2>
-            <p className="text-sm text-gray-500">Showing {sortedPlayers.length} players matching filters</p>
           </div>
         </div>
 
