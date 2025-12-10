@@ -281,11 +281,11 @@ export default function EnhancedPlayerProfile({ show, onClose, playerId, playerI
 
         <div className="border-b border-gray-200 px-6 flex gap-1 bg-gray-50">
           <TabButton active={activeTab === 'overview'} onClick={() => setActiveTab('overview')}>Overview</TabButton>
-          {!isSquadPlayer && <TabButton active={activeTab === 'performance'} onClick={() => setActiveTab('performance')}>Performance</TabButton>}
-          {!isSquadPlayer && <TabButton active={activeTab === 'matches'} onClick={() => setActiveTab('matches')}>Matches</TabButton>}
-          {!isSquadPlayer && <TabButton active={activeTab === 'career'} onClick={() => setActiveTab('career')}>Career</TabButton>}
-          {!isSquadPlayer && <TabButton active={activeTab === 'timeline'} onClick={() => setActiveTab('timeline')}>Timeline</TabButton>}
-          {!isSquadPlayer && <TabButton active={activeTab === 'whatsapp'} onClick={() => setActiveTab('whatsapp')}>WhatsApp</TabButton>}
+          <TabButton active={activeTab === 'performance'} onClick={() => setActiveTab('performance')}>Performance</TabButton>
+          <TabButton active={activeTab === 'matches'} onClick={() => setActiveTab('matches')}>Matches</TabButton>
+          <TabButton active={activeTab === 'career'} onClick={() => setActiveTab('career')}>Career</TabButton>
+          <TabButton active={activeTab === 'timeline'} onClick={() => setActiveTab('timeline')}>Timeline</TabButton>
+          <TabButton active={activeTab === 'whatsapp'} onClick={() => setActiveTab('whatsapp')}>WhatsApp</TabButton>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
@@ -306,160 +306,130 @@ export default function EnhancedPlayerProfile({ show, onClose, playerId, playerI
                 </div>
               )}
 
-              {isSquadPlayer ? (
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="bg-white rounded-xl border border-gray-200 p-4">
-                    <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <User className="h-4 w-4 text-gray-400" />
-                      Player Information
-                    </h3>
-                    <div className="space-y-2 text-sm">
+              <div className="grid grid-cols-4 gap-3">
+                <StatCard label="Contract Until" value={player.contract || 'N/A'} icon={FileText} />
+                <StatCard label="Joined Club" value={player.joinedClub || 'N/A'} icon={Calendar} />
+                <StatCard label="Weekly Wages" value={player.wages || 'N/A'} icon={Briefcase} />
+                <StatCard label="Agent" value={player.agent || 'N/A'} icon={User} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div className="bg-white rounded-xl border border-gray-200 p-4">
+                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <User className="h-4 w-4 text-gray-400" />
+                    Player Information
+                  </h3>
+                  <div className="space-y-2 text-sm">
+                    {player.dob && (
                       <div className="flex justify-between">
-                        <span className="text-gray-500">Nationality</span>
-                        <span className="font-medium">{player.nation}</span>
+                        <span className="text-gray-500">Date of Birth</span>
+                        <span className="font-medium">{player.dob} (Age {player.age})</span>
                       </div>
+                    )}
+                    {!player.dob && player.age && (
                       <div className="flex justify-between">
                         <span className="text-gray-500">Age</span>
                         <span className="font-medium">{player.age} years</span>
                       </div>
+                    )}
+                    {player.birthplace && (
                       <div className="flex justify-between">
-                        <span className="text-gray-500">Position</span>
-                        <span className="font-medium">{player.position}</span>
+                        <span className="text-gray-500">Birthplace</span>
+                        <span className="font-medium">{player.birthplace}</span>
                       </div>
+                    )}
+                    {player.height && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Height</span>
+                        <span className="font-medium">{player.height} {player.heightMetric ? `(${player.heightMetric})` : ''}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Citizenship</span>
+                      <span className="font-medium">{player.nation || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Position</span>
+                      <span className="font-medium">{player.position}</span>
+                    </div>
+                    {player.number && (
                       <div className="flex justify-between">
                         <span className="text-gray-500">Squad Number</span>
                         <span className="font-medium">#{player.number}</span>
                       </div>
+                    )}
+                    {player.foot && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Preferred Foot</span>
+                        <span className="font-medium">{player.foot}</span>
+                      </div>
+                    )}
+                    {player.minutes !== undefined && (
                       <div className="flex justify-between">
                         <span className="text-gray-500">Minutes Played</span>
-                        <span className="font-medium">{player.minutes || 0}</span>
+                        <span className="font-medium">{player.minutes}</span>
                       </div>
-                      {player.flag && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Status</span>
-                          <span className="font-medium">{player.flag}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-xl border border-gray-200 p-4">
-                    <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-gray-400" />
-                      Contract Details
-                    </h3>
-                    <div className="space-y-2 text-sm">
+                    )}
+                    {player.nationalTeam && (
                       <div className="flex justify-between">
-                        <span className="text-gray-500">Current Club</span>
-                        <span className="font-medium">{player.club}</span>
+                        <span className="text-gray-500">International</span>
+                        <span className="font-medium">{player.nationalTeam} ({player.caps || 0} caps)</span>
                       </div>
+                    )}
+                    {player.flag && (
                       <div className="flex justify-between">
-                        <span className="text-gray-500">League</span>
-                        <span className="font-medium">{player.league}</span>
+                        <span className="text-gray-500">Status</span>
+                        <span className="font-medium">{player.flag}</span>
                       </div>
+                    )}
+                    {player.injury && player.injury.daysOut > 0 && (
                       <div className="flex justify-between">
-                        <span className="text-gray-500">Contract Until</span>
-                        <span className="font-medium">{player.contract}</span>
+                        <span className="text-gray-500">Injury</span>
+                        <span className="font-medium text-red-600">{player.injury.daysOut} days out</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Market Value</span>
-                        <span className="font-medium text-green-600">{player.marketValue}</span>
-                      </div>
-                      {player.injury && player.injury.daysOut > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Injury Status</span>
-                          <span className="font-medium text-red-600">{player.injury.daysOut} days out</span>
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-4 gap-3">
-                    <StatCard label="Contract Until" value={player.contract} icon={FileText} />
-                    <StatCard label="Joined Club" value={player.joinedClub} icon={Calendar} />
-                    <StatCard label="Weekly Wages" value={player.wages} icon={Briefcase} />
-                    <StatCard label="Agent" value={player.agent} icon={User} />
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="bg-white rounded-xl border border-gray-200 p-4">
-                      <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                        <User className="h-4 w-4 text-gray-400" />
-                        Player Information
-                      </h3>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Date of Birth</span>
-                          <span className="font-medium">{player.dob} (Age {player.age})</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Birthplace</span>
-                          <span className="font-medium">{player.birthplace}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Height</span>
-                          <span className="font-medium">{player.height} ({player.heightMetric})</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Citizenship</span>
-                          <span className="font-medium">{player.nation}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Position</span>
-                          <span className="font-medium">{player.position}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Preferred Foot</span>
-                          <span className="font-medium">{player.foot}</span>
-                        </div>
-                        {player.nationalTeam && (
-                          <div className="flex justify-between">
-                            <span className="text-gray-500">International</span>
-                            <span className="font-medium">{player.nationalTeam} ({player.caps || 0} caps)</span>
-                          </div>
-                        )}
-                      </div>
+                <div className="bg-white rounded-xl border border-gray-200 p-4">
+                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-gray-400" />
+                    Contract Details
+                  </h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Current Club</span>
+                      <span className="font-medium">{player.club}</span>
                     </div>
-
-                    <div className="bg-white rounded-xl border border-gray-200 p-4">
-                      <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-gray-400" />
-                        Contract Details
-                      </h3>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Current Club</span>
-                          <span className="font-medium">{player.club}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">League</span>
-                          <span className="font-medium">{player.league} ({player.leagueLevel || 'First Tier'})</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Joined</span>
-                          <span className="font-medium">{player.joinedClub}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Contract Expires</span>
-                          <span className="font-medium">{player.contractExpiry || player.contract}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Market Value</span>
-                          <span className="font-medium text-green-600">{player.marketValue}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Expected Fee</span>
-                          <span className="font-medium">{player.fee}</span>
-                        </div>
-                      </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">League</span>
+                      <span className="font-medium">{player.league} {player.leagueLevel ? `(${player.leagueLevel})` : ''}</span>
                     </div>
+                    {player.joinedClub && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Joined</span>
+                        <span className="font-medium">{player.joinedClub}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Contract Expires</span>
+                      <span className="font-medium">{player.contractExpiry || player.contract || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Market Value</span>
+                      <span className="font-medium text-green-600">{player.marketValue || 'N/A'}</span>
+                    </div>
+                    {player.fee && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Expected Fee</span>
+                        <span className="font-medium">{player.fee}</span>
+                      </div>
+                    )}
                   </div>
-                </>
-              )}
+                </div>
+              </div>
 
-              {!isSquadPlayer && Object.keys(metrics).length > 0 && (
+              {Object.keys(metrics).length > 0 && (
                 <div className="bg-white rounded-xl border border-gray-200 p-4">
                   <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                     <Activity className="h-4 w-4 text-blue-500" />
@@ -473,7 +443,7 @@ export default function EnhancedPlayerProfile({ show, onClose, playerId, playerI
                 </div>
               )}
 
-              {!isSquadPlayer && (player.pros?.length > 0 || player.cons?.length > 0) && (
+              {(player.pros?.length > 0 || player.cons?.length > 0) && (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-green-50 rounded-xl border border-green-200 p-4">
                     <h3 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
@@ -506,7 +476,7 @@ export default function EnhancedPlayerProfile({ show, onClose, playerId, playerI
                 </div>
               )}
 
-              {!isSquadPlayer && player.scoutingNotes && (
+              {player.scoutingNotes && (
                 <div className="bg-blue-50 rounded-xl border border-blue-200 p-4">
                   <h3 className="font-semibold text-blue-800 mb-2">Scouting Notes</h3>
                   <p className="text-sm text-blue-700">{player.scoutingNotes}</p>
