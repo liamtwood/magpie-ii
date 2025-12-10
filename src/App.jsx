@@ -1759,18 +1759,18 @@ export default function MagpieV2() {
   const [searchSort, setSearchSort] = useState({ field: 'overall', direction: 'desc' });
 
   const searchPlayersData = [
-    { id: 1, name: 'Pedri', age: 23, club: 'Barcelona', value: '€140M', tier: 1, overall: 9.08, distribution: 6.88, progression: 8.07, finishing: 6.52, physicalIn: 4.37, physicalOut: 6.59, physicalOther: 6.46, defending: 2.49, pressing: 3.95 },
-    { id: 2, name: 'Vitinha', age: 25.8, club: 'Paris Saint-Ger...', value: '€90M', tier: 1, overall: 8.25, distribution: 8.43, progression: 7.86, finishing: 5.78, physicalIn: 4.00, physicalOut: 5.12, physicalOther: 9.22, defending: 2.09, pressing: 1.59 },
-    { id: 3, name: 'Ismael Saibari', age: 23, club: 'PSV Eindhoven', value: '€27M', tier: 2, overall: 8.03, distribution: 5.18, progression: 3.49, finishing: 7.82, physicalIn: 4.07, physicalOut: 5.10, physicalOther: 8.89, defending: 3.43, pressing: 3.85 },
-    { id: 4, name: 'Bruno Guimarães', age: 26, club: 'Newcastle United', value: '€100M', tier: 1, overall: 7.61, distribution: 6.06, progression: 4.85, finishing: 3.77, physicalIn: 4.31, physicalOut: 5.86, physicalOther: 6.55, defending: 3.08, pressing: 2.13 },
-    { id: 5, name: 'Florian Wirtz', age: 21, club: 'Bayer Leverkusen', value: '€130M', tier: 1, overall: 8.89, distribution: 7.12, progression: 7.54, finishing: 7.21, physicalIn: 3.89, physicalOut: 4.78, physicalOther: 7.88, defending: 2.11, pressing: 2.87 },
-    { id: 6, name: 'Jamal Musiala', age: 21, club: 'Bayern Munich', value: '€120M', tier: 1, overall: 8.76, distribution: 6.95, progression: 7.23, finishing: 6.89, physicalIn: 4.12, physicalOut: 5.01, physicalOther: 8.12, defending: 2.34, pressing: 2.45 },
-    { id: 7, name: 'Declan Rice', age: 25.9, club: 'Arsenal', value: '€120M', tier: 1, overall: 7.26, distribution: 5.71, progression: 3.67, finishing: 5.34, physicalIn: 3.86, physicalOut: 4.84, physicalOther: 8.14, defending: 3.75, pressing: 2.13 },
-    { id: 8, name: 'Joshua Kimmich', age: 30.8, club: 'Bayern Munich', value: '€45M', tier: 2, overall: 7.24, distribution: 7.18, progression: 5.64, finishing: 5.38, physicalIn: 3.48, physicalOut: 5.34, physicalOther: 8.06, defending: 4.30, pressing: 1.50 },
-    { id: 9, name: 'Frenkie de Jong', age: 28.5, club: 'Barcelona', value: '€45M', tier: 2, overall: 7.21, distribution: 5.50, progression: 6.60, finishing: 3.08, physicalIn: 2.97, physicalOut: 4.74, physicalOther: 9.28, defending: 1.99, pressing: 1.86 },
-    { id: 10, name: 'Martin Ødegaard', age: 25.9, club: 'Arsenal', value: '€80M', tier: 1, overall: 7.18, distribution: 6.12, progression: 4.94, finishing: 6.25, physicalIn: 3.09, physicalOut: 4.97, physicalOther: 8.00, defending: 0.92, pressing: 1.99 },
-    { id: 11, name: 'Sandro Tonali', age: 24.5, club: 'Newcastle United', value: '€55M', tier: 2, overall: 6.82, distribution: 4.91, progression: 3.90, finishing: 4.02, physicalIn: 4.57, physicalOut: 5.70, physicalOther: 7.02, defending: 9.01, pressing: 4.47 },
-    { id: 12, name: 'Adam Wharton', age: 20, club: 'Crystal Palace', value: '€45M', tier: 2, overall: 7.05, distribution: 5.65, progression: 4.20, finishing: 4.60, physicalIn: 3.86, physicalOut: 5.02, physicalOther: 8.34, defending: 2.21, pressing: 2.20 },
+    { id: 1, name: 'Pedri', age: 23, club: 'Barcelona', value: '€140M', tier: 1, overall: 9.08, distribution: 6.88, progression: 8.07, finishing: 6.52, physicalIn: 4.37, physicalOut: 6.59, physicalOther: 6.46, defending: 2.49, pressing: 3.95, image: 'https://img.a.transfermarkt.technology/portrait/medium/683840-1744278342.jpg', tmUrl: 'https://www.transfermarkt.us/pedri/profil/spieler/683840' },
+    { id: 2, name: 'Vitinha', age: 25, club: 'Paris Saint-Germain', value: '€90M', tier: 1, overall: 8.25, distribution: 8.43, progression: 7.86, finishing: 5.78, physicalIn: 4.00, physicalOut: 5.12, physicalOther: 9.22, defending: 2.09, pressing: 1.59, image: 'https://img.a.transfermarkt.technology/portrait/medium/487469-1696319973.jpg', tmUrl: 'https://www.transfermarkt.us/vitinha/profil/spieler/487469' },
+    { id: 3, name: 'Ismael Saibari', age: 24, club: 'PSV Eindhoven', value: '€27M', tier: 2, overall: 8.03, distribution: 5.18, progression: 3.49, finishing: 7.82, physicalIn: 4.07, physicalOut: 5.10, physicalOther: 8.89, defending: 3.43, pressing: 3.85, image: 'https://img.a.transfermarkt.technology/portrait/medium/702869-1765214009.jpg', tmUrl: 'https://www.transfermarkt.us/ismael-saibari/profil/spieler/702869' },
+    { id: 4, name: 'Bruno Guimarães', age: 28, club: 'Newcastle United', value: '€80M', tier: 1, overall: 7.61, distribution: 6.06, progression: 4.85, finishing: 3.77, physicalIn: 4.31, physicalOut: 5.86, physicalOther: 6.55, defending: 3.08, pressing: 2.13, image: 'https://img.a.transfermarkt.technology/portrait/medium/520624-1663665353.jpg', tmUrl: 'https://www.transfermarkt.us/bruno-guimaraes/profil/spieler/520624' },
+    { id: 5, name: 'Florian Wirtz', age: 22, club: 'Liverpool', value: '€140M', tier: 1, overall: 8.89, distribution: 7.12, progression: 7.54, finishing: 7.21, physicalIn: 3.89, physicalOut: 4.78, physicalOther: 7.88, defending: 2.11, pressing: 2.87, image: 'https://img.a.transfermarkt.technology/portrait/medium/598577-1694590254.jpg', tmUrl: 'https://www.transfermarkt.us/florian-wirtz/profil/spieler/598577' },
+    { id: 6, name: 'Jamal Musiala', age: 22, club: 'Bayern Munich', value: '€140M', tier: 1, overall: 8.76, distribution: 6.95, progression: 7.23, finishing: 6.89, physicalIn: 4.12, physicalOut: 5.01, physicalOther: 8.12, defending: 2.34, pressing: 2.45, image: 'https://img.a.transfermarkt.technology/portrait/medium/580195-1694590377.jpg', tmUrl: 'https://www.transfermarkt.us/jamal-musiala/profil/spieler/580195' },
+    { id: 7, name: 'Declan Rice', age: 26, club: 'Arsenal', value: '€120M', tier: 1, overall: 7.26, distribution: 5.71, progression: 3.67, finishing: 5.34, physicalIn: 3.86, physicalOut: 4.84, physicalOther: 8.14, defending: 3.75, pressing: 2.13, image: 'https://img.a.transfermarkt.technology/portrait/medium/357662-1694590580.jpg', tmUrl: 'https://www.transfermarkt.us/declan-rice/profil/spieler/357662' },
+    { id: 8, name: 'Joshua Kimmich', age: 30, club: 'Bayern Munich', value: '€45M', tier: 2, overall: 7.24, distribution: 7.18, progression: 5.64, finishing: 5.38, physicalIn: 3.48, physicalOut: 5.34, physicalOther: 8.06, defending: 4.30, pressing: 1.50, image: 'https://img.a.transfermarkt.technology/portrait/medium/161056-1694590438.jpg', tmUrl: 'https://www.transfermarkt.us/joshua-kimmich/profil/spieler/161056' },
+    { id: 9, name: 'Frenkie de Jong', age: 28, club: 'Barcelona', value: '€45M', tier: 2, overall: 7.21, distribution: 5.50, progression: 6.60, finishing: 3.08, physicalIn: 2.97, physicalOut: 4.74, physicalOther: 9.28, defending: 1.99, pressing: 1.86, image: 'https://img.a.transfermarkt.technology/portrait/medium/326330-1696319844.jpg', tmUrl: 'https://www.transfermarkt.us/frenkie-de-jong/profil/spieler/326330' },
+    { id: 10, name: 'Martin Ødegaard', age: 26, club: 'Arsenal', value: '€80M', tier: 1, overall: 7.18, distribution: 6.12, progression: 4.94, finishing: 6.25, physicalIn: 3.09, physicalOut: 4.97, physicalOther: 8.00, defending: 0.92, pressing: 1.99, image: 'https://img.a.transfermarkt.technology/portrait/medium/316264-1694590561.jpg', tmUrl: 'https://www.transfermarkt.us/martin-odegaard/profil/spieler/316264' },
+    { id: 11, name: 'Sandro Tonali', age: 25, club: 'Newcastle United', value: '€75M', tier: 1, overall: 6.82, distribution: 4.91, progression: 3.90, finishing: 4.02, physicalIn: 4.57, physicalOut: 5.70, physicalOther: 7.02, defending: 9.01, pressing: 4.47, image: 'https://img.a.transfermarkt.technology/portrait/medium/397033-1694591359.jpg', tmUrl: 'https://www.transfermarkt.us/sandro-tonali/profil/spieler/397033' },
+    { id: 12, name: 'Adam Wharton', age: 21, club: 'Crystal Palace', value: '€60M', tier: 1, overall: 7.05, distribution: 5.65, progression: 4.20, finishing: 4.60, physicalIn: 3.86, physicalOut: 5.02, physicalOther: 8.34, defending: 2.21, pressing: 2.20, image: 'https://img.a.transfermarkt.technology/portrait/medium/744149-1714383653.jpg', tmUrl: 'https://www.transfermarkt.us/adam-wharton/profil/spieler/744149' },
   ];
 
   const getMetricColor = (value, max = 10) => {
@@ -2074,8 +2074,20 @@ export default function MagpieV2() {
                     <td className="px-3 py-2 text-gray-500 font-medium">{idx + 1}</td>
                     <td className="px-3 py-2">
                       <div className="flex items-center gap-2">
-                        <PlayerAvatar name={player.name} size="sm" />
-                        <span className="font-medium text-gray-900">{player.name}</span>
+                        {player.image ? (
+                          <img src={player.image} alt={player.name} className="w-8 h-8 rounded-full object-cover" />
+                        ) : (
+                          <PlayerAvatar name={player.name} size="sm" />
+                        )}
+                        <a 
+                          href={player.tmUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="font-medium text-gray-900 hover:text-blue-600 hover:underline"
+                        >
+                          {player.name}
+                        </a>
                       </div>
                     </td>
                     <td className="px-3 py-2 text-gray-600">{player.age}</td>
