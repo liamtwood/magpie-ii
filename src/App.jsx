@@ -2079,15 +2079,19 @@ export default function MagpieV2() {
                         ) : (
                           <PlayerAvatar name={player.name} size="sm" />
                         )}
-                        <a 
-                          href={player.tmUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="font-medium text-gray-900 hover:text-blue-600 hover:underline"
-                        >
-                          {player.name}
-                        </a>
+                        <span className="font-medium text-gray-900">{player.name}</span>
+                        {player.tmUrl && (
+                          <a 
+                            href={player.tmUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-gray-400 hover:text-blue-600"
+                            title="View on Transfermarkt"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        )}
                       </div>
                     </td>
                     <td className="px-3 py-2 text-gray-600">{player.age}</td>
