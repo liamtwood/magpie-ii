@@ -112,6 +112,7 @@ const playerAvatars = {
   'Jacob Murphy': 'https://img.a.transfermarkt.technology/portrait/medium/303509-1699383278.jpg',
   'Miguel Almirón': 'https://img.a.transfermarkt.technology/portrait/medium/118723-1659351524.jpg',
   'William Osula': 'https://img.a.transfermarkt.technology/portrait/medium/661936-1708333996.jpg',
+  'Nick Woltemade': 'https://img.a.transfermarkt.technology/portrait/medium/455661-1724672318.jpg',
   'Tiago Santos': 'https://img.a.transfermarkt.technology/portrait/medium/633828-1705311891.jpg',
   'Malo Gusto': 'https://img.a.transfermarkt.technology/portrait/medium/664655-1712830899.jpg',
   'Devyne Rensch': 'https://img.a.transfermarkt.technology/portrait/medium/565867-1724672377.jpg',
@@ -316,6 +317,7 @@ export default function MagpieV2() {
     { id: 23, name: 'Jacob Murphy', position: 'RW', age: 30, contract: '2027', value: '€12M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 1950 },
     { id: 24, name: 'Miguel Almirón', position: 'RW', age: 31, contract: '2026', value: '€8M', injury: { risk: 'low', daysOut: 0 }, flag: '⚠️ Contract', minutes: 1620 },
     { id: 18, name: 'William Osula', position: 'CF', age: 21, contract: '2030', value: '€8M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 360 },
+    { id: 11, name: 'Nick Woltemade', position: 'CF', age: 23, contract: '2031', value: '€65M', injury: { risk: 'low', daysOut: 0 }, flag: '🆕 New', minutes: 720 },
   ];
 
   const parseValue = (valueStr) => {
