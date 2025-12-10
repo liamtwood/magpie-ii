@@ -2189,24 +2189,24 @@ export default function MagpieV2() {
                   <div className={`w-10 h-10 rounded-lg ${config.bg} ${config.text} flex items-center justify-center font-bold text-sm border-2 ${config.border}`}>
                     {shortlist.position}
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="font-semibold text-gray-900">{shortlist.title}</div>
                     <div className="text-sm text-gray-500">{shortlist.trigger}</div>
                   </div>
-                  <div>
+                  <div className="w-40 text-right">
                     <div className="text-xs text-gray-400">BUDGET</div>
                     <div className="font-semibold">{formatBudget(shortlist.budget.transfer)} + {formatBudget(shortlist.budget.wages)}/wk</div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">
+                  <div className="w-36 flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold flex-shrink-0">
                       {shortlist.ballHolder.avatar}
                     </div>
-                    <div>
-                      <div className="text-sm font-medium">{shortlist.ballHolder.name.split(' ')[0]}</div>
-                      <div className="text-xs text-gray-400">{shortlist.ballHolder.role}</div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium truncate">{shortlist.ballHolder.name.split(' ')[0]}</div>
+                      <div className="text-xs text-gray-400 truncate">{shortlist.ballHolder.role}</div>
                     </div>
                   </div>
-                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  <div className={`w-20 text-center px-3 py-1 rounded-full text-sm font-medium ${
                     shortlist.deadline < 30 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
                   }`}>
                     {shortlist.deadline}d left
