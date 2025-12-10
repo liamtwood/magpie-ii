@@ -290,7 +290,6 @@ export default function MagpieV2() {
     { id: 6, name: 'Bruno Guimarães', position: 'CM', age: 26, contract: '2028', value: '€100M', injury: { risk: 'low', daysOut: 4 }, flag: '⭐ Key', minutes: 2520 },
     { id: 7, name: 'Sandro Tonali', position: 'CM', age: 24, contract: '2029', value: '€50M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 1200 },
     { id: 8, name: 'Sean Longstaff', position: 'CM', age: 27, contract: '2026', value: '€15M', injury: { risk: 'low', daysOut: 8 }, flag: '⚠️ Saudi Interest', minutes: 1650 },
-    { id: 9, name: 'Alexander Isak', position: 'CF', age: 25, contract: '2030', value: '€120M', injury: { risk: 'low', daysOut: 12 }, flag: '⭐ Key', minutes: 2700 },
     { id: 10, name: 'Anthony Gordon', position: 'LW', age: 23, contract: '2029', value: '€75M', injury: { risk: 'low', daysOut: 0 }, flag: null, minutes: 2580 },
   ];
 
