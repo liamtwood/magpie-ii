@@ -92,7 +92,7 @@ const playerAvatars = {
   'Nick Pope': '/players/pope_1765315479137.png',
   'Sean Longstaff': '/players/longstaff_1765315600236.png',
   'Tiago Santos': '/players/santos_1765321431388.webp',
-  'Malo Gusto': null,
+  'Malo Gusto': '/players/gusto_1765337067.jpg',
   'Devyne Rensch': null,
   'Sander Berge': null,
   'Adam Wharton': null,
