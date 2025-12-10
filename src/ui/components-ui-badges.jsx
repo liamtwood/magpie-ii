@@ -217,7 +217,7 @@ export const PlayerAvatar = ({ src, name, number, size = 'md', className = '', e
   };
 
   const initialsElement = (
-    <div className={`${sizeClasses[size]} bg-gradient-to-br from-slate-600 to-slate-800 rounded-full flex items-center justify-center text-white font-bold`}>
+    <div className={`${sizeClasses[size]} bg-gradient-to-br from-slate-600 to-slate-800 rounded-lg flex items-center justify-center text-white font-bold`}>
       {initials}
     </div>
   );
@@ -226,7 +226,7 @@ export const PlayerAvatar = ({ src, name, number, size = 'md', className = '', e
     <img 
       src={src} 
       alt={name} 
-      className={`${sizeClasses[size]} rounded-full object-cover`}
+      className={`${sizeClasses[size]} rounded-lg object-cover`}
       onError={() => setImageError(true)}
     />
   ) : initialsElement;
@@ -249,7 +249,7 @@ export const PlayerAvatar = ({ src, name, number, size = 'md', className = '', e
         className="cursor-pointer"
       >
         {avatarContent}
-        <div className={`absolute inset-0 ${sizeClasses[size]} rounded-full bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center transition-all`}>
+        <div className={`absolute inset-0 ${sizeClasses[size]} rounded-lg bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center transition-all`}>
           <Camera className={`${iconSizes[size]} text-white opacity-0 group-hover:opacity-100 transition-opacity`} />
         </div>
       </div>

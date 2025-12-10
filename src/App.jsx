@@ -134,13 +134,13 @@ const PlayerAvatar = ({ name, size = 'md', className = '' }) => {
       <img
         src={imageUrl}
         alt={name}
-        className={`${sizeClasses[size]} rounded-full object-cover ${className}`}
+        className={`${sizeClasses[size]} rounded-lg object-cover ${className}`}
       />
     );
   }
 
   return (
-    <div className={`${sizeClasses[size]} rounded-full bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center font-semibold ${className}`}>
+    <div className={`${sizeClasses[size]} rounded-lg bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center font-semibold ${className}`}>
       {initials}
     </div>
   );
@@ -2077,7 +2077,7 @@ export default function MagpieV2() {
                     <td className="px-3 py-2">
                       <div className="flex items-center gap-2">
                         {player.image ? (
-                          <img src={player.image} alt={player.name} className="w-8 h-8 rounded-full object-cover" />
+                          <img src={player.image} alt={player.name} className="w-8 h-8 rounded-lg object-cover" />
                         ) : (
                           <PlayerAvatar name={player.name} size="sm" />
                         )}

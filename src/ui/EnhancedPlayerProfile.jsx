@@ -146,14 +146,14 @@ const PlayerAvatar = ({ name, image, size = 'md', className = '' }) => {
       <img
         src={imageUrl}
         alt={name}
-        className={`${sizeClasses[size]} rounded-full object-cover ${className}`}
+        className={`${sizeClasses[size]} rounded-lg object-cover ${className}`}
         onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
       />
     );
   }
   
   return (
-    <div className={`${sizeClasses[size]} rounded-full bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center font-semibold ${className}`}>
+    <div className={`${sizeClasses[size]} rounded-lg bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center font-semibold ${className}`}>
       {initials}
     </div>
   );
