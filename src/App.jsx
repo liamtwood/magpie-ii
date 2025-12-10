@@ -6,7 +6,7 @@ import {
   Circle, Clock, TrendingUp, Activity, Zap, Shield, Heart,
   Send, X, MoreHorizontal, Filter, ArrowUpDown, Phone, Eye,
   ArrowUp, ArrowDown, ExternalLink, GripVertical, MessageCircle,
-  Home, Trophy, Flag
+  Home, Trophy, Flag, List, LayoutGrid
 } from 'lucide-react';
 import WhatsAppPanel from './ui/WhatsAppPanel';
 import EnhancedPlayerProfile from './ui/EnhancedPlayerProfile';
@@ -176,6 +176,8 @@ export default function MagpieV2() {
   const [playerStatuses, setPlayerStatuses] = useState({});
   const [customStatusInput, setCustomStatusInput] = useState('');
   const [selectedStatusOption, setSelectedStatusOption] = useState(null);
+  const [squadViewMode, setSquadViewMode] = useState('list');
+  const [selectedPitchPosition, setSelectedPitchPosition] = useState(null);
   
   const standardStatusOptions = [
     { id: 'available', label: 'Available', color: 'bg-green-100 text-green-700' },
@@ -1551,14 +1553,26 @@ export default function MagpieV2() {
             <p className="text-gray-500 mt-1">Current squad composition and status</p>
           </div>
           <div className="flex gap-2">
-            <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">
-              <Filter className="h-4 w-4" />
-              Filter
-            </button>
-            <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">
-              <ArrowUpDown className="h-4 w-4" />
-              Sort
-            </button>
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button 
+                onClick={() => setSquadViewMode('list')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  squadViewMode === 'list' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <List className="h-4 w-4" />
+                List
+              </button>
+              <button 
+                onClick={() => setSquadViewMode('pitch')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  squadViewMode === 'pitch' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Pitch
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1647,98 +1661,280 @@ export default function MagpieV2() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr className="text-xs font-semibold text-gray-500 uppercase">
-              <th className="px-4 py-3 text-left">Player</th>
-              <th className="px-4 py-3 text-left">Pos</th>
-              <th className="px-4 py-3 text-left">Age</th>
-              <th className="px-4 py-3 text-left">Contract</th>
-              <th className="px-4 py-3 text-left">Value</th>
-              <th className="px-4 py-3 text-left">Injury Risk</th>
-              <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {squad.map((player) => (
-              <tr key={player.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setOpenPlayerPanel(player)}>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <PlayerAvatar name={player.name} size="sm" />
-                    <span className="font-medium text-gray-900">{player.name}</span>
+      {squadViewMode === 'list' ? (
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr className="text-xs font-semibold text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left">Player</th>
+                <th className="px-4 py-3 text-left">Pos</th>
+                <th className="px-4 py-3 text-left">Age</th>
+                <th className="px-4 py-3 text-left">Contract</th>
+                <th className="px-4 py-3 text-left">Value</th>
+                <th className="px-4 py-3 text-left">Injury Risk</th>
+                <th className="px-4 py-3 text-left">Status</th>
+                <th className="px-4 py-3 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {squad.map((player) => (
+                <tr key={player.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setOpenPlayerPanel(player)}>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <PlayerAvatar name={player.name} size="sm" />
+                      <span className="font-medium text-gray-900">{player.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="px-2 py-1 bg-gray-100 rounded text-xs font-medium">{player.position}</span>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{player.age}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{player.contract}</td>
+                  <td className="px-4 py-3 text-sm font-medium">{player.value}</td>
+                  <td className="px-4 py-3">
+                    <InjuryBadge risk={player.injury.risk} daysOut={player.injury.daysOut} />
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      {player.flag && <span className="text-sm">{player.flag}</span>}
+                      {getPlayerStatusBadge(player.id)}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="relative">
+                      <button 
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          setOpenActionMenuId(openActionMenuId === player.id ? null : player.id);
+                        }}
+                        className="p-1.5 hover:bg-gray-100 rounded"
+                      >
+                        <MoreHorizontal className="h-4 w-4 text-gray-500" />
+                      </button>
+                      {openActionMenuId === player.id && (
+                        <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                          <button
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              handleCreateShortlist(player); 
+                              setOpenActionMenuId(null);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                          >
+                            <Plus className="h-4 w-4 text-gray-400" />
+                            Create Shortlist
+                          </button>
+                          <button
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              handleOpenStatusModal(player);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                          >
+                            <Activity className="h-4 w-4 text-gray-400" />
+                            Change Status
+                          </button>
+                          <div className="border-t border-gray-100 my-1" />
+                          <button
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              setOpenActionMenuId(null);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 text-red-600"
+                          >
+                            <X className="h-4 w-4" />
+                            Delete Player
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="flex gap-6">
+          <div className="flex-1 bg-gradient-to-b from-green-600 to-green-700 rounded-xl p-6 relative" style={{ minHeight: '600px' }}>
+            <div className="absolute inset-4 border-2 border-white/30 rounded-lg" />
+            <div className="absolute left-1/2 top-4 bottom-4 w-0.5 bg-white/30 -translate-x-1/2" />
+            <div className="absolute left-1/2 top-1/2 w-24 h-24 border-2 border-white/30 rounded-full -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute left-4 right-4 top-4 h-24 border-b-2 border-l-2 border-r-2 border-white/30" style={{ borderBottomLeftRadius: '0', borderBottomRightRadius: '0' }}>
+              <div className="absolute left-1/2 -translate-x-1/2 top-0 w-40 h-12 border-b-2 border-l-2 border-r-2 border-white/30" />
+            </div>
+            <div className="absolute left-4 right-4 bottom-4 h-24 border-t-2 border-l-2 border-r-2 border-white/30">
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-40 h-12 border-t-2 border-l-2 border-r-2 border-white/30" />
+            </div>
+
+            {(() => {
+              const formation433 = [
+                { pos: 'GK', x: 50, y: 90, label: 'GK' },
+                { pos: 'LB', x: 15, y: 70, label: 'LB' },
+                { pos: 'CB', x: 35, y: 75, label: 'CB' },
+                { pos: 'CB', x: 65, y: 75, label: 'CB', secondary: true },
+                { pos: 'RB', x: 85, y: 70, label: 'RB' },
+                { pos: 'CM', x: 30, y: 50, label: 'CM' },
+                { pos: 'CM', x: 50, y: 45, label: 'CM', secondary: true },
+                { pos: 'CM', x: 70, y: 50, label: 'CM', tertiary: true },
+                { pos: 'LW', x: 15, y: 20, label: 'LW' },
+                { pos: 'CF', x: 50, y: 15, label: 'CF' },
+                { pos: 'RW', x: 85, y: 20, label: 'RW' },
+              ];
+
+              const getPlayerForPosition = (pos, secondary, tertiary) => {
+                const posPlayers = squad.filter(p => p.position === pos);
+                if (tertiary) return posPlayers[2] || null;
+                if (secondary) return posPlayers[1] || null;
+                return posPlayers[0] || null;
+              };
+
+              const getShortlistForPosition = (pos) => {
+                return shortlists.find(s => s.position === pos);
+              };
+
+              return formation433.map((slot, idx) => {
+                const player = getPlayerForPosition(slot.pos, slot.secondary, slot.tertiary);
+                const shortlist = getShortlistForPosition(slot.pos);
+                const isSelected = selectedPitchPosition === `${slot.pos}-${idx}`;
+                const hasShortlist = !!shortlist;
+
+                return (
+                  <div
+                    key={idx}
+                    className="absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all hover:scale-110"
+                    style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
+                    onClick={() => setSelectedPitchPosition(isSelected ? null : `${slot.pos}-${idx}`)}
+                  >
+                    <div className={`relative ${isSelected ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}>
+                      {player ? (
+                        <PlayerAvatar name={player.name} size="lg" />
+                      ) : (
+                        <div className="w-14 h-14 rounded-lg bg-white/20 border-2 border-dashed border-white/40 flex items-center justify-center">
+                          <span className="text-white/60 text-xs font-bold">{slot.label}</span>
+                        </div>
+                      )}
+                      {hasShortlist && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
+                          <span className="text-[8px] text-white font-bold">{shortlist.planB.length}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-center mt-1">
+                      <div className="text-white text-xs font-semibold drop-shadow-lg">
+                        {player ? player.name.split(' ').pop() : slot.label}
+                      </div>
+                      {player && player.flag && (
+                        <div className="text-yellow-300 text-[10px] font-medium">{player.flag}</div>
+                      )}
+                    </div>
                   </div>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="px-2 py-1 bg-gray-100 rounded text-xs font-medium">{player.position}</span>
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-600">{player.age}</td>
-                <td className="px-4 py-3 text-sm text-gray-600">{player.contract}</td>
-                <td className="px-4 py-3 text-sm font-medium">{player.value}</td>
-                <td className="px-4 py-3">
-                  <InjuryBadge risk={player.injury.risk} daysOut={player.injury.daysOut} />
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    {player.flag && <span className="text-sm">{player.flag}</span>}
-                    {getPlayerStatusBadge(player.id)}
-                  </div>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="relative">
-                    <button 
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        setOpenActionMenuId(openActionMenuId === player.id ? null : player.id);
-                      }}
-                      className="p-1.5 hover:bg-gray-100 rounded"
-                    >
-                      <MoreHorizontal className="h-4 w-4 text-gray-500" />
-                    </button>
-                    {openActionMenuId === player.id && (
-                      <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                );
+              });
+            })()}
+          </div>
+
+          {selectedPitchPosition && (
+            <div className="w-80 bg-white rounded-xl border border-gray-200 p-4 overflow-hidden">
+              {(() => {
+                const [pos] = selectedPitchPosition.split('-');
+                const currentPlayers = squad.filter(p => p.position === pos);
+                const shortlist = shortlists.find(s => s.position === pos);
+
+                return (
+                  <>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-gray-900">{pos} Position</h3>
+                      <button
+                        onClick={() => setSelectedPitchPosition(null)}
+                        className="p-1 hover:bg-gray-100 rounded"
+                      >
+                        <X className="h-4 w-4 text-gray-500" />
+                      </button>
+                    </div>
+
+                    <div className="mb-4">
+                      <div className="text-xs font-semibold text-gray-500 uppercase mb-2">Current Squad</div>
+                      <div className="space-y-2">
+                        {currentPlayers.length > 0 ? currentPlayers.map(player => (
+                          <div
+                            key={player.id}
+                            onClick={() => setOpenPlayerPanel(player)}
+                            className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer"
+                          >
+                            <PlayerAvatar name={player.name} size="sm" />
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm text-gray-900 truncate">{player.name}</div>
+                              <div className="text-xs text-gray-500">Age {player.age} • {player.value}</div>
+                            </div>
+                            {player.flag && <span className="text-xs">{player.flag}</span>}
+                          </div>
+                        )) : (
+                          <div className="text-sm text-gray-400 italic">No players in this position</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {shortlist && (
+                      <div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center gap-2">
+                          Candidates
+                          <span className="px-1.5 py-0.5 bg-red-100 text-red-700 rounded-full text-[10px]">
+                            {shortlist.planB.length}
+                          </span>
+                        </div>
+                        <div className="space-y-2">
+                          {shortlist.planB.map(candidate => (
+                            <div
+                              key={candidate.id}
+                              onClick={() => {
+                                setEnhancedPlayerId(candidate.name);
+                                setEnhancedPlayerShortlistId(shortlist.id);
+                                setShowEnhancedProfile(true);
+                              }}
+                              className="flex items-center gap-3 p-2 bg-blue-50 rounded-lg hover:bg-blue-100 cursor-pointer border border-blue-100"
+                            >
+                              <PlayerAvatar name={candidate.name} size="sm" />
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium text-sm text-gray-900 truncate">{candidate.name}</div>
+                                <div className="text-xs text-gray-500">{candidate.club} • {candidate.fee}</div>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`h-3 w-3 ${i < candidate.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                         <button
-                          onClick={(e) => { 
-                            e.stopPropagation(); 
-                            handleCreateShortlist(player); 
-                            setOpenActionMenuId(null);
-                          }}
-                          className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                          onClick={() => setExpandedShortlist(shortlist.id)}
+                          className="w-full mt-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
-                          <Plus className="h-4 w-4 text-gray-400" />
-                          Create Shortlist
-                        </button>
-                        <button
-                          onClick={(e) => { 
-                            e.stopPropagation(); 
-                            handleOpenStatusModal(player);
-                          }}
-                          className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
-                        >
-                          <Activity className="h-4 w-4 text-gray-400" />
-                          Change Status
-                        </button>
-                        <div className="border-t border-gray-100 my-1" />
-                        <button
-                          onClick={(e) => { 
-                            e.stopPropagation(); 
-                            setOpenActionMenuId(null);
-                          }}
-                          className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 text-red-600"
-                        >
-                          <X className="h-4 w-4" />
-                          Delete Player
+                          View Full Shortlist
                         </button>
                       </div>
                     )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+
+                    {!shortlist && currentPlayers.length > 0 && (
+                      <button
+                        onClick={() => handleCreateShortlist(currentPlayers[0])}
+                        className="w-full py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 flex items-center justify-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Create Shortlist
+                      </button>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
   };
