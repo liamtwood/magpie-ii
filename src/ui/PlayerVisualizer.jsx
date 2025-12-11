@@ -27,89 +27,37 @@ const Badge = ({ source, small = false }) => (
   </span>
 );
 
-const santosMetrics = [
-  {
-    name: 'Overall',
-    score: 7.90,
-    percentile: 83,
-    color: '#ec4899',
-    sources: ['statsbomb', 'impect', 'skillcorner', 'second_spectrum'],
-    formula: 'Weighted avg of all categories',
-    metrics: ['Position-Adjusted Score', 'Form Trend', 'Minutes Played']
-  },
-  {
-    name: 'Distribution',
-    score: 7.50,
-    percentile: 75,
-    color: '#3b82f6',
-    sources: ['statsbomb'],
-    formula: 'Pass Acc × 0.3 + Prog Pass × 0.25 + Long Pass × 0.2 + ...',
-    metrics: ['Pass Accuracy', 'Prog Pass Acc', 'Long Pass Acc', 'Pass Under Pressure', 'Switch Play Acc']
-  },
-  {
-    name: 'Progression',
-    score: 7.70,
-    percentile: 77,
-    color: '#8b5cf6',
-    sources: ['statsbomb', 'impect'],
-    formula: 'Prog Carries × 0.3 + Prog Passes × 0.3 + Packing × 0.25 + ...',
-    metrics: ['Prog Carries/90', 'Prog Passes/90', 'Packing Value/90', 'Line Breaks/90']
-  },
-  {
-    name: 'Finishing',
-    score: 4.50,
-    percentile: 45,
-    color: '#ef4444',
-    sources: ['statsbomb'],
-    formula: 'xG Perf × 0.25 + xA Perf × 0.25 + Shot Quality × 0.2 + ...',
-    metrics: ['Goals - xG', 'Assists - xA', 'xG/Shot', 'Chances Created/90']
-  },
-  {
-    name: 'Dribbling',
-    score: 6.40,
-    percentile: 64,
-    color: '#f97316',
-    sources: ['statsbomb', 'skillcorner', 'second_spectrum'],
-    formula: 'Dribble Success × 0.3 + Take-ons × 0.25 + Carries × 0.25 + Ball Retention × 0.2',
-    metrics: ['Dribble Success %', 'Take-ons Won/90', 'Progressive Carries/90', 'Ball Retention Under Pressure']
-  },
-  {
-    name: 'Physical (Def)',
-    score: 8.50,
-    percentile: 85,
-    color: '#14b8a6',
-    sources: ['skillcorner', 'second_spectrum'],
-    formula: 'Press Distance × 0.3 + Sprints × 0.25 + Recovery Runs × 0.25 + ...',
-    metrics: ['Pressure Distance/90', 'Defensive Sprints/90', 'Recovery Runs/90', 'Defensive Actions Distance']
-  },
-  {
-    name: 'Physical (Ath)',
-    score: 8.20,
-    percentile: 82,
-    color: '#06b6d4',
-    sources: ['skillcorner', 'second_spectrum', 'catapult'],
-    formula: 'Top Speed × 0.2 + HI Distance × 0.25 + Total Distance × 0.2 + ...',
-    metrics: ['Top Speed', 'HI Distance/Min', 'Total Distance/90', 'Sprint Count/90', 'Off-Ball Workrate']
-  },
-  {
-    name: 'Defending',
-    score: 7.80,
-    percentile: 78,
-    color: '#eab308',
-    sources: ['statsbomb'],
-    formula: 'Tackle Success × 0.25 + Aerial × 0.2 + Interceptions × 0.2 + ...',
-    metrics: ['Tackle Success %', 'Aerial Duel %', 'Interceptions/90', 'Ball Recoveries/90']
-  },
-  {
-    name: 'Pressing',
-    score: 8.50,
-    percentile: 85,
-    color: '#22c55e',
-    sources: ['statsbomb', 'impect', 'second_spectrum'],
-    formula: 'Pressure Count × 0.25 + Success × 0.3 + Counter-Press × 0.25 + ...',
-    metrics: ['Pressures/90', 'Pressure Success %', 'Counter-Press/90', 'Pressure Regains/90']
-  }
+const baseMetrics = [
+  { name: 'Overall', color: '#ec4899', sources: ['statsbomb', 'impect', 'skillcorner', 'second_spectrum'], formula: 'Weighted avg of all categories', metrics: ['Position-Adjusted Score', 'Form Trend', 'Minutes Played'] },
+  { name: 'Distribution', color: '#3b82f6', sources: ['statsbomb'], formula: 'Pass Acc × 0.3 + Prog Pass × 0.25 + Long Pass × 0.2 + ...', metrics: ['Pass Accuracy', 'Prog Pass Acc', 'Long Pass Acc', 'Pass Under Pressure', 'Switch Play Acc'] },
+  { name: 'Progression', color: '#8b5cf6', sources: ['statsbomb', 'impect'], formula: 'Prog Carries × 0.3 + Prog Passes × 0.3 + Packing × 0.25 + ...', metrics: ['Prog Carries/90', 'Prog Passes/90', 'Packing Value/90', 'Line Breaks/90'] },
+  { name: 'Finishing', color: '#ef4444', sources: ['statsbomb'], formula: 'xG Perf × 0.25 + xA Perf × 0.25 + Shot Quality × 0.2 + ...', metrics: ['Goals - xG', 'Assists - xA', 'xG/Shot', 'Chances Created/90'] },
+  { name: 'Dribbling', color: '#f97316', sources: ['statsbomb', 'skillcorner', 'second_spectrum'], formula: 'Dribble Success × 0.3 + Take-ons × 0.25 + Carries × 0.25 + Ball Retention × 0.2', metrics: ['Dribble Success %', 'Take-ons Won/90', 'Progressive Carries/90', 'Ball Retention Under Pressure'] },
+  { name: 'Physical (Def)', color: '#14b8a6', sources: ['skillcorner', 'second_spectrum'], formula: 'Press Distance × 0.3 + Sprints × 0.25 + Recovery Runs × 0.25 + ...', metrics: ['Pressure Distance/90', 'Defensive Sprints/90', 'Recovery Runs/90', 'Defensive Actions Distance'] },
+  { name: 'Physical (Ath)', color: '#06b6d4', sources: ['skillcorner', 'second_spectrum', 'catapult'], formula: 'Top Speed × 0.2 + HI Distance × 0.25 + Total Distance × 0.2 + ...', metrics: ['Top Speed', 'HI Distance/Min', 'Total Distance/90', 'Sprint Count/90', 'Off-Ball Workrate'] },
+  { name: 'Defending', color: '#eab308', sources: ['statsbomb'], formula: 'Tackle Success × 0.25 + Aerial × 0.2 + Interceptions × 0.2 + ...', metrics: ['Tackle Success %', 'Aerial Duel %', 'Interceptions/90', 'Ball Recoveries/90'] },
+  { name: 'Pressing', color: '#22c55e', sources: ['statsbomb', 'impect', 'second_spectrum'], formula: 'Pressure Count × 0.25 + Success × 0.3 + Counter-Press × 0.25 + ...', metrics: ['Pressures/90', 'Pressure Success %', 'Counter-Press/90', 'Pressure Regains/90'] }
 ];
+
+const metricsBySeason = {
+  '24/25': [7.90, 7.50, 7.70, 4.50, 6.40, 8.50, 8.20, 7.80, 8.50],
+  '23/24': [7.60, 7.30, 7.40, 4.20, 6.10, 8.20, 7.90, 7.50, 8.20],
+  '22/23': [6.80, 6.50, 6.60, 3.50, 5.80, 7.40, 7.20, 6.90, 7.50],
+  '21/22': [6.20, 6.00, 6.10, 3.20, 5.40, 6.80, 6.60, 6.40, 6.90],
+  '20/21': [5.50, 5.30, 5.40, 2.80, 4.90, 6.00, 5.80, 5.70, 6.10],
+  '19/20': [4.80, 4.60, 4.70, 2.40, 4.30, 5.20, 5.00, 4.90, 5.30],
+};
+
+const getMetricsForSeason = (season) => {
+  const scores = metricsBySeason[season] || metricsBySeason['24/25'];
+  return baseMetrics.map((m, i) => ({
+    ...m,
+    score: scores[i],
+    percentile: Math.round(scores[i] * 10)
+  }));
+};
+
+const santosMetrics = getMetricsForSeason('24/25');
 
 const santosPlayer = {
   name: 'Tiago Santos',
@@ -439,6 +387,9 @@ const DetailPanel = ({ metric, entity, onClose }) => {
 const PlayerVisualizer = ({ playerAvatar }) => {
   const [selectedMetric, setSelectedMetric] = useState(null);
   const [selectedEntity, setSelectedEntity] = useState(null);
+  const [selectedSeason, setSelectedSeason] = useState('24/25');
+  
+  const currentMetrics = getMetricsForSeason(selectedSeason);
   
   const handleMetricClick = (metric) => {
     setSelectedEntity(null);
@@ -448,6 +399,10 @@ const PlayerVisualizer = ({ playerAvatar }) => {
   const handleEntityClick = (entity) => {
     setSelectedMetric(null);
     setSelectedEntity(selectedEntity === entity ? null : entity);
+  };
+  
+  const handleSeasonClick = (season) => {
+    setSelectedSeason(season);
   };
   
   const handleClose = () => {
@@ -487,7 +442,7 @@ const PlayerVisualizer = ({ playerAvatar }) => {
       <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-2xl border border-slate-700 overflow-hidden flex" style={{ height: '600px' }}>
         
         <div className="w-36 border-r border-slate-600 flex flex-col items-center justify-center p-4 gap-2">
-          <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Club</span>
+          <span className="text-xs uppercase tracking-wider text-slate-300 font-semibold">Club</span>
           <div 
             onClick={() => handleEntityClick('Club')}
             className={`w-24 h-24 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all relative overflow-hidden
@@ -502,7 +457,7 @@ const PlayerVisualizer = ({ playerAvatar }) => {
               className="w-14 h-14 object-contain"
             />
           </div>
-          <span className="text-[10px] text-slate-500">{santosClubs.clubs.length} Club History</span>
+          <span className="text-xs text-slate-400">{santosClubs.clubs.length} Club History</span>
           
           <div className="flex flex-wrap gap-1.5 mt-auto">
             {['statsbomb', 'impect', 'skillcorner', 'second_spectrum'].map(src => (
@@ -532,7 +487,7 @@ const PlayerVisualizer = ({ playerAvatar }) => {
               x={250}
               y={centerY}
               baseRadius={playerRadius}
-              metrics={santosMetrics}
+              metrics={currentMetrics}
               onMetricClick={handleMetricClick}
               selectedMetric={selectedMetric?.name}
             />
@@ -587,6 +542,11 @@ const PlayerVisualizer = ({ playerAvatar }) => {
               {santosPlayer.position} • {santosPlayer.age} yrs • {santosPlayer.marketValue}
             </text>
           </svg>
+          
+          <div className="absolute top-4 left-4 bg-slate-800/80 rounded-lg px-3 py-1.5 border border-slate-700">
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider">Season</span>
+            <div className="text-sm font-semibold text-white">{selectedSeason}</div>
+          </div>
           
           <div className="absolute bottom-4 right-4 text-xs text-slate-500">
             Click metrics to see breakdown
@@ -699,8 +659,18 @@ const PlayerVisualizer = ({ playerAvatar }) => {
                         </thead>
                         <tbody>
                           {club.seasons.map((row, i) => (
-                            <tr key={i} className="border-b border-slate-800/30">
-                              <td className="py-1.5 text-white">{row.season}</td>
+                            <tr 
+                              key={i} 
+                              onClick={() => handleSeasonClick(row.season)}
+                              className={`border-b border-slate-800/30 cursor-pointer transition-colors
+                                ${selectedSeason === row.season 
+                                  ? 'bg-blue-900/40 border-blue-500/30' 
+                                  : 'hover:bg-slate-800/50'}`}
+                            >
+                              <td className="py-1.5 text-white flex items-center gap-2">
+                                {selectedSeason === row.season && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
+                                {row.season}
+                              </td>
                               <td className="text-center py-1.5 text-white">{row.apps}</td>
                               <td className="text-center py-1.5 text-white">{row.goals}</td>
                               <td className="text-center py-1.5 text-white">{row.assists}</td>
