@@ -489,14 +489,19 @@ const PlayerVisualizer = ({ playerAvatar }) => {
         <div className="w-32 border-r border-slate-600 flex flex-col items-center justify-center p-4 gap-4">
           <div 
             onClick={() => handleEntityClick('Club')}
-            className={`w-20 h-20 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all relative
+            className={`w-20 h-20 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all relative overflow-hidden
               ${selectedEntity === 'Club' 
-                ? 'bg-blue-800 border-2 border-blue-400 ring-4 ring-blue-400/30' 
-                : 'bg-slate-700 border-2 border-slate-500 hover:bg-slate-600'}`}
+                ? 'border-2 border-blue-400 ring-4 ring-blue-400/30' 
+                : 'border-2 border-slate-500 hover:border-slate-400'}`}
+            style={{ backgroundColor: '#1e293b' }}
           >
-            <span className="text-white font-semibold text-sm">CLUB</span>
+            <img 
+              src={santosClubs.clubs[0].badge} 
+              alt="Current Club" 
+              className="w-12 h-12 object-contain"
+            />
             <span className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-              {santosClubs.statsByClub.length}
+              {santosClubs.clubs.length}
             </span>
           </div>
           
@@ -604,7 +609,7 @@ const PlayerVisualizer = ({ playerAvatar }) => {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="font-bold text-white text-lg">{selectedMetric ? selectedMetric.name : selectedEntity}</h3>
-                  <p className="text-xs text-slate-400">{selectedMetric ? 'Composite Metric' : 'Data Entity'}</p>
+                  <p className="text-xs text-slate-400">{selectedMetric ? 'Composite Metric' : 'Club History'}</p>
                 </div>
                 <button 
                   onClick={handleClose}
@@ -670,38 +675,36 @@ const PlayerVisualizer = ({ playerAvatar }) => {
               )}
               
               {selectedEntity === 'Club' && (
-                <div className="space-y-4">
-                  <h4 className="text-[11px] uppercase tracking-wider text-slate-400 font-medium">Club</h4>
-                  
+                <div className="space-y-5">
                   {santosClubs.clubs.map((club, idx) => (
                     <div key={idx} className="space-y-2">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         {club.badge ? (
-                          <img src={club.badge} alt={club.name} className="w-5 h-5 object-contain" />
+                          <img src={club.badge} alt={club.name} className="w-8 h-8 object-contain" />
                         ) : (
-                          <div className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center text-[8px] text-white font-medium">
+                          <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs text-white font-medium">
                             {club.name.charAt(0)}
                           </div>
                         )}
-                        <span className="text-[11px] font-medium text-white">{club.name}</span>
+                        <span className="text-sm font-semibold text-white">{club.name}</span>
                       </div>
                       
-                      <table className="w-full text-[10px]">
+                      <table className="w-full text-xs">
                         <thead>
                           <tr className="border-b border-slate-700">
-                            <th className="text-left py-1 text-slate-500 font-medium">Season</th>
-                            <th className="text-center py-1 text-slate-500 font-medium">Apps</th>
-                            <th className="text-center py-1 text-slate-500 font-medium">Goals</th>
-                            <th className="text-center py-1 text-slate-500 font-medium">Assists</th>
+                            <th className="text-left py-1.5 text-slate-400 font-medium">Season</th>
+                            <th className="text-center py-1.5 text-slate-400 font-medium">Apps</th>
+                            <th className="text-center py-1.5 text-slate-400 font-medium">Goals</th>
+                            <th className="text-center py-1.5 text-slate-400 font-medium">Assists</th>
                           </tr>
                         </thead>
                         <tbody>
                           {club.seasons.map((row, i) => (
                             <tr key={i} className="border-b border-slate-800/30">
-                              <td className="py-1 text-slate-300">{row.season}</td>
-                              <td className="text-center py-1 text-slate-300">{row.apps}</td>
-                              <td className="text-center py-1 text-slate-300">{row.goals}</td>
-                              <td className="text-center py-1 text-slate-300">{row.assists}</td>
+                              <td className="py-1.5 text-white">{row.season}</td>
+                              <td className="text-center py-1.5 text-white">{row.apps}</td>
+                              <td className="text-center py-1.5 text-white">{row.goals}</td>
+                              <td className="text-center py-1.5 text-white">{row.assists}</td>
                             </tr>
                           ))}
                         </tbody>
