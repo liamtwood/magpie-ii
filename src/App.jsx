@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import WhatsAppPanel from './ui/WhatsAppPanel';
 import EnhancedPlayerProfile from './ui/EnhancedPlayerProfile';
+import PlayerVisualizer from './ui/PlayerVisualizer';
 
 // Data source badge component
 const SourceBadge = ({ source }) => {
@@ -289,6 +290,7 @@ export default function MagpieV2() {
     { id: 'player-search', name: 'Player Search', icon: Search },
     { id: 'shortlists', name: 'Shortlists', icon: ClipboardList },
     { id: 'player-profile', name: 'Player Profile', icon: User },
+    { id: 'player-visualizer', name: 'Player Visualizer', icon: Eye },
   ];
 
   const currentWindow = {
@@ -3099,6 +3101,7 @@ export default function MagpieV2() {
           {activeScreen === 'player-search' && renderPlayerSearchScreen()}
           {activeScreen === 'shortlists' && renderShortlistsScreen()}
           {activeScreen === 'player-profile' && renderPlayerProfileScreen()}
+          {activeScreen === 'player-visualizer' && <PlayerVisualizer />}
         </main>
       </div>
 
