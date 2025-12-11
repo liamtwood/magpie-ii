@@ -452,139 +452,241 @@ const PlayerVisualizer = ({ playerAvatar }) => {
         </div>
       </div>
       
-      <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-2xl border border-slate-700 relative overflow-hidden" style={{ height: '600px' }}>
-        <svg width="100%" height="100%" viewBox="0 0 700 600" preserveAspectRatio="xMidYMid meet">
-          <defs>
-            <radialGradient id="playerGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-          
-          <circle cx={centerX} cy={centerY} r={playerRadius + 30} fill="url(#playerGlow)" />
-          
-          <g onClick={() => handleEntityClick('Club')} className="cursor-pointer">
-            {selectedEntity === 'Club' && (
-              <circle
-                cx={50}
-                cy={300}
-                r={52}
-                fill="none"
-                stroke="#3b82f6"
-                strokeWidth={3}
-                className="animate-pulse"
-              />
-            )}
-            <circle
-              cx={50}
-              cy={300}
-              r={45}
-              fill={selectedEntity === 'Club' ? '#1e40af' : '#3b4261'}
-              stroke={selectedEntity === 'Club' ? '#3b82f6' : '#4b5563'}
-              strokeWidth={2}
-              className="transition-all duration-200 hover:brightness-125"
-            />
-            <text
-              x={50}
-              y={300}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill="white"
-              fontSize={14}
-              fontWeight="600"
-            >
-              CLUB
-            </text>
-            <circle cx={80} cy={270} r={12} fill="#3b82f6" />
-            <text
-              x={80}
-              y={270}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill="white"
-              fontSize={10}
-              fontWeight="bold"
-            >
+      <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-2xl border border-slate-700 overflow-hidden flex" style={{ height: '600px' }}>
+        
+        <div className="w-32 border-r border-slate-600 flex flex-col items-center justify-center p-4 gap-4">
+          <div 
+            onClick={() => handleEntityClick('Club')}
+            className={`w-20 h-20 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all relative
+              ${selectedEntity === 'Club' 
+                ? 'bg-blue-800 border-2 border-blue-400 ring-4 ring-blue-400/30' 
+                : 'bg-slate-700 border-2 border-slate-500 hover:bg-slate-600'}`}
+          >
+            <span className="text-white font-semibold text-sm">CLUB</span>
+            <span className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
               {santosClubs.statsByClub.length}
-            </text>
-          </g>
-          
-          <MetricsRing
-            x={centerX}
-            y={centerY}
-            baseRadius={playerRadius}
-            metrics={santosMetrics}
-            onMetricClick={handleMetricClick}
-            selectedMetric={selectedMetric?.name}
-          />
-          
-          <circle
-            cx={centerX}
-            cy={centerY}
-            r={playerRadius + 4}
-            fill="none"
-            stroke="#06b6d4"
-            strokeWidth={3}
-          />
-          
-          <clipPath id="playerClip">
-            <circle cx={centerX} cy={centerY} r={playerRadius} />
-          </clipPath>
-          
-          <circle
-            cx={centerX}
-            cy={centerY}
-            r={playerRadius}
-            fill="#1e3a5f"
-          />
-          
-          <image
-            href={santosPlayer.image}
-            x={centerX - playerRadius}
-            y={centerY - playerRadius}
-            width={playerRadius * 2}
-            height={playerRadius * 2}
-            clipPath="url(#playerClip)"
-            preserveAspectRatio="xMidYMid slice"
-          />
-          
-          <text
-            x={centerX}
-            y={centerY + playerRadius + 25}
-            textAnchor="middle"
-            fill="white"
-            fontSize={16}
-            fontWeight="700"
-          >
-            {santosPlayer.name}
-          </text>
-          <text
-            x={centerX}
-            y={centerY + playerRadius + 45}
-            textAnchor="middle"
-            fill="#94a3b8"
-            fontSize={12}
-          >
-            {santosPlayer.position} • {santosPlayer.age} yrs • {santosPlayer.marketValue}
-          </text>
-        </svg>
-        
-        <DetailPanel metric={selectedMetric} entity={selectedEntity} onClose={handleClose} />
-        
-        <div className="absolute bottom-4 left-4 flex flex-wrap gap-1.5">
-          {['statsbomb', 'impect', 'skillcorner', 'second_spectrum'].map(src => (
-            <span
-              key={src}
-              className="px-2 py-1 rounded text-[10px] font-medium text-white"
-              style={{ backgroundColor: dataSourceColors[src] }}
-            >
-              {src}
             </span>
-          ))}
+          </div>
+          
+          <div className="flex flex-wrap gap-1.5 mt-auto">
+            {['statsbomb', 'impect', 'skillcorner', 'second_spectrum'].map(src => (
+              <span
+                key={src}
+                className="px-1.5 py-0.5 rounded text-[8px] font-medium text-white"
+                style={{ backgroundColor: dataSourceColors[src] }}
+              >
+                {src.slice(0, 3)}
+              </span>
+            ))}
+          </div>
         </div>
         
-        <div className="absolute bottom-4 right-4 text-xs text-slate-500">
-          Click metrics to see breakdown
+        <div className="flex-1 border-r border-slate-600 relative">
+          <svg width="100%" height="100%" viewBox="0 0 500 600" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <radialGradient id="playerGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+            
+            <circle cx={250} cy={centerY} r={playerRadius + 30} fill="url(#playerGlow)" />
+            
+            <MetricsRing
+              x={250}
+              y={centerY}
+              baseRadius={playerRadius}
+              metrics={santosMetrics}
+              onMetricClick={handleMetricClick}
+              selectedMetric={selectedMetric?.name}
+            />
+            
+            <circle
+              cx={250}
+              cy={centerY}
+              r={playerRadius + 4}
+              fill="none"
+              stroke="#06b6d4"
+              strokeWidth={3}
+            />
+            
+            <clipPath id="playerClip">
+              <circle cx={250} cy={centerY} r={playerRadius} />
+            </clipPath>
+            
+            <circle
+              cx={250}
+              cy={centerY}
+              r={playerRadius}
+              fill="#1e3a5f"
+            />
+            
+            <image
+              href={santosPlayer.image}
+              x={250 - playerRadius}
+              y={centerY - playerRadius}
+              width={playerRadius * 2}
+              height={playerRadius * 2}
+              clipPath="url(#playerClip)"
+              preserveAspectRatio="xMidYMid slice"
+            />
+            
+            <text
+              x={250}
+              y={centerY + playerRadius + 25}
+              textAnchor="middle"
+              fill="white"
+              fontSize={16}
+              fontWeight="700"
+            >
+              {santosPlayer.name}
+            </text>
+            <text
+              x={250}
+              y={centerY + playerRadius + 45}
+              textAnchor="middle"
+              fill="#94a3b8"
+              fontSize={12}
+            >
+              {santosPlayer.position} • {santosPlayer.age} yrs • {santosPlayer.marketValue}
+            </text>
+          </svg>
+          
+          <div className="absolute bottom-4 right-4 text-xs text-slate-500">
+            Click metrics to see breakdown
+          </div>
+        </div>
+        
+        <div className="w-80 border-l border-slate-600 bg-slate-900/50 overflow-y-auto">
+          {!selectedMetric && !selectedEntity && (
+            <div className="h-full flex items-center justify-center p-6">
+              <div className="text-center text-slate-500">
+                <div className="text-lg font-medium mb-2">Select a metric or entity</div>
+                <div className="text-sm">Click on any metric circle or the Club node to see details</div>
+              </div>
+            </div>
+          )}
+          
+          {(selectedMetric || selectedEntity) && (
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="font-bold text-white text-lg">{selectedMetric ? selectedMetric.name : selectedEntity}</h3>
+                  <p className="text-xs text-slate-400">{selectedMetric ? 'Composite Metric' : 'Data Entity'}</p>
+                </div>
+                <button 
+                  onClick={handleClose}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-600 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              {selectedMetric && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-16 h-16 rounded-xl flex flex-col items-center justify-center"
+                      style={{ backgroundColor: `${selectedMetric.color}30`, border: `2px solid ${selectedMetric.color}` }}
+                    >
+                      <span className="text-xl font-bold text-white">{selectedMetric.score.toFixed(1)}</span>
+                      <span className="text-[10px]" style={{ color: selectedMetric.color }}>{selectedMetric.percentile}%ile</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-xs text-slate-500 mb-1">Percentile vs Position</div>
+                      <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full rounded-full"
+                          style={{ width: `${selectedMetric.percentile}%`, backgroundColor: selectedMetric.color }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-xs uppercase tracking-wider text-slate-500 mb-2 font-medium">Formula</h4>
+                    <div className="bg-slate-800/50 rounded-lg p-2">
+                      <code className="text-[10px] text-pink-400 font-mono">{selectedMetric.formula}</code>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-xs uppercase tracking-wider text-slate-500 mb-2 font-medium">Sources</h4>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedMetric.sources.map(src => (
+                        <span key={src} className="px-2 py-0.5 rounded text-[10px] font-medium text-white" style={{ backgroundColor: dataSourceColors[src] }}>
+                          {src}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-xs uppercase tracking-wider text-slate-500 mb-2 font-medium">Components</h4>
+                    <div className="space-y-1.5">
+                      {selectedMetric.metrics.map((m, i) => (
+                        <div key={i} className="flex items-center justify-between bg-slate-800/50 rounded px-2 py-1.5">
+                          <span className="text-xs text-slate-300">{m}</span>
+                          <div className="w-12 h-1 bg-slate-700 rounded-full overflow-hidden">
+                            <div className="h-full rounded-full" style={{ width: `${60 + Math.random() * 35}%`, backgroundColor: selectedMetric.color }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {selectedEntity === 'Club' && (
+                <div className="space-y-4">
+                  <div className="bg-blue-900/30 rounded-lg p-3 border border-blue-700/30">
+                    <div className="font-bold text-white">{santosClubs.current}</div>
+                    <div className="text-xs text-blue-300">Ligue 1 • France</div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-xs uppercase tracking-wider text-slate-500 mb-2 font-medium">Stats by Club</h4>
+                    <div className="space-y-1.5">
+                      {santosClubs.statsByClub.map((club, i) => (
+                        <div key={i} className="bg-slate-800/50 rounded p-2">
+                          <div className="font-medium text-white text-sm">{club.club}</div>
+                          <div className="flex gap-3 mt-1 text-xs">
+                            <span className="text-slate-400">Apps: <span className="text-white">{club.appearances}</span></span>
+                            <span className="text-slate-400">G: <span className="text-white">{club.goals}</span></span>
+                            <span className="text-slate-400">A: <span className="text-white">{club.assists}</span></span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-xs uppercase tracking-wider text-slate-500 mb-2 font-medium">Transfer History</h4>
+                    <div className="space-y-1.5">
+                      {santosClubs.transferHistory.map((t, i) => (
+                        <div key={i} className="bg-slate-800/50 rounded p-2 flex justify-between items-center">
+                          <div>
+                            <div className="text-[10px] text-slate-400">{t.season}</div>
+                            <div className="text-xs text-white">{t.from} → {t.to}</div>
+                          </div>
+                          <div className="text-green-400 text-xs font-medium">{t.fee}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-xs uppercase tracking-wider text-slate-500 mb-2 font-medium">Youth Clubs</h4>
+                    <div className="flex flex-wrap gap-1">
+                      {santosClubs.youthClubs.map((club, i) => (
+                        <span key={i} className="px-2 py-1 bg-slate-800/50 rounded text-xs text-slate-300">{club}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
