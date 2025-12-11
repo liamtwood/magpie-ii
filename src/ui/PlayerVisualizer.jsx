@@ -124,7 +124,7 @@ const santosPlayer = {
 };
 
 const MetricsRing = ({ x, y, baseRadius, metrics, onMetricClick, selectedMetric }) => {
-  const ringRadius = baseRadius + 90;
+  const ringRadius = baseRadius + 120;
   
   const getLabelPosition = (index, total) => {
     if (index === 0 || index === 1 || index === total - 1) return 'top';
@@ -142,6 +142,9 @@ const MetricsRing = ({ x, y, baseRadius, metrics, onMetricClick, selectedMetric 
         const isSelected = selectedMetric === metric.name;
         const nodeRadius = 32 + (metric.percentile / 100) * 10;
         const labelPos = getLabelPosition(i, metrics.length);
+        
+        const lineEndX = mx - Math.cos(angle) * nodeRadius;
+        const lineEndY = my - Math.sin(angle) * nodeRadius;
         
         let labelX = mx;
         let labelY = my;
@@ -164,8 +167,8 @@ const MetricsRing = ({ x, y, baseRadius, metrics, onMetricClick, selectedMetric 
             <line
               x1={x + Math.cos(angle) * baseRadius}
               y1={y + Math.sin(angle) * baseRadius}
-              x2={mx}
-              y2={my}
+              x2={lineEndX}
+              y2={lineEndY}
               stroke={metric.color}
               strokeWidth={isSelected ? 3 : 1.5}
               opacity={0.6}
