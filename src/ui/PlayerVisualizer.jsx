@@ -125,13 +125,37 @@ const santosPlayer = {
 
 const santosClubs = {
   current: 'LOSC Lille',
-  statsBySeason: [
-    { season: '24/25', club: 'Lille', apps: 18, goals: 2, assists: 1 },
-    { season: '23/24', club: 'Lille', apps: 44, goals: 2, assists: 3 },
-    { season: '22/23', club: 'Estoril', apps: 32, goals: 0, assists: 4 },
-    { season: '21/22', club: 'Estoril', apps: 22, goals: 0, assists: 3 },
-    { season: '20/21', club: 'Sporting CP U23', apps: 17, goals: 0, assists: 0 },
-    { season: '19/20', club: 'Estoril U23', apps: 16, goals: 1, assists: 2 },
+  clubs: [
+    {
+      name: 'Lille',
+      badge: '/clubs/lille.png',
+      seasons: [
+        { season: '24/25', apps: 18, goals: 2, assists: 1 },
+        { season: '23/24', apps: 44, goals: 2, assists: 3 },
+      ]
+    },
+    {
+      name: 'Estoril',
+      badge: null,
+      seasons: [
+        { season: '22/23', apps: 32, goals: 0, assists: 4 },
+        { season: '21/22', apps: 22, goals: 0, assists: 3 },
+      ]
+    },
+    {
+      name: 'Sporting CP U23',
+      badge: null,
+      seasons: [
+        { season: '20/21', apps: 17, goals: 0, assists: 0 },
+      ]
+    },
+    {
+      name: 'Estoril U23',
+      badge: null,
+      seasons: [
+        { season: '19/20', apps: 16, goals: 1, assists: 2 },
+      ]
+    },
   ],
   statsByClub: [
     { club: 'Lille', appearances: 62, goals: 4, assists: 4 },
@@ -646,29 +670,44 @@ const PlayerVisualizer = ({ playerAvatar }) => {
               )}
               
               {selectedEntity === 'Club' && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <h4 className="text-[11px] uppercase tracking-wider text-slate-400 font-medium">Club</h4>
                   
-                  <table className="w-full text-[10px]">
-                    <thead>
-                      <tr className="border-b border-slate-700">
-                        <th className="text-left py-1.5 text-slate-400 font-medium">Season</th>
-                        <th className="text-center py-1.5 text-slate-400 font-medium">Apps</th>
-                        <th className="text-center py-1.5 text-slate-400 font-medium">Goals</th>
-                        <th className="text-center py-1.5 text-slate-400 font-medium">Assists</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {santosClubs.statsBySeason.map((row, i) => (
-                        <tr key={i} className="border-b border-slate-800/50">
-                          <td className="py-1.5 text-white">{row.season} <span className="text-slate-500">({row.club})</span></td>
-                          <td className="text-center py-1.5 text-white">{row.apps}</td>
-                          <td className="text-center py-1.5 text-white">{row.goals}</td>
-                          <td className="text-center py-1.5 text-white">{row.assists}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  {santosClubs.clubs.map((club, idx) => (
+                    <div key={idx} className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        {club.badge ? (
+                          <img src={club.badge} alt={club.name} className="w-5 h-5 object-contain" />
+                        ) : (
+                          <div className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center text-[8px] text-white font-medium">
+                            {club.name.charAt(0)}
+                          </div>
+                        )}
+                        <span className="text-[11px] font-medium text-white">{club.name}</span>
+                      </div>
+                      
+                      <table className="w-full text-[10px]">
+                        <thead>
+                          <tr className="border-b border-slate-700">
+                            <th className="text-left py-1 text-slate-500 font-medium">Season</th>
+                            <th className="text-center py-1 text-slate-500 font-medium">Apps</th>
+                            <th className="text-center py-1 text-slate-500 font-medium">Goals</th>
+                            <th className="text-center py-1 text-slate-500 font-medium">Assists</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {club.seasons.map((row, i) => (
+                            <tr key={i} className="border-b border-slate-800/30">
+                              <td className="py-1 text-slate-300">{row.season}</td>
+                              <td className="text-center py-1 text-slate-300">{row.apps}</td>
+                              <td className="text-center py-1 text-slate-300">{row.goals}</td>
+                              <td className="text-center py-1 text-slate-300">{row.assists}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
