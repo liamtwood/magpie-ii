@@ -191,6 +191,7 @@ export default function MagpieV2() {
   const [selectedStatusOption, setSelectedStatusOption] = useState(null);
   const [squadViewMode, setSquadViewMode] = useState('list');
   const [selectedPitchPosition, setSelectedPitchPosition] = useState(null);
+  const [issuesTab, setIssuesTab] = useState('critical');
   
   const standardStatusOptions = [
     { id: 'available', label: 'Available', color: 'bg-green-100 text-green-700' },
@@ -1521,73 +1522,135 @@ export default function MagpieV2() {
           </div>
         </div>
 
-        {criticalIssues.length > 0 && (
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              <h3 className="font-semibold text-gray-900">Critical - Immediate Action Required</h3>
-              <span className="text-sm text-gray-500">({criticalIssues.length})</span>
-            </div>
-            <div className="space-y-3">
-              {criticalIssues.map(issue => <IssueCard key={issue.id} issue={issue} />)}
-            </div>
-          </div>
-        )}
-
-        {moderateIssues.length > 0 && (
-          <div>
-            <div className="flex items-center gap-2 mb-4">
+        <div>
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Issues</h2>
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setIssuesTab('critical')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
+                issuesTab === 'critical' 
+                  ? 'bg-red-100 text-red-700 border-2 border-red-300' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-red-500" />
+              Critical
+              <span className="bg-red-200 text-red-800 px-1.5 py-0.5 rounded text-xs">{criticalIssues.length}</span>
+            </button>
+            <button
+              onClick={() => setIssuesTab('moderate')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
+                issuesTab === 'moderate' 
+                  ? 'bg-amber-100 text-amber-700 border-2 border-amber-300' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
               <span className="w-2 h-2 rounded-full bg-amber-500" />
-              <h3 className="font-semibold text-gray-900">Moderate - Plan Ahead</h3>
-              <span className="text-sm text-gray-500">({moderateIssues.length})</span>
-            </div>
+              Moderate
+              <span className="bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded text-xs">{moderateIssues.length}</span>
+            </button>
+            <button
+              onClick={() => setIssuesTab('resolved')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
+                issuesTab === 'resolved' 
+                  ? 'bg-green-100 text-green-700 border-2 border-green-300' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              Resolved
+              <span className="bg-green-200 text-green-800 px-1.5 py-0.5 rounded text-xs">{Object.keys(dismissedIssues).length}</span>
+            </button>
+            <button
+              onClick={() => setIssuesTab('snoozed')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
+                issuesTab === 'snoozed' 
+                  ? 'bg-gray-200 text-gray-700 border-2 border-gray-400' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <Pause className="h-4 w-4" />
+              Snoozed
+              <span className="bg-gray-300 text-gray-800 px-1.5 py-0.5 rounded text-xs">{Object.keys(snoozedIssues).length}</span>
+            </button>
+          </div>
+
+          {issuesTab === 'critical' && (
             <div className="space-y-3">
-              {moderateIssues.map(issue => <IssueCard key={issue.id} issue={issue} />)}
-            </div>
-          </div>
-        )}
-
-        {lowIssues.length > 0 && (
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
-              <h3 className="font-semibold text-gray-900">Low Priority - Monitor</h3>
-              <span className="text-sm text-gray-500">({lowIssues.length})</span>
-            </div>
-            <div className="space-y-3">
-              {lowIssues.map(issue => <IssueCard key={issue.id} issue={issue} />)}
-            </div>
-          </div>
-        )}
-
-        {activeIssues.length === 0 && (
-          <div className="bg-green-50 rounded-xl border border-green-200 p-8 text-center">
-            <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-green-800">All Clear!</h3>
-            <p className="text-green-600 mt-1">No active squad issues detected. All concerns have been addressed or snoozed.</p>
-          </div>
-        )}
-
-        {Object.keys(snoozedIssues).length > 0 && (
-          <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Pause className="h-4 w-4 text-gray-500" />
-              <span className="font-medium text-gray-700">Snoozed Issues</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {squadIssues.filter(i => snoozedIssues[i.id]).map(issue => (
-                <div key={issue.id} className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg border border-gray-200 text-sm">
-                  <span className="font-medium">{issue.player.name}</span>
-                  <span className="text-gray-400">•</span>
-                  <span className="text-gray-500">{issue.title}</span>
-                  <span className="text-xs text-amber-600 font-medium">
-                    {snoozedIssues[issue.id].until === 'jan2026' ? 'Jan 2026' : snoozedIssues[issue.id].until}
-                  </span>
+              {criticalIssues.length > 0 ? (
+                criticalIssues.map(issue => <IssueCard key={issue.id} issue={issue} />)
+              ) : (
+                <div className="bg-green-50 rounded-xl border border-green-200 p-6 text-center">
+                  <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                  <p className="text-green-700 font-medium">No critical issues</p>
                 </div>
-              ))}
+              )}
             </div>
-          </div>
-        )}
+          )}
+
+          {issuesTab === 'moderate' && (
+            <div className="space-y-3">
+              {moderateIssues.length > 0 ? (
+                moderateIssues.map(issue => <IssueCard key={issue.id} issue={issue} />)
+              ) : (
+                <div className="bg-green-50 rounded-xl border border-green-200 p-6 text-center">
+                  <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                  <p className="text-green-700 font-medium">No moderate issues</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {issuesTab === 'resolved' && (
+            <div className="space-y-3">
+              {Object.keys(dismissedIssues).length > 0 ? (
+                squadIssues.filter(i => dismissedIssues[i.id]).map(issue => (
+                  <div key={issue.id} className="bg-green-50 rounded-xl border border-green-200 p-4 flex items-center gap-4">
+                    <PlayerAvatar name={issue.player.name} image={playerAvatars[issue.player.name]} size="md" />
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900">{issue.player.name}</div>
+                      <div className="text-sm text-gray-600">{issue.title}</div>
+                    </div>
+                    <div className="flex items-center gap-2 text-green-600">
+                      <CheckCircle2 className="h-5 w-5" />
+                      <span className="text-sm font-medium">Resolved</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 text-center">
+                  <p className="text-gray-500">No resolved issues yet</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {issuesTab === 'snoozed' && (
+            <div className="space-y-3">
+              {Object.keys(snoozedIssues).length > 0 ? (
+                squadIssues.filter(i => snoozedIssues[i.id]).map(issue => (
+                  <div key={issue.id} className="bg-gray-50 rounded-xl border border-gray-200 p-4 flex items-center gap-4">
+                    <PlayerAvatar name={issue.player.name} image={playerAvatars[issue.player.name]} size="md" />
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900">{issue.player.name}</div>
+                      <div className="text-sm text-gray-600">{issue.title}</div>
+                    </div>
+                    <div className="flex items-center gap-2 text-amber-600">
+                      <Pause className="h-5 w-5" />
+                      <span className="text-sm font-medium">
+                        Until {snoozedIssues[issue.id].until === 'jan2026' ? 'Jan 2026' : snoozedIssues[issue.id].until}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 text-center">
+                  <p className="text-gray-500">No snoozed issues</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     );
   };
