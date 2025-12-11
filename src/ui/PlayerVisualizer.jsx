@@ -84,6 +84,28 @@ const santosWhatsApp = {
   ]
 };
 
+const santosMediaMentions = [
+  { date: 'Dec 10, 2024', source: 'L\'Equipe', title: 'Newcastle monitoring Lille\'s Tiago Santos ahead of January', sentiment: 'positive', link: '#' },
+  { date: 'Dec 8, 2024', source: 'The Athletic', title: 'Premier League clubs circling for Portuguese full-back', sentiment: 'neutral', link: '#' },
+  { date: 'Dec 5, 2024', source: 'Record (Portugal)', title: 'Santos attracts interest from England', sentiment: 'positive', link: '#' },
+  { date: 'Dec 2, 2024', source: 'Foot Mercato', title: 'Lille could sell Santos for €20m in winter window', sentiment: 'neutral', link: '#' },
+  { date: 'Nov 28, 2024', source: 'Sky Sports', title: 'Newcastle scouting Lille defender as Trippier replacement', sentiment: 'positive', link: '#' },
+  { date: 'Nov 20, 2024', source: 'RMC Sport', title: 'Santos impresses in Champions League display', sentiment: 'positive', link: '#' },
+];
+
+const santosInjuries = [
+  { date: 'Mar 2024', type: 'Hamstring Strain', severity: 'Minor', daysMissed: 14, matches: 3, status: 'Recovered' },
+  { date: 'Oct 2023', type: 'Ankle Sprain', severity: 'Minor', daysMissed: 10, matches: 2, status: 'Recovered' },
+  { date: 'Feb 2023', type: 'Muscle Fatigue', severity: 'Minor', daysMissed: 5, matches: 1, status: 'Recovered' },
+];
+
+const santosScoutReports = [
+  { date: 'Dec 8, 2024', scout: 'Steve Nickson', match: 'Lille vs Lyon (L1)', rating: 8.5, notes: 'Excellent 1v1 defending, great recovery pace. Showed composure on the ball under pressure.' },
+  { date: 'Nov 26, 2024', scout: 'Steve Nickson', match: 'Lille vs Juventus (UCL)', rating: 8.2, notes: 'Handled Chiesa well. Good positioning and decision-making in final third.' },
+  { date: 'Nov 10, 2024', scout: 'Andy Howe', match: 'Lille vs PSG (L1)', rating: 7.8, notes: 'Tested against top opposition. Showed character but caught out once by Dembélé.' },
+  { date: 'Oct 20, 2024', scout: 'Video Analysis', match: '5 Match Compilation', rating: 8.0, notes: 'Consistent performer. Strong aerial ability for a full-back. Needs to improve crossing accuracy.' },
+];
+
 const santosTimeline = [
   { date: 'Dec 8, 2024', type: 'scout', title: 'Live Scout Visit', desc: 'Steve Nickson attended Lille vs Lyon (Ligue 1)', icon: '👁️' },
   { date: 'Dec 5, 2024', type: 'video', title: 'Video Analysis Session', desc: 'Reviewed 5 matches from current season', icon: '🎬' },
@@ -454,7 +476,8 @@ const PlayerVisualizer = ({ playerAvatar }) => {
   const currentMetrics = activeMode === 'club' ? getMetricsForSeason(selectedSeason) : recruitMetrics;
   
   const handleMetricClick = (metric) => {
-    if (metric.name === 'WhatsApp' || metric.name === 'Timeline' || metric.name === 'Overview') {
+    const entityMetrics = ['WhatsApp', 'Timeline', 'Overview', 'Rumours', 'Injuries', 'Scouting'];
+    if (entityMetrics.includes(metric.name)) {
       setSelectedMetric(null);
       setSelectedEntity(selectedEntity === metric.name ? null : metric.name);
     } else {
@@ -912,6 +935,110 @@ const PlayerVisualizer = ({ playerAvatar }) => {
                         </div>
                       ))}
                     </div>
+                  </div>
+                </div>
+              )}
+              
+              {selectedEntity === 'Rumours' && (
+                <div className="space-y-3">
+                  <div className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-3">
+                    <div className="text-xs text-orange-300 font-medium">Media Mentions</div>
+                    <div className="text-[10px] text-slate-400 mt-1">{santosMediaMentions.length} articles tracking this player</div>
+                  </div>
+                  
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {santosMediaMentions.map((item, idx) => (
+                      <div key={idx} className="bg-slate-800/50 rounded-lg p-3 hover:bg-slate-800/70 transition-colors cursor-pointer">
+                        <div className="flex items-start justify-between gap-2 mb-1.5">
+                          <span className="text-xs font-medium text-white leading-tight">{item.title}</span>
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium shrink-0 ${
+                            item.sentiment === 'positive' ? 'bg-green-500/20 text-green-400' : 'bg-slate-500/20 text-slate-400'
+                          }`}>
+                            {item.sentiment}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                          <span className="text-orange-400 font-medium">{item.source}</span>
+                          <span>•</span>
+                          <span>{item.date}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {selectedEntity === 'Injuries' && (
+                <div className="space-y-3">
+                  <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3">
+                    <div className="text-xs text-red-300 font-medium">Injury History</div>
+                    <div className="text-[10px] text-slate-400 mt-1">{santosInjuries.length} recorded injuries • {santosInjuries.reduce((a, b) => a + b.daysMissed, 0)} total days missed</div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {santosInjuries.map((item, idx) => (
+                      <div key={idx} className="bg-slate-800/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-white">{item.type}</span>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                            item.severity === 'Minor' ? 'bg-yellow-500/20 text-yellow-400' : 
+                            item.severity === 'Moderate' ? 'bg-orange-500/20 text-orange-400' : 
+                            'bg-red-500/20 text-red-400'
+                          }`}>
+                            {item.severity}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div className="bg-slate-900/50 rounded p-1.5">
+                            <div className="text-xs font-bold text-white">{item.daysMissed}</div>
+                            <div className="text-[9px] text-slate-500">Days</div>
+                          </div>
+                          <div className="bg-slate-900/50 rounded p-1.5">
+                            <div className="text-xs font-bold text-white">{item.matches}</div>
+                            <div className="text-[9px] text-slate-500">Matches</div>
+                          </div>
+                          <div className="bg-slate-900/50 rounded p-1.5">
+                            <div className="text-[10px] font-medium text-green-400">{item.status}</div>
+                            <div className="text-[9px] text-slate-500">Status</div>
+                          </div>
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-2">{item.date}</div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-green-400" />
+                      <span className="text-xs text-green-300 font-medium">Currently Fit</span>
+                    </div>
+                    <div className="text-[10px] text-slate-400 mt-1">No current injuries reported</div>
+                  </div>
+                </div>
+              )}
+              
+              {selectedEntity === 'Scouting' && (
+                <div className="space-y-3">
+                  <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-3">
+                    <div className="text-xs text-purple-300 font-medium">Scout Reports</div>
+                    <div className="text-[10px] text-slate-400 mt-1">{santosScoutReports.length} reports filed • Avg rating: {(santosScoutReports.reduce((a, b) => a + b.rating, 0) / santosScoutReports.length).toFixed(1)}</div>
+                  </div>
+                  
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {santosScoutReports.map((item, idx) => (
+                      <div key={idx} className="bg-slate-800/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <span className="text-xs font-medium text-white">{item.match}</span>
+                            <div className="text-[10px] text-slate-500">{item.scout} • {item.date}</div>
+                          </div>
+                          <div className="w-10 h-10 rounded-lg bg-purple-500/20 border border-purple-500/50 flex items-center justify-center">
+                            <span className="text-sm font-bold text-purple-300">{item.rating}</span>
+                          </div>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">{item.notes}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
