@@ -540,9 +540,9 @@ const PlayerVisualizer = ({ playerAvatar }) => {
             </div>
           </div>
           <img 
-            src="https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg" 
-            alt="Newcastle United"
-            className="w-12 h-12 opacity-80"
+            src={santosClubs.clubs[0].badge} 
+            alt={santosClubs.clubs[0].name}
+            className="w-12 h-12 object-contain opacity-90"
           />
         </div>
       
