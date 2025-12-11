@@ -174,7 +174,7 @@ export default function MagpieV2() {
   const [activeShortlistId, setActiveShortlistId] = useState(null);
   const [activePlayerId, setActivePlayerId] = useState(null);
   const [openShortlistPanel, setOpenShortlistPanel] = useState(null);
-  const [shortlistRankings, setShortlistRankings] = useState({});
+  const [shortlistOrder, setShortlistOrder] = useState(['trippier', 'cb', 'longstaff']);
   const [openPlayerPanel, setOpenPlayerPanel] = useState(null);
   const [showWhatsAppPanel, setShowWhatsAppPanel] = useState(false);
   const [activeWhatsAppShortlist, setActiveWhatsAppShortlist] = useState(null);
@@ -503,6 +503,30 @@ export default function MagpieV2() {
       low: { bg: 'bg-green-50', border: 'border-green-500', text: 'text-green-700', dot: 'bg-green-500' },
     };
     return configs[severity];
+  };
+
+  const moveShortlistUp = (shortlistId) => {
+    setShortlistOrder(prev => {
+      const index = prev.indexOf(shortlistId);
+      if (index <= 0) return prev;
+      const newOrder = [...prev];
+      [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
+      return newOrder;
+    });
+  };
+
+  const moveShortlistDown = (shortlistId) => {
+    setShortlistOrder(prev => {
+      const index = prev.indexOf(shortlistId);
+      if (index < 0 || index >= prev.length - 1) return prev;
+      const newOrder = [...prev];
+      [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
+      return newOrder;
+    });
+  };
+
+  const getOrderedShortlists = () => {
+    return shortlistOrder.map(id => shortlists.find(s => s.id === id)).filter(Boolean);
   };
 
   const getStatusColor = (color) => {
@@ -2491,9 +2515,11 @@ export default function MagpieV2() {
         </div>
 
         <div className="space-y-3">
-          {shortlists.map((shortlist) => {
+          {getOrderedShortlists().map((shortlist, index) => {
             const config = getSeverityConfig(shortlist.severity);
             const isExpanded = expandedShortlist === shortlist.id;
+            const isFirst = index === 0;
+            const isLast = index === getOrderedShortlists().length - 1;
 
             return (
               <div
@@ -2506,6 +2532,27 @@ export default function MagpieV2() {
                   onClick={() => setExpandedShortlist(isExpanded ? null : shortlist.id)}
                   className={`p-4 cursor-pointer flex items-center gap-4 ${isExpanded ? config.bg : 'hover:bg-gray-50'}`}
                 >
+                  <div className="flex flex-col items-center gap-0.5">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); moveShortlistUp(shortlist.id); }}
+                      disabled={isFirst}
+                      className={`p-1 rounded hover:bg-gray-200 transition-colors ${isFirst ? 'opacity-30 cursor-not-allowed' : 'text-gray-500 hover:text-gray-700'}`}
+                      title="Move up in priority"
+                    >
+                      <ChevronUp className="h-4 w-4" />
+                    </button>
+                    <div className="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-bold">
+                      {index + 1}
+                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); moveShortlistDown(shortlist.id); }}
+                      disabled={isLast}
+                      className={`p-1 rounded hover:bg-gray-200 transition-colors ${isLast ? 'opacity-30 cursor-not-allowed' : 'text-gray-500 hover:text-gray-700'}`}
+                      title="Move down in priority"
+                    >
+                      <ChevronDown className="h-4 w-4" />
+                    </button>
+                  </div>
                   <div className={`w-10 h-10 rounded-lg ${config.bg} ${config.text} flex items-center justify-center font-bold text-sm border-2 ${config.border}`}>
                     {shortlist.position}
                   </div>
