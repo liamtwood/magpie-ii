@@ -466,8 +466,8 @@ const PlayerVisualizer = ({ playerAvatar }) => {
           <g onClick={() => handleEntityClick('Club')} className="cursor-pointer">
             {selectedEntity === 'Club' && (
               <circle
-                cx={55}
-                cy={55}
+                cx={50}
+                cy={300}
                 r={52}
                 fill="none"
                 stroke="#3b82f6"
@@ -476,8 +476,8 @@ const PlayerVisualizer = ({ playerAvatar }) => {
               />
             )}
             <circle
-              cx={55}
-              cy={55}
+              cx={50}
+              cy={300}
               r={45}
               fill={selectedEntity === 'Club' ? '#1e40af' : '#3b4261'}
               stroke={selectedEntity === 'Club' ? '#3b82f6' : '#4b5563'}
@@ -485,8 +485,8 @@ const PlayerVisualizer = ({ playerAvatar }) => {
               className="transition-all duration-200 hover:brightness-125"
             />
             <text
-              x={55}
-              y={55}
+              x={50}
+              y={300}
               textAnchor="middle"
               dominantBaseline="middle"
               fill="white"
@@ -495,10 +495,10 @@ const PlayerVisualizer = ({ playerAvatar }) => {
             >
               CLUB
             </text>
-            <circle cx={85} cy={25} r={12} fill="#3b82f6" />
+            <circle cx={80} cy={270} r={12} fill="#3b82f6" />
             <text
-              x={85}
-              y={25}
+              x={80}
+              y={270}
               textAnchor="middle"
               dominantBaseline="middle"
               fill="white"
