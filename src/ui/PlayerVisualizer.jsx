@@ -512,29 +512,41 @@ const PlayerVisualizer = ({ playerAvatar }) => {
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">Player Visualizer</h2>
-            <p className="text-gray-500 mt-1">Interactive performance metrics breakdown</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <img 
-              src={santosPlayer.image} 
-              alt={santosPlayer.name}
-              className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-              onError={(e) => {
-                e.target.style.display = 'none';
-              }}
-            />
+        {/* Dark header bar */}
+        <div className="bg-gray-900 rounded-2xl p-4 mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <img 
+                src={santosPlayer.image} 
+                alt={santosPlayer.name}
+                className="w-14 h-14 rounded-full object-cover border-2 border-gray-600"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-md">
+                <svg className="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </div>
+            </div>
             <div>
-              <div className="font-semibold text-gray-900">{santosPlayer.name}</div>
-              <div className="text-sm text-gray-500">{santosPlayer.club} • {santosPlayer.position}</div>
+              <div className="text-gray-400 text-sm">{santosPlayer.name.split(' ')[0]}</div>
+              <div className="text-white text-xl font-bold">{santosPlayer.name.split(' ').slice(1).join(' ') || santosPlayer.name.split(' ')[0]}</div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="bg-gray-700 text-gray-300 text-[10px] font-semibold px-2 py-0.5 rounded">PLAYER</span>
+                <span className="bg-green-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded">Active</span>
+              </div>
             </div>
           </div>
+          <img 
+            src="https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg" 
+            alt="Newcastle United"
+            className="w-12 h-12 opacity-80"
+          />
         </div>
-      </div>
       
-      <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-2xl border border-slate-700 overflow-hidden flex" style={{ height: '600px' }}>
+        <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-2xl border border-slate-700 overflow-hidden flex" style={{ height: '600px' }}>
         
         <div className="w-36 border-r border-slate-600 flex flex-col items-center p-3 gap-2 overflow-y-auto">
           <div className="flex flex-col items-center gap-0.5">
@@ -1045,6 +1057,7 @@ const PlayerVisualizer = ({ playerAvatar }) => {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
