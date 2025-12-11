@@ -466,43 +466,43 @@ const PlayerVisualizer = ({ playerAvatar }) => {
           <g onClick={() => handleEntityClick('Club')} className="cursor-pointer">
             {selectedEntity === 'Club' && (
               <circle
-                cx={60}
-                cy={60}
-                r={38}
+                cx={55}
+                cy={55}
+                r={52}
                 fill="none"
                 stroke="#3b82f6"
-                strokeWidth={2}
+                strokeWidth={3}
                 className="animate-pulse"
               />
             )}
             <circle
-              cx={60}
-              cy={60}
-              r={32}
+              cx={55}
+              cy={55}
+              r={45}
               fill={selectedEntity === 'Club' ? '#1e40af' : '#3b4261'}
               stroke={selectedEntity === 'Club' ? '#3b82f6' : '#4b5563'}
               strokeWidth={2}
               className="transition-all duration-200 hover:brightness-125"
             />
             <text
-              x={60}
-              y={60}
+              x={55}
+              y={55}
               textAnchor="middle"
               dominantBaseline="middle"
               fill="white"
-              fontSize={11}
+              fontSize={14}
               fontWeight="600"
             >
               CLUB
             </text>
-            <circle cx={82} cy={42} r={10} fill="#3b82f6" />
+            <circle cx={85} cy={25} r={12} fill="#3b82f6" />
             <text
-              x={82}
-              y={42}
+              x={85}
+              y={25}
               textAnchor="middle"
               dominantBaseline="middle"
               fill="white"
-              fontSize={9}
+              fontSize={10}
               fontWeight="bold"
             >
               {santosClubs.statsByClub.length}
