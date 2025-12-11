@@ -100,6 +100,22 @@ The application follows a client-side only architecture with no backend:
 - **Quick Navigation**: Links to player profiles and full shortlists from pitch view
 - **State Management**: `squadViewMode` and `selectedPitchPosition` in App.jsx
 
+### 11. Player Visualizer (GameScope)
+- **Radial Metrics Display**: SVG-based visualization showing 9 performance categories in a ring around player
+- **Interactive Metric Selection**: Click any metric node to see detailed breakdown panel
+- **Metric Categories**: Overall, Distribution, Progression, Finishing, Dribbling, Physical (Def), Physical (Ath), Defending, Pressing
+- **Score & Percentile**: Each metric shows score (0-10) and percentile vs position group
+- **Data Source Badges**: Color-coded badges showing which providers contribute to each metric
+- **Detail Panel**: Shows composite formula, source data, and component metrics when a category is selected
+- **Currently Hardcoded**: Shows Tiago Santos data as demo (ready to accept dynamic player data)
+- **Component**: `src/ui/PlayerVisualizer.jsx`
+
+### 12. Dashboard Issue Tabs
+- **Tabbed Interface**: Issues filtered by Critical, Moderate, Resolved, Snoozed categories
+- **Count Badges**: Each tab shows count of issues in that category
+- **Visual Styling**: Color-coded tabs matching issue severity (red, amber, green, gray)
+- **Empty States**: Friendly messages when no issues exist in a category
+
 ## External Dependencies
 
 ### NPM Packages
