@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { User, Search, Dumbbell, HeartPulse, FileText, Newspaper, MessageCircle, Clock, ClipboardList } from 'lucide-react';
 
 const dataSourceColors = {
   statsbomb: '#1e40af',
@@ -60,13 +61,14 @@ const getMetricsForSeason = (season) => {
 const santosMetrics = getMetricsForSeason('24/25');
 
 const recruitMetrics = [
-  { name: 'Scouting', color: '#8b5cf6', score: 8.2, percentile: 82, sources: ['scoutastic', 'internal'], formula: 'Scout Reports × 0.4 + Video Analysis × 0.3 + Live Views × 0.3', metrics: ['Scout Reports Filed', 'Video Sessions Completed', 'Live Matches Watched', 'Profile Completeness'], icon: '🔍' },
-  { name: 'Physical', color: '#06b6d4', score: 8.5, percentile: 85, sources: ['skillcorner', 'catapult', 'second_spectrum'], formula: 'Athleticism × 0.3 + Durability × 0.3 + Workload Capacity × 0.4', metrics: ['Top Speed', 'Sprint Distance/90', 'HI Running/90', 'Recovery Metrics'], icon: '💪' },
-  { name: 'Injuries', color: '#ef4444', score: 8.9, percentile: 89, sources: ['catapult', 'internal'], formula: 'Injury History × 0.4 + Recovery Time × 0.3 + Availability % × 0.3', metrics: ['Major Injuries', 'Days Missed (3yr)', 'Availability %', 'Current Status'], icon: '🏥' },
-  { name: 'Contracts', color: '#22c55e', score: 7.8, percentile: 78, sources: ['transfer_room', 'internal'], formula: 'Contract Length × 0.25 + Wage Fit × 0.35 + Release Clause × 0.2 + Agent Fee × 0.2', metrics: ['Contract Expires', 'Wage Demands', 'Release Clause', 'Agent Fee Est.'], icon: '📝' },
-  { name: 'Rumours', color: '#f97316', score: 6.5, percentile: 65, sources: ['noisefeed', 'transfer_room'], formula: 'Media Mentions × 0.3 + Club Interest × 0.4 + Agent Activity × 0.3', metrics: ['Media Mentions', 'Clubs Interested', 'Agent Contacts', 'Social Media Activity'], icon: '📰' },
-  { name: 'WhatsApp', color: '#25d366', score: 7.2, percentile: 72, sources: ['internal'], formula: 'Messages × 0.3 + Engagement × 0.4 + Response Time × 0.3', metrics: ['Total Messages', 'Active Participants', 'Last Activity', 'Key Decisions'], icon: '💬' },
-  { name: 'Timeline', color: '#f59e0b', score: 7.5, percentile: 75, sources: ['internal'], formula: 'Activities × 0.4 + Recency × 0.3 + Progress × 0.3', metrics: ['Total Activities', 'Days Since First Contact', 'Current Stage', 'Next Action'], icon: '📅' },
+  { name: 'Overview', color: '#06b6d4', score: 8.0, percentile: 80, sources: ['internal'], formula: 'Profile Completeness × 0.4 + Data Quality × 0.3 + Last Updated × 0.3', metrics: ['Profile Status', 'Data Sources', 'Last Updated', 'Confidence Score'], IconComponent: User },
+  { name: 'Scouting', color: '#8b5cf6', score: 8.2, percentile: 82, sources: ['scoutastic', 'internal'], formula: 'Scout Reports × 0.4 + Video Analysis × 0.3 + Live Views × 0.3', metrics: ['Scout Reports Filed', 'Video Sessions Completed', 'Live Matches Watched', 'Profile Completeness'], IconComponent: Search },
+  { name: 'Physical', color: '#14b8a6', score: 8.5, percentile: 85, sources: ['skillcorner', 'catapult', 'second_spectrum'], formula: 'Athleticism × 0.3 + Durability × 0.3 + Workload Capacity × 0.4', metrics: ['Top Speed', 'Sprint Distance/90', 'HI Running/90', 'Recovery Metrics'], IconComponent: Dumbbell },
+  { name: 'Injuries', color: '#ef4444', score: 8.9, percentile: 89, sources: ['catapult', 'internal'], formula: 'Injury History × 0.4 + Recovery Time × 0.3 + Availability % × 0.3', metrics: ['Major Injuries', 'Days Missed (3yr)', 'Availability %', 'Current Status'], IconComponent: HeartPulse },
+  { name: 'Contracts', color: '#22c55e', score: 7.8, percentile: 78, sources: ['transfer_room', 'internal'], formula: 'Contract Length × 0.25 + Wage Fit × 0.35 + Release Clause × 0.2 + Agent Fee × 0.2', metrics: ['Contract Expires', 'Wage Demands', 'Release Clause', 'Agent Fee Est.'], IconComponent: FileText },
+  { name: 'Rumours', color: '#f97316', score: 6.5, percentile: 65, sources: ['noisefeed', 'transfer_room'], formula: 'Media Mentions × 0.3 + Club Interest × 0.4 + Agent Activity × 0.3', metrics: ['Media Mentions', 'Clubs Interested', 'Agent Contacts', 'Social Media Activity'], IconComponent: Newspaper },
+  { name: 'WhatsApp', color: '#25d366', score: 7.2, percentile: 72, sources: ['internal'], formula: 'Messages × 0.3 + Engagement × 0.4 + Response Time × 0.3', metrics: ['Total Messages', 'Active Participants', 'Last Activity', 'Key Decisions'], IconComponent: MessageCircle },
+  { name: 'Timeline', color: '#f59e0b', score: 7.5, percentile: 75, sources: ['internal'], formula: 'Activities × 0.4 + Recency × 0.3 + Progress × 0.3', metrics: ['Total Activities', 'Days Since First Contact', 'Current Stage', 'Next Action'], IconComponent: Clock },
 ];
 
 const santosWhatsApp = {
@@ -155,6 +157,12 @@ const MetricsRing = ({ x, y, baseRadius, metrics, onMetricClick, selectedMetric,
   const ringRadius = baseRadius + 120;
   
   const getLabelPosition = (index, total) => {
+    if (total === 8) {
+      if (index === 0 || index === 7) return 'top';
+      if (index === 1 || index === 2) return 'right';
+      if (index === 3 || index === 4) return 'bottom';
+      if (index === 5 || index === 6) return 'left';
+    }
     if (total === 7) {
       if (index === 0) return 'top';
       if (index === 1 || index === 2) return 'right';
@@ -176,7 +184,7 @@ const MetricsRing = ({ x, y, baseRadius, metrics, onMetricClick, selectedMetric,
         const isSelected = selectedMetric === metric.name || selectedEntity === metric.name;
         const nodeRadius = 32 + (metric.percentile / 100) * 10;
         const labelPos = getLabelPosition(i, metrics.length);
-        const hasIcon = !!metric.icon;
+        const hasIcon = !!metric.IconComponent;
         
         const lineEndX = mx - Math.cos(angle) * nodeRadius;
         const lineEndY = my - Math.sin(angle) * nodeRadius;
@@ -231,16 +239,17 @@ const MetricsRing = ({ x, y, baseRadius, metrics, onMetricClick, selectedMetric,
               className="transition-all duration-200 hover:brightness-125"
             />
             
-            {hasIcon ? (
-              <text
-                x={mx}
-                y={my + 2}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontSize={22}
+            {metric.IconComponent ? (
+              <foreignObject
+                x={mx - 14}
+                y={my - 14}
+                width={28}
+                height={28}
               >
-                {metric.icon}
-              </text>
+                <div xmlns="http://www.w3.org/1999/xhtml" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+                  <metric.IconComponent size={20} color={metric.color} strokeWidth={2.5} />
+                </div>
+              </foreignObject>
             ) : (
               <>
                 <text
@@ -445,7 +454,7 @@ const PlayerVisualizer = ({ playerAvatar }) => {
   const currentMetrics = activeMode === 'club' ? getMetricsForSeason(selectedSeason) : recruitMetrics;
   
   const handleMetricClick = (metric) => {
-    if (metric.name === 'WhatsApp' || metric.name === 'Timeline') {
+    if (metric.name === 'WhatsApp' || metric.name === 'Timeline' || metric.name === 'Overview') {
       setSelectedMetric(null);
       setSelectedEntity(selectedEntity === metric.name ? null : metric.name);
     } else {
