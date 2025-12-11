@@ -440,7 +440,7 @@ const PlayerVisualizer = ({ playerAvatar }) => {
   const [selectedMetric, setSelectedMetric] = useState(null);
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [selectedSeason, setSelectedSeason] = useState('24/25');
-  const [activeMode, setActiveMode] = useState('club'); // 'club' or 'recruit'
+  const [activeMode, setActiveMode] = useState('recruit'); // 'club' or 'recruit'
   
   const currentMetrics = activeMode === 'club' ? getMetricsForSeason(selectedSeason) : recruitMetrics;
   
@@ -458,7 +458,7 @@ const PlayerVisualizer = ({ playerAvatar }) => {
     setSelectedMetric(null);
     if (entity === 'Club') {
       setActiveMode('club');
-    } else if (entity === 'Recruit') {
+    } else if (entity === 'Overview') {
       setActiveMode('recruit');
     }
     setSelectedEntity(selectedEntity === entity ? null : entity);
