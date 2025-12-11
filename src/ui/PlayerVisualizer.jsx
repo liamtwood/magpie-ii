@@ -125,6 +125,14 @@ const santosPlayer = {
 
 const santosClubs = {
   current: 'LOSC Lille',
+  statsBySeason: [
+    { season: '24/25', club: 'Lille', apps: 18, goals: 2, assists: 1 },
+    { season: '23/24', club: 'Lille', apps: 44, goals: 2, assists: 3 },
+    { season: '22/23', club: 'Estoril', apps: 32, goals: 0, assists: 4 },
+    { season: '21/22', club: 'Estoril', apps: 22, goals: 0, assists: 3 },
+    { season: '20/21', club: 'Sporting CP U23', apps: 17, goals: 0, assists: 0 },
+    { season: '19/20', club: 'Estoril U23', apps: 16, goals: 1, assists: 2 },
+  ],
   statsByClub: [
     { club: 'Lille', appearances: 62, goals: 4, assists: 4 },
     { club: 'Estoril', appearances: 54, goals: 0, assists: 7 },
@@ -638,51 +646,29 @@ const PlayerVisualizer = ({ playerAvatar }) => {
               )}
               
               {selectedEntity === 'Club' && (
-                <div className="space-y-4">
-                  <div className="bg-blue-900/30 rounded-lg p-3 border border-blue-700/30">
-                    <div className="font-bold text-white">{santosClubs.current}</div>
-                    <div className="text-xs text-blue-300">Ligue 1 • France</div>
-                  </div>
+                <div className="space-y-3">
+                  <h4 className="text-[11px] uppercase tracking-wider text-slate-400 font-medium">Club</h4>
                   
-                  <div>
-                    <h4 className="text-xs uppercase tracking-wider text-slate-500 mb-2 font-medium">Stats by Club</h4>
-                    <div className="space-y-1.5">
-                      {santosClubs.statsByClub.map((club, i) => (
-                        <div key={i} className="bg-slate-800/50 rounded p-2">
-                          <div className="font-medium text-white text-sm">{club.club}</div>
-                          <div className="flex gap-3 mt-1 text-xs">
-                            <span className="text-slate-400">Apps: <span className="text-white">{club.appearances}</span></span>
-                            <span className="text-slate-400">G: <span className="text-white">{club.goals}</span></span>
-                            <span className="text-slate-400">A: <span className="text-white">{club.assists}</span></span>
-                          </div>
-                        </div>
+                  <table className="w-full text-[10px]">
+                    <thead>
+                      <tr className="border-b border-slate-700">
+                        <th className="text-left py-1.5 text-slate-400 font-medium">Season</th>
+                        <th className="text-center py-1.5 text-slate-400 font-medium">Apps</th>
+                        <th className="text-center py-1.5 text-slate-400 font-medium">Goals</th>
+                        <th className="text-center py-1.5 text-slate-400 font-medium">Assists</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {santosClubs.statsBySeason.map((row, i) => (
+                        <tr key={i} className="border-b border-slate-800/50">
+                          <td className="py-1.5 text-white">{row.season} <span className="text-slate-500">({row.club})</span></td>
+                          <td className="text-center py-1.5 text-white">{row.apps}</td>
+                          <td className="text-center py-1.5 text-white">{row.goals}</td>
+                          <td className="text-center py-1.5 text-white">{row.assists}</td>
+                        </tr>
                       ))}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-xs uppercase tracking-wider text-slate-500 mb-2 font-medium">Transfer History</h4>
-                    <div className="space-y-1.5">
-                      {santosClubs.transferHistory.map((t, i) => (
-                        <div key={i} className="bg-slate-800/50 rounded p-2 flex justify-between items-center">
-                          <div>
-                            <div className="text-[10px] text-slate-400">{t.season}</div>
-                            <div className="text-xs text-white">{t.from} → {t.to}</div>
-                          </div>
-                          <div className="text-green-400 text-xs font-medium">{t.fee}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-xs uppercase tracking-wider text-slate-500 mb-2 font-medium">Youth Clubs</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {santosClubs.youthClubs.map((club, i) => (
-                        <span key={i} className="px-2 py-1 bg-slate-800/50 rounded text-xs text-slate-300">{club}</span>
-                      ))}
-                    </div>
-                  </div>
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
