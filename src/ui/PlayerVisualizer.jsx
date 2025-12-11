@@ -59,6 +59,14 @@ const getMetricsForSeason = (season) => {
 
 const santosMetrics = getMetricsForSeason('24/25');
 
+const recruitMetrics = [
+  { name: 'Scouting', color: '#8b5cf6', score: 8.2, percentile: 82, sources: ['scoutastic', 'internal'], formula: 'Scout Reports × 0.4 + Video Analysis × 0.3 + Live Views × 0.3', metrics: ['Scout Reports Filed', 'Video Sessions Completed', 'Live Matches Watched', 'Profile Completeness'] },
+  { name: 'Rumours', color: '#f97316', score: 6.5, percentile: 65, sources: ['noisefeed', 'transfer_room'], formula: 'Media Mentions × 0.3 + Club Interest × 0.4 + Agent Activity × 0.3', metrics: ['Media Mentions', 'Clubs Interested', 'Agent Contacts', 'Social Media Activity'] },
+  { name: 'Contracts', color: '#22c55e', score: 7.8, percentile: 78, sources: ['transfer_room', 'internal'], formula: 'Contract Length × 0.25 + Wage Fit × 0.35 + Release Clause × 0.2 + Agent Fee × 0.2', metrics: ['Contract Expires', 'Wage Demands', 'Release Clause', 'Agent Fee Est.'] },
+  { name: 'Injuries', color: '#ef4444', score: 8.9, percentile: 89, sources: ['catapult', 'internal'], formula: 'Injury History × 0.4 + Recovery Time × 0.3 + Availability % × 0.3', metrics: ['Major Injuries', 'Days Missed (3yr)', 'Availability %', 'Current Status'] },
+  { name: 'Physical', color: '#06b6d4', score: 8.5, percentile: 85, sources: ['skillcorner', 'catapult', 'second_spectrum'], formula: 'Athleticism × 0.3 + Durability × 0.3 + Workload Capacity × 0.4', metrics: ['Top Speed', 'Sprint Distance/90', 'HI Running/90', 'Recovery Metrics'] },
+];
+
 const santosPlayer = {
   name: 'Tiago Santos',
   club: 'LOSC Lille',
@@ -388,8 +396,9 @@ const PlayerVisualizer = ({ playerAvatar }) => {
   const [selectedMetric, setSelectedMetric] = useState(null);
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [selectedSeason, setSelectedSeason] = useState('24/25');
+  const [activeMode, setActiveMode] = useState('club'); // 'club' or 'recruit'
   
-  const currentMetrics = getMetricsForSeason(selectedSeason);
+  const currentMetrics = activeMode === 'club' ? getMetricsForSeason(selectedSeason) : recruitMetrics;
   
   const handleMetricClick = (metric) => {
     setSelectedEntity(null);
@@ -398,7 +407,13 @@ const PlayerVisualizer = ({ playerAvatar }) => {
   
   const handleEntityClick = (entity) => {
     setSelectedMetric(null);
-    setSelectedEntity(selectedEntity === entity ? null : entity);
+    if (entity === 'Club') {
+      setActiveMode('club');
+      setSelectedEntity(selectedEntity === entity ? null : entity);
+    } else if (entity === 'Recruit') {
+      setActiveMode('recruit');
+      setSelectedEntity(selectedEntity === entity ? null : entity);
+    }
   };
   
   const handleSeasonClick = (season) => {
@@ -441,26 +456,48 @@ const PlayerVisualizer = ({ playerAvatar }) => {
       
       <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-2xl border border-slate-700 overflow-hidden flex" style={{ height: '600px' }}>
         
-        <div className="w-36 border-r border-slate-600 flex flex-col items-center justify-center p-4 gap-2">
-          <span className="text-xs uppercase tracking-wider text-slate-300 font-semibold">Club</span>
-          <div 
-            onClick={() => handleEntityClick('Club')}
-            className={`w-24 h-24 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all relative overflow-hidden
-              ${selectedEntity === 'Club' 
-                ? 'border-2 border-blue-400 ring-4 ring-blue-400/30' 
-                : 'border-2 border-slate-500 hover:border-slate-400'}`}
-            style={{ backgroundColor: '#1e293b' }}
-          >
-            <img 
-              src={santosClubs.clubs[0].badge} 
-              alt="Current Club" 
-              className="w-14 h-14 object-contain"
-            />
+        <div className="w-36 border-r border-slate-600 flex flex-col items-center justify-center p-4 gap-4">
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-xs uppercase tracking-wider text-slate-300 font-semibold">Club</span>
+            <div 
+              onClick={() => handleEntityClick('Club')}
+              className={`w-20 h-20 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all relative overflow-hidden
+                ${selectedEntity === 'Club' || activeMode === 'club'
+                  ? 'border-2 border-blue-400 ring-4 ring-blue-400/30' 
+                  : 'border-2 border-slate-500 hover:border-slate-400'}`}
+              style={{ backgroundColor: '#1e293b' }}
+            >
+              <img 
+                src={santosClubs.clubs[0].badge} 
+                alt="Current Club" 
+                className="w-12 h-12 object-contain"
+              />
+            </div>
+            <span className="text-[10px] text-slate-400">{santosClubs.clubs.length} Club History</span>
           </div>
-          <span className="text-xs text-slate-400">{santosClubs.clubs.length} Club History</span>
           
-          <div className="flex flex-wrap gap-1.5 mt-auto">
-            {['statsbomb', 'impect', 'skillcorner', 'second_spectrum'].map(src => (
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-xs uppercase tracking-wider text-slate-300 font-semibold">Recruit</span>
+            <div 
+              onClick={() => handleEntityClick('Recruit')}
+              className={`w-20 h-20 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all relative overflow-hidden
+                ${selectedEntity === 'Recruit' || activeMode === 'recruit'
+                  ? 'border-2 border-purple-400 ring-4 ring-purple-400/30' 
+                  : 'border-2 border-slate-500 hover:border-slate-400'}`}
+              style={{ backgroundColor: '#1e293b' }}
+            >
+              <svg className="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <span className="text-[10px] text-slate-400">5 Intel Categories</span>
+          </div>
+          
+          <div className="flex flex-wrap gap-1.5 mt-auto justify-center">
+            {(activeMode === 'club' 
+              ? ['statsbomb', 'impect', 'skillcorner', 'second_spectrum']
+              : ['scoutastic', 'noisefeed', 'transfer_room', 'catapult']
+            ).map(src => (
               <span
                 key={src}
                 className="px-1.5 py-0.5 rounded text-[8px] font-medium text-white"
@@ -544,8 +581,8 @@ const PlayerVisualizer = ({ playerAvatar }) => {
           </svg>
           
           <div className="absolute top-4 left-4 bg-slate-800/80 rounded-lg px-3 py-1.5 border border-slate-700">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider">Season</span>
-            <div className="text-sm font-semibold text-white">{selectedSeason}</div>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider">{activeMode === 'club' ? 'Season' : 'Mode'}</span>
+            <div className="text-sm font-semibold text-white">{activeMode === 'club' ? selectedSeason : 'Recruit Intel'}</div>
           </div>
           
           <div className="absolute bottom-4 right-4 text-xs text-slate-500">
@@ -568,7 +605,7 @@ const PlayerVisualizer = ({ playerAvatar }) => {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="font-bold text-white text-lg">{selectedMetric ? selectedMetric.name : selectedEntity}</h3>
-                  <p className="text-xs text-slate-400">{selectedMetric ? 'Composite Metric' : 'Club History'}</p>
+                  <p className="text-xs text-slate-400">{selectedMetric ? 'Composite Metric' : (selectedEntity === 'Club' ? 'Club History' : 'Recruitment Intelligence')}</p>
                 </div>
                 <button 
                   onClick={handleClose}
@@ -680,6 +717,44 @@ const PlayerVisualizer = ({ playerAvatar }) => {
                       </table>
                     </div>
                   ))}
+                </div>
+              )}
+              
+              {selectedEntity === 'Recruit' && (
+                <div className="space-y-4">
+                  <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-3">
+                    <div className="text-xs text-purple-300 font-medium mb-1">Recruitment Intel Mode</div>
+                    <p className="text-[11px] text-slate-400">Showing recruitment-focused metrics: scouting reports, transfer rumours, contract intel, injury history, and physical profiles.</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {recruitMetrics.map((metric, idx) => (
+                      <div key={idx} className="bg-slate-800/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: metric.color }} />
+                            <span className="text-sm font-medium text-white">{metric.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg font-bold text-white">{metric.score.toFixed(1)}</span>
+                            <span className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: `${metric.color}30`, color: metric.color }}>
+                              {metric.percentile}%
+                            </span>
+                          </div>
+                        </div>
+                        <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all" style={{ width: `${metric.percentile}%`, backgroundColor: metric.color }} />
+                        </div>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {metric.sources.map(src => (
+                            <span key={src} className="px-1.5 py-0.5 rounded text-[8px] font-medium text-white" style={{ backgroundColor: dataSourceColors[src] }}>
+                              {src}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
