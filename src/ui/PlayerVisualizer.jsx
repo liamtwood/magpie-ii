@@ -486,10 +486,11 @@ const PlayerVisualizer = ({ playerAvatar }) => {
       
       <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-2xl border border-slate-700 overflow-hidden flex" style={{ height: '600px' }}>
         
-        <div className="w-32 border-r border-slate-600 flex flex-col items-center justify-center p-4 gap-4">
+        <div className="w-36 border-r border-slate-600 flex flex-col items-center justify-center p-4 gap-2">
+          <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Club</span>
           <div 
             onClick={() => handleEntityClick('Club')}
-            className={`w-20 h-20 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all relative overflow-hidden
+            className={`w-24 h-24 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all relative overflow-hidden
               ${selectedEntity === 'Club' 
                 ? 'border-2 border-blue-400 ring-4 ring-blue-400/30' 
                 : 'border-2 border-slate-500 hover:border-slate-400'}`}
@@ -498,12 +499,10 @@ const PlayerVisualizer = ({ playerAvatar }) => {
             <img 
               src={santosClubs.clubs[0].badge} 
               alt="Current Club" 
-              className="w-12 h-12 object-contain"
+              className="w-14 h-14 object-contain"
             />
-            <span className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-              {santosClubs.clubs.length}
-            </span>
           </div>
+          <span className="text-[10px] text-slate-500">{santosClubs.clubs.length} Club History</span>
           
           <div className="flex flex-wrap gap-1.5 mt-auto">
             {['statsbomb', 'impect', 'skillcorner', 'second_spectrum'].map(src => (
