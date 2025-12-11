@@ -338,7 +338,7 @@ const PlayerVisualizer = ({ playerAvatar }) => {
     setSelectedMetric(null);
   };
   
-  const centerX = 280;
+  const centerX = 220;
   const centerY = 300;
   const playerRadius = 70;
 
