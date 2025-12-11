@@ -518,7 +518,7 @@ const PlayerVisualizer = ({ playerAvatar }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <span className="text-[9px] uppercase tracking-wider text-slate-400 font-medium">Overview</span>
+            <span className="text-[9px] uppercase tracking-wider text-slate-400 font-medium">Profile</span>
           </div>
           
           <div className="flex flex-col items-center gap-0.5">
@@ -537,22 +537,6 @@ const PlayerVisualizer = ({ playerAvatar }) => {
               />
             </div>
             <span className="text-[9px] uppercase tracking-wider text-slate-400 font-medium">Club</span>
-          </div>
-          
-          <div className="flex flex-col items-center gap-0.5">
-            <div 
-              onClick={() => handleEntityClick('Recruit')}
-              className={`w-14 h-14 rounded-full flex items-center justify-center cursor-pointer transition-all
-                ${selectedEntity === 'Recruit' || activeMode === 'recruit'
-                  ? 'border-2 border-purple-400 ring-3 ring-purple-400/30' 
-                  : 'border-2 border-slate-500 hover:border-slate-400'}`}
-              style={{ backgroundColor: '#1e293b' }}
-            >
-              <svg className="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <span className="text-[9px] uppercase tracking-wider text-slate-400 font-medium">Recruit</span>
           </div>
           
         </div>
