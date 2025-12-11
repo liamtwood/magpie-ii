@@ -136,7 +136,7 @@ const santosClubs = {
     },
     {
       name: 'Estoril',
-      badge: null,
+      badge: '/clubs/estoril.png',
       seasons: [
         { season: '22/23', apps: 32, goals: 0, assists: 4 },
         { season: '21/22', apps: 22, goals: 0, assists: 3 },
@@ -144,14 +144,14 @@ const santosClubs = {
     },
     {
       name: 'Sporting CP U23',
-      badge: null,
+      badge: '/clubs/sporting.png',
       seasons: [
         { season: '20/21', apps: 17, goals: 0, assists: 0 },
       ]
     },
     {
       name: 'Estoril U23',
-      badge: null,
+      badge: '/clubs/estoril.png',
       seasons: [
         { season: '19/20', apps: 16, goals: 1, assists: 2 },
       ]
