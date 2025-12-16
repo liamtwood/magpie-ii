@@ -236,7 +236,7 @@ const PlayerSwipe = () => {
                 <div
                   key={issue.id}
                   onClick={() => handleIssueSelect(issue)}
-                  className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 w-72 h-[420px] shrink-0"
+                  className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 w-72 h-[480px] shrink-0"
                 >
                   {/* Glow effect based on risk */}
                   <div 
@@ -339,7 +339,7 @@ const PlayerSwipe = () => {
               <div className="flex gap-6 flex-1 justify-center">
                 {/* Kieran Trippier Card (Current Player) - Only show when scroll is at 0 */}
                 {candidateScrollIndex === 0 && (
-                  <div className="group relative w-72 h-[420px] shrink-0">
+                  <div className="group relative w-72 h-[480px] shrink-0">
                     <div className="relative bg-slate-600/60 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-500/50 h-full flex flex-col">
                       {/* Player Image */}
                       <div className="relative h-64 bg-gradient-to-b from-slate-500/30 to-slate-600/30 shrink-0">
@@ -387,7 +387,7 @@ const PlayerSwipe = () => {
                     <div
                       key={actualIndex}
                       onClick={() => handleCandidateSelect(actualIndex)}
-                      className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 w-72 h-[420px] shrink-0"
+                      className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 w-72 h-[480px] shrink-0"
                     >
                       {/* Glow effect based on rank */}
                       <div 
