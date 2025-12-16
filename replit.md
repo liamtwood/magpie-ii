@@ -116,6 +116,17 @@ The application follows a client-side only architecture with no backend:
 - **Visual Styling**: Color-coded tabs matching issue severity (red, amber, green, gray)
 - **Empty States**: Friendly messages when no issues exist in a category
 
+### 13. Player Swipe (Dating App Style)
+- **Issue Cards View**: Large cards showing squad issues (contract expiring, injuries, succession) with risk percentages
+- **Card Sizing**: Card size and glow intensity reflects issue criticality (higher risk = bigger/brighter)
+- **Shortlist Summary**: After selecting an issue, shows exec summary with ranked replacement candidates
+- **Candidate Stack**: Visual stack of candidates ranked 1-3 with ratings and key info
+- **Candidate Deep Dive**: Full-screen player card with background styling and detailed stats overlay
+- **Swipe Navigation**: Swipe right/left for next/previous candidate, swipe up for more details
+- **Keyboard Support**: Arrow keys for navigation (desktop fallback)
+- **Action Buttons**: Like/pass buttons similar to dating apps for quick candidate decisions
+- **Component**: `src/ui/PlayerSwipe.jsx`
+
 ## External Dependencies
 
 ### NPM Packages
