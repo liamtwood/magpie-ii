@@ -489,22 +489,22 @@ const PlayerSwipe = () => {
           </div>
           
           <div className="flex-1 flex items-center justify-center relative overflow-hidden">
-            {/* All three circles in expanded phase */}
+            {/* Replacement circles on sides during expanded phase */}
             {animationPhase === 'expanded' && selectedIssue && (
-              <div className="flex items-center justify-center gap-8">
+              <>
                 {/* Left - Tiago Santos */}
-                <TiagoVideoCircle />
-                
-                {/* Center - Kieran Trippier */}
-                <KieranVideoCircle />
+                <div className="absolute" style={{ right: 'calc(50% + 180px)' }}>
+                  <TiagoVideoCircle />
+                </div>
                 
                 {/* Right - Malo Gusto */}
-                <GustoVideoCircle videoId="fd5f4Akuieg" />
-              </div>
+                <div className="absolute" style={{ left: 'calc(50% + 180px)' }}>
+                  <GustoVideoCircle videoId="fd5f4Akuieg" />
+                </div>
+              </>
             )}
             
-            {/* Issue cards / Current player card - hide when expanded */}
-            {animationPhase !== 'expanded' && (
+            {/* Issue cards / Current player card */}
             <div className="flex gap-6 justify-center relative z-10">
               {issueCards.map((issue) => {
                 const isSelected = animatingIssue === issue.id;
@@ -513,6 +513,9 @@ const PlayerSwipe = () => {
                 // Calculate offset to center the selected card
                 const cardPositions = { pope: -312, botman: 0, trippier: 312 };
                 const offset = cardPositions[issue.id] || 0;
+                
+                // Don't render other cards when expanded
+                if (isOther && animationPhase === 'expanded') return null;
                 
                 return (
                   <div
@@ -613,7 +616,6 @@ const PlayerSwipe = () => {
                 );
               })}
             </div>
-            )}
           </div>
         </div>
       )}
