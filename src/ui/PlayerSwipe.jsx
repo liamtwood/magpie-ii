@@ -180,7 +180,7 @@ const GustoVideoCircle = ({ videoId = null }) => {
                 if (event.data === 1) {
                   setTimeout(() => {
                     event.target.pauseVideo();
-                  }, 7000);
+                  }, 5000);
                 }
               }}
             />
@@ -426,7 +426,7 @@ const PlayerSwipe = () => {
                 <TiagoVideoCircle />
                 
                 {/* Right replacement card - Malo Gusto */}
-                <GustoVideoCircle />
+                <GustoVideoCircle videoId="fd5f4Akuieg" />
               </>
             )}
             
