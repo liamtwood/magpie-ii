@@ -350,53 +350,86 @@ const PlayerSwipe = () => {
           
           {/* Candidate Stack */}
           <div className="flex-1 p-6 overflow-y-auto">
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {selectedIssue.candidates.map((candidate, index) => (
                 <div
                   key={index}
                   onClick={() => handleCandidateSelect(index)}
-                  className="group relative cursor-pointer"
+                  className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105"
                 >
-                  <div className={`relative bg-slate-800/60 backdrop-blur-sm rounded-2xl overflow-hidden border transition-all duration-300
-                    ${index === 0 ? 'border-yellow-500/50 ring-2 ring-yellow-500/20' : 'border-slate-700/50 hover:border-slate-500/50'}`}>
-                    <div className="flex items-center p-4 gap-4">
-                      {/* Rank */}
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shrink-0
+                  {/* Glow effect for top pick */}
+                  {index === 0 && (
+                    <div 
+                      className="absolute inset-0 rounded-3xl blur-xl opacity-50 transition-opacity group-hover:opacity-80"
+                      style={{
+                        background: 'radial-gradient(circle, rgba(234,179,8,0.4) 0%, transparent 70%)'
+                      }}
+                    />
+                  )}
+                  
+                  <div className={`relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border transition-colors
+                    ${index === 0 ? 'border-yellow-500/50' : 'border-slate-700/50 hover:border-slate-500/50'}`}>
+                    {/* Player Image */}
+                    <div className="relative h-48 bg-gradient-to-b from-slate-700/50 to-slate-800/50">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <PlayerAvatarSwipe name={candidate.name} size="issue" />
+                      </div>
+                      
+                      {/* Rank Badge */}
+                      <div className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg
                         ${index === 0 ? 'bg-gradient-to-br from-yellow-400 to-amber-500 text-slate-900' : 
                           index === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-900' :
                           'bg-slate-700 text-slate-300'}`}>
-                        {candidate.rank}
+                        #{candidate.rank}
                       </div>
                       
-                      {/* Avatar */}
-                      <PlayerAvatarSwipe name={candidate.name} size="md" className="rounded-xl shrink-0" />
+                      {/* Club Badge */}
+                      <div className="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-slate-900/80 text-slate-300 text-xs font-medium">
+                        {candidate.club}
+                      </div>
+                    </div>
+                    
+                    {/* Player Info */}
+                    <div className="p-5">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-xl font-bold text-white">{candidate.name}</h3>
+                        <span className="text-slate-400 text-sm">{candidate.age} yrs</span>
+                      </div>
                       
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-lg font-bold text-white truncate">{candidate.name}</h3>
-                          <span className="text-slate-500 text-sm shrink-0">{candidate.age}</span>
+                      {/* Value & Rating */}
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-green-400 font-semibold">{candidate.value}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="text-lg font-bold text-white">{candidate.rating}</div>
+                          <span className="text-slate-500 text-xs">FC</span>
                         </div>
-                        <div className="text-slate-400 text-sm mb-2">{candidate.club} • {candidate.value}</div>
-                        <p className="text-slate-500 text-sm truncate">{candidate.highlights}</p>
                       </div>
                       
-                      {/* Rating & Confidence */}
-                      <div className="text-right shrink-0">
-                        <div className="text-2xl font-bold text-white">{candidate.rating}</div>
-                        <div className="text-xs text-slate-500 mb-1">FC Rating</div>
-                        {candidate.confidence && (
-                          <div className={`text-xs font-medium px-2 py-0.5 rounded ${
-                            candidate.confidence >= 80 ? 'bg-green-500/20 text-green-400' :
-                            candidate.confidence >= 50 ? 'bg-amber-500/20 text-amber-400' :
-                            'bg-red-500/20 text-red-400'
-                          }`}>
-                            {candidate.confidence}% conf
+                      <p className="text-slate-500 text-sm line-clamp-2 mb-3">{candidate.highlights}</p>
+                      
+                      {/* Confidence Bar */}
+                      {candidate.confidence && (
+                        <div>
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-slate-400">Deal Confidence</span>
+                            <span className={`font-medium ${
+                              candidate.confidence >= 80 ? 'text-green-400' :
+                              candidate.confidence >= 50 ? 'text-amber-400' :
+                              'text-red-400'
+                            }`}>{candidate.confidence}%</span>
                           </div>
-                        )}
-                      </div>
-                      
-                      <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-slate-400 transition-colors shrink-0" />
+                          <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                            <div 
+                              className={`h-full rounded-full transition-all ${
+                                candidate.confidence >= 80 ? 'bg-green-500' :
+                                candidate.confidence >= 50 ? 'bg-amber-500' :
+                                'bg-red-500'
+                              }`}
+                              style={{ width: `${candidate.confidence}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
