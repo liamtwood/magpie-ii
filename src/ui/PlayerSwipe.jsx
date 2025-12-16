@@ -272,69 +272,43 @@ const PlayerSwipe = () => {
             {/* Replacement cards that appear during expanded phase */}
             {animationPhase === 'expanded' && selectedIssue && (
               <>
-                {/* Left replacement card - Tiago Santos with YouTube video */}
+                {/* Left replacement card - Tiago Santos with YouTube video (Circle) */}
                 <div 
-                  className="absolute w-72 h-[480px] scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
+                  className="absolute w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
                   style={{
-                    right: 'calc(50% + 168px)',
+                    right: 'calc(50% + 180px)',
                     animation: 'slideInLeft 0.4s ease-out forwards'
                   }}
                 >
-                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-teal-500/50 h-full flex flex-col cursor-pointer">
-                    <div className="relative h-64 bg-black shrink-0 overflow-hidden">
-                      <div className="absolute inset-0 scale-150">
-                        <YouTube
-                          videoId="AtAfGUdYwdg"
-                          className="w-full h-full"
-                          iframeClassName="w-full h-full"
-                          opts={{
-                            width: '100%',
-                            height: '100%',
-                            playerVars: {
-                              autoplay: 1,
-                              mute: 1,
-                              controls: 0,
-                              modestbranding: 1,
-                              rel: 0,
-                              showinfo: 0,
-                              disablekb: 1,
-                            },
-                          }}
-                          onStateChange={(event) => {
-                            if (event.data === 1) {
-                              setTimeout(() => {
-                                event.target.pauseVideo();
-                              }, 7000);
-                            }
-                          }}
-                        />
-                      </div>
-                      <div className="absolute inset-0 pointer-events-none" />
-                      <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-teal-500/90 text-white text-xs font-bold z-10">
-                        #1 PICK
-                      </div>
-                      {selectedIssue.candidates[0]?.club && clubBadges[selectedIssue.candidates[0].club] && (
-                        <div className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full p-1 z-10">
-                          <img src={clubBadges[selectedIssue.candidates[0].club]} alt="" className="w-full h-full object-contain" />
-                        </div>
-                      )}
+                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-teal-500/50 cursor-pointer bg-black">
+                    <div className="absolute inset-0 scale-[2]">
+                      <YouTube
+                        videoId="AtAfGUdYwdg"
+                        className="w-full h-full"
+                        iframeClassName="w-full h-full"
+                        opts={{
+                          width: '100%',
+                          height: '100%',
+                          playerVars: {
+                            autoplay: 1,
+                            mute: 1,
+                            controls: 0,
+                            modestbranding: 1,
+                            rel: 0,
+                            showinfo: 0,
+                            disablekb: 1,
+                          },
+                        }}
+                        onStateChange={(event) => {
+                          if (event.data === 1) {
+                            setTimeout(() => {
+                              event.target.pauseVideo();
+                            }, 7000);
+                          }
+                        }}
+                      />
                     </div>
-                    <div className="p-5 flex-1">
-                      <h3 className="text-lg font-bold text-white">{selectedIssue.candidates[0]?.name}</h3>
-                      <p className="text-teal-400 text-sm">{selectedIssue.candidates[0]?.club} • {selectedIssue.candidates[0]?.age} yrs</p>
-                      <p className="text-white text-lg font-semibold mt-2">{selectedIssue.candidates[0]?.value}</p>
-                      <div className="mt-3 flex items-center gap-2">
-                        <div className="flex items-center gap-1 text-amber-400">
-                          <Star className="w-4 h-4 fill-current" />
-                          <span className="text-sm font-medium">{selectedIssue.candidates[0]?.rating}</span>
-                        </div>
-                        {selectedIssue.candidates[0]?.confidence && (
-                          <div className="text-slate-400 text-xs">
-                            {selectedIssue.candidates[0].confidence}% confidence
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <div className="absolute inset-0 pointer-events-none" />
                   </div>
                 </div>
                 
