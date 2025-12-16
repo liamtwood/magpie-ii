@@ -33,7 +33,7 @@ const PlayerAvatarSwipe = ({ name, size = 'md', className = '' }) => {
       <img
         src={imageUrl}
         alt={name}
-        className={`${sizeClasses[size]} rounded-full object-cover ${className}`}
+        className={`${sizeClasses[size]} rounded-xl object-cover ${className}`}
         onError={(e) => {
           e.target.style.display = 'none';
           e.target.nextSibling && (e.target.nextSibling.style.display = 'flex');
@@ -43,7 +43,7 @@ const PlayerAvatarSwipe = ({ name, size = 'md', className = '' }) => {
   }
 
   return (
-    <div className={`${sizeClasses[size]} rounded-full bg-gradient-to-br from-slate-600 to-slate-700 text-white flex items-center justify-center font-bold ${className}`}>
+    <div className={`${sizeClasses[size]} rounded-xl bg-gradient-to-br from-slate-600 to-slate-700 text-white flex items-center justify-center font-bold ${className}`}>
       {initials}
     </div>
   );
@@ -279,7 +279,7 @@ const PlayerSwipe = () => {
                       <div className="mt-4 flex items-center gap-2">
                         <div className="flex -space-x-2">
                           {issue.candidates.slice(0, 3).map((c, i) => (
-                            <div key={i} className="border-2 border-slate-800 rounded-full">
+                            <div key={i} className="border-2 border-slate-800 rounded-lg">
                               <PlayerAvatarSwipe name={c.name} size="sm" />
                             </div>
                           ))}
