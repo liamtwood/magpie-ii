@@ -126,28 +126,30 @@ const PlayerSwipe = () => {
   const [touchStart, setTouchStart] = useState(null);
   const [touchStartY, setTouchStartY] = useState(null);
   
-  // Animation states
+  // Animation states - single page mode
   const [animatingIssue, setAnimatingIssue] = useState(null);
-  const [animationPhase, setAnimationPhase] = useState('idle'); // 'idle', 'center', 'expand'
+  const [animationPhase, setAnimationPhase] = useState('idle'); // 'idle', 'center', 'expanded'
 
   const handleIssueSelect = (issue) => {
     setSelectedIssue(issue);
     setAnimatingIssue(issue.id);
     setAnimationPhase('center');
+    setCurrentCandidateIndex(0);
+    setCandidateScrollIndex(0);
     
     // Phase 1: Move selected card to center, fade others
     setTimeout(() => {
-      setAnimationPhase('expand');
-    }, 400);
-    
-    // Phase 2: Show replacement cards
+      setAnimationPhase('expanded');
+    }, 500);
+  };
+  
+  const handleBackToIssues = () => {
+    setAnimationPhase('center');
     setTimeout(() => {
-      setCurrentCandidateIndex(0);
-      setCandidateScrollIndex(0);
-      setView('shortlist');
       setAnimationPhase('idle');
       setAnimatingIssue(null);
-    }, 800);
+      setSelectedIssue(null);
+    }, 400);
   };
 
   const handleCandidateSelect = (index) => {
@@ -239,35 +241,51 @@ const PlayerSwipe = () => {
 
   return (
     <div className="h-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden">
-      {/* Issues View - Card Selection */}
-      {(view === 'issues' || animationPhase !== 'idle') && view !== 'shortlist' && view !== 'candidate' && (
+      {/* Single Page View - Everything animates in place */}
+      {view === 'issues' && (
         <div className="h-full flex flex-col p-6 relative">
-          <div className={`text-center mb-8 transition-all duration-400 ${animationPhase !== 'idle' ? 'opacity-0' : 'opacity-100'}`}>
-            <h1 className="text-3xl font-bold text-white mb-2">Squad Issues</h1>
-            <p className="text-slate-400">Tap to explore replacement options</p>
+          {/* Header - changes based on state */}
+          <div className={`text-center mb-8 transition-all duration-500`}>
+            {animationPhase === 'idle' ? (
+              <>
+                <h1 className="text-3xl font-bold text-white mb-2">Squad Issues</h1>
+                <p className="text-slate-400">Tap to explore replacement options</p>
+              </>
+            ) : (
+              <div className="flex items-center justify-center gap-4">
+                <button 
+                  onClick={handleBackToIssues}
+                  className="p-2 hover:bg-slate-800 rounded-full transition-colors"
+                >
+                  <ArrowLeft className="w-6 h-6 text-white" />
+                </button>
+                <div>
+                  <h1 className="text-2xl font-bold text-white">{selectedIssue?.player} Replacement</h1>
+                  <p className="text-slate-400 text-sm">{selectedIssue?.candidates?.length} candidates ranked</p>
+                </div>
+              </div>
+            )}
           </div>
           
-          <div className="flex-1 flex items-center justify-center relative">
-            {/* Replacement cards that appear during expand phase */}
-            {animationPhase === 'expand' && selectedIssue && (
+          <div className="flex-1 flex items-center justify-center relative overflow-hidden">
+            {/* Replacement cards that appear during expanded phase */}
+            {animationPhase === 'expanded' && selectedIssue && (
               <>
                 {/* Left replacement card */}
                 <div 
-                  className="absolute w-72 h-[480px] transition-all duration-500 ease-out"
+                  className="absolute w-72 h-[480px]"
                   style={{
-                    left: 'calc(50% - 450px)',
-                    opacity: 1,
-                    transform: 'translateX(0) scale(1)',
+                    left: 'calc(50% - 460px)',
                     animation: 'slideInLeft 0.4s ease-out forwards'
                   }}
                 >
-                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-teal-500/50 h-full flex flex-col">
+                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-teal-500/50 h-full flex flex-col cursor-pointer hover:scale-105 transition-transform">
                     <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50 shrink-0">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <PlayerAvatarSwipe name={selectedIssue.candidates[0]?.name} size="issue" />
                       </div>
-                      <div className="absolute top-4 left-4 px-2 py-1 rounded-full bg-teal-500/90 text-white text-xs font-bold">
-                        #1
+                      <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-teal-500/90 text-white text-xs font-bold">
+                        #1 PICK
                       </div>
                       {selectedIssue.candidates[0]?.club && clubBadges[selectedIssue.candidates[0].club] && (
                         <div className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full p-1">
@@ -277,29 +295,38 @@ const PlayerSwipe = () => {
                     </div>
                     <div className="p-5 flex-1">
                       <h3 className="text-lg font-bold text-white">{selectedIssue.candidates[0]?.name}</h3>
-                      <p className="text-teal-400 text-sm">{selectedIssue.candidates[0]?.club}</p>
-                      <p className="text-slate-400 text-sm mt-2">{selectedIssue.candidates[0]?.value}</p>
+                      <p className="text-teal-400 text-sm">{selectedIssue.candidates[0]?.club} • {selectedIssue.candidates[0]?.age} yrs</p>
+                      <p className="text-white text-lg font-semibold mt-2">{selectedIssue.candidates[0]?.value}</p>
+                      <div className="mt-3 flex items-center gap-2">
+                        <div className="flex items-center gap-1 text-amber-400">
+                          <Star className="w-4 h-4 fill-current" />
+                          <span className="text-sm font-medium">{selectedIssue.candidates[0]?.rating}</span>
+                        </div>
+                        {selectedIssue.candidates[0]?.confidence && (
+                          <div className="text-slate-400 text-xs">
+                            {selectedIssue.candidates[0].confidence}% confidence
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
                 
                 {/* Right replacement card */}
                 <div 
-                  className="absolute w-72 h-[480px] transition-all duration-500 ease-out"
+                  className="absolute w-72 h-[480px]"
                   style={{
-                    right: 'calc(50% - 450px)',
-                    opacity: 1,
-                    transform: 'translateX(0) scale(1)',
+                    right: 'calc(50% - 460px)',
                     animation: 'slideInRight 0.4s ease-out forwards'
                   }}
                 >
-                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-teal-500/50 h-full flex flex-col">
+                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-teal-500/50 h-full flex flex-col cursor-pointer hover:scale-105 transition-transform">
                     <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50 shrink-0">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <PlayerAvatarSwipe name={selectedIssue.candidates[1]?.name} size="issue" />
                       </div>
-                      <div className="absolute top-4 left-4 px-2 py-1 rounded-full bg-teal-500/90 text-white text-xs font-bold">
-                        #2
+                      <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-teal-500/90 text-white text-xs font-bold">
+                        #2 PICK
                       </div>
                       {selectedIssue.candidates[1]?.club && clubBadges[selectedIssue.candidates[1].club] && (
                         <div className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full p-1">
@@ -309,53 +336,71 @@ const PlayerSwipe = () => {
                     </div>
                     <div className="p-5 flex-1">
                       <h3 className="text-lg font-bold text-white">{selectedIssue.candidates[1]?.name}</h3>
-                      <p className="text-teal-400 text-sm">{selectedIssue.candidates[1]?.club}</p>
-                      <p className="text-slate-400 text-sm mt-2">{selectedIssue.candidates[1]?.value}</p>
+                      <p className="text-teal-400 text-sm">{selectedIssue.candidates[1]?.club} • {selectedIssue.candidates[1]?.age} yrs</p>
+                      <p className="text-white text-lg font-semibold mt-2">{selectedIssue.candidates[1]?.value}</p>
+                      <div className="mt-3 flex items-center gap-2">
+                        <div className="flex items-center gap-1 text-amber-400">
+                          <Star className="w-4 h-4 fill-current" />
+                          <span className="text-sm font-medium">{selectedIssue.candidates[1]?.rating}</span>
+                        </div>
+                        {selectedIssue.candidates[1]?.confidence && (
+                          <div className="text-slate-400 text-xs">
+                            {selectedIssue.candidates[1].confidence}% confidence
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </>
             )}
             
-            <div className="flex gap-6 justify-center">
-              {issueCards.map((issue, index) => {
+            {/* Issue cards / Current player card */}
+            <div className="flex gap-6 justify-center relative z-10">
+              {issueCards.map((issue) => {
                 const isSelected = animatingIssue === issue.id;
                 const isOther = animatingIssue && !isSelected;
                 
-                // Calculate position for centering animation
+                // Calculate offset to center the selected card
                 const cardPositions = { pope: -312, botman: 0, trippier: 312 };
                 const offset = cardPositions[issue.id] || 0;
+                
+                // Don't render other cards when expanded
+                if (isOther && animationPhase === 'expanded') return null;
                 
                 return (
                   <div
                     key={issue.id}
                     onClick={() => animationPhase === 'idle' && handleIssueSelect(issue)}
-                    className={`group relative cursor-pointer w-72 h-[480px] shrink-0 transition-all duration-500 ease-out
-                      ${animationPhase === 'idle' ? 'hover:scale-105' : ''}`}
+                    className={`group relative w-72 h-[480px] shrink-0 transition-all duration-500 ease-out
+                      ${animationPhase === 'idle' ? 'cursor-pointer hover:scale-105' : ''}`}
                     style={{
                       transform: isSelected && animationPhase !== 'idle' 
                         ? `translateX(${-offset}px) scale(1.02)` 
                         : 'translateX(0) scale(1)',
                       opacity: isOther ? 0 : 1,
                       zIndex: isSelected ? 10 : 1,
-                      pointerEvents: animationPhase !== 'idle' ? 'none' : 'auto'
+                      pointerEvents: animationPhase !== 'idle' && !isSelected ? 'none' : 'auto'
                     }}
                   >
-                    {/* Glow effect based on risk */}
+                    {/* Glow effect */}
                     <div 
-                      className="absolute inset-0 rounded-3xl blur-xl opacity-50 transition-opacity group-hover:opacity-80"
+                      className={`absolute inset-0 rounded-3xl blur-xl transition-opacity
+                        ${animationPhase === 'idle' ? 'opacity-50 group-hover:opacity-80' : 'opacity-30'}`}
                       style={{
-                        background: issue.risk > 90 
-                          ? 'radial-gradient(circle, rgba(239,68,68,0.4) 0%, transparent 70%)'
-                          : issue.risk > 80 
-                            ? 'radial-gradient(circle, rgba(251,146,60,0.4) 0%, transparent 70%)'
-                            : 'radial-gradient(circle, rgba(250,204,21,0.4) 0%, transparent 70%)'
+                        background: isSelected && animationPhase !== 'idle'
+                          ? 'radial-gradient(circle, rgba(251,191,36,0.3) 0%, transparent 70%)'
+                          : issue.risk > 90 
+                            ? 'radial-gradient(circle, rgba(239,68,68,0.4) 0%, transparent 70%)'
+                            : issue.risk > 80 
+                              ? 'radial-gradient(circle, rgba(251,146,60,0.4) 0%, transparent 70%)'
+                              : 'radial-gradient(circle, rgba(250,204,21,0.4) 0%, transparent 70%)'
                       }}
                     />
                     
-                    <div className={`relative backdrop-blur-sm rounded-3xl overflow-hidden border transition-colors h-full flex flex-col
+                    <div className={`relative backdrop-blur-sm rounded-3xl overflow-hidden border transition-all duration-500 h-full flex flex-col
                       ${isSelected && animationPhase !== 'idle' 
-                        ? 'bg-slate-600/60 border-slate-500/50' 
+                        ? 'bg-slate-600/60 border-amber-500/50' 
                         : 'bg-slate-800/80 border-slate-700/50 hover:border-slate-500/50'}`}>
                       {/* Player Image */}
                       <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50 shrink-0">
@@ -365,13 +410,13 @@ const PlayerSwipe = () => {
                         
                         {/* Current badge for selected */}
                         {isSelected && animationPhase !== 'idle' && (
-                          <div className="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-slate-900/90 text-amber-400 text-xs font-bold border border-amber-500/30">
+                          <div className="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-amber-500/90 text-slate-900 text-xs font-bold">
                             CURRENT
                           </div>
                         )}
                         
-                        {/* Risk Badge - hide during animation */}
-                        {!(isSelected && animationPhase !== 'idle') && (
+                        {/* Risk Badge - show only in idle */}
+                        {animationPhase === 'idle' && (
                           <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1.5
                             ${issue.risk > 90 ? 'bg-red-500/90 text-white' : 
                               issue.risk > 80 ? 'bg-orange-500/90 text-white' : 
@@ -381,8 +426,8 @@ const PlayerSwipe = () => {
                           </div>
                         )}
                         
-                        {/* Position Badge - hide during animation */}
-                        {!(isSelected && animationPhase !== 'idle') && (
+                        {/* Position Badge - show only in idle */}
+                        {animationPhase === 'idle' && (
                           <div className="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-slate-900/80 text-slate-300 text-xs font-medium">
                             {issue.position}
                           </div>
@@ -403,8 +448,8 @@ const PlayerSwipe = () => {
                         </p>
                         <p className="text-slate-500 text-sm line-clamp-2">{issue.summary}</p>
                         
-                        {/* Candidates Preview - hide during animation */}
-                        {!(isSelected && animationPhase !== 'idle') && (
+                        {/* Candidates Preview - show only in idle */}
+                        {animationPhase === 'idle' && (
                           <div className="mt-4 flex items-center gap-2">
                             <div className="flex -space-x-2">
                               {issue.candidates.slice(0, 3).map((c, i) => (
