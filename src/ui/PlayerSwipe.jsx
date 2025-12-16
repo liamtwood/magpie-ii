@@ -282,30 +282,34 @@ const PlayerSwipe = () => {
                 >
                   <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-teal-500/50 h-full flex flex-col cursor-pointer">
                     <div className="relative h-64 bg-black shrink-0 overflow-hidden">
-                      <YouTube
-                        videoId="AtAfGUdYwdg"
-                        className="absolute inset-0"
-                        iframeClassName="w-full h-full"
-                        opts={{
-                          width: '100%',
-                          height: '100%',
-                          playerVars: {
-                            autoplay: 1,
-                            mute: 1,
-                            controls: 0,
-                            modestbranding: 1,
-                            rel: 0,
-                            showinfo: 0,
-                          },
-                        }}
-                        onStateChange={(event) => {
-                          if (event.data === 1) {
-                            setTimeout(() => {
-                              event.target.pauseVideo();
-                            }, 7000);
-                          }
-                        }}
-                      />
+                      <div className="absolute inset-0 scale-150">
+                        <YouTube
+                          videoId="AtAfGUdYwdg"
+                          className="w-full h-full"
+                          iframeClassName="w-full h-full"
+                          opts={{
+                            width: '100%',
+                            height: '100%',
+                            playerVars: {
+                              autoplay: 1,
+                              mute: 1,
+                              controls: 0,
+                              modestbranding: 1,
+                              rel: 0,
+                              showinfo: 0,
+                              disablekb: 1,
+                            },
+                          }}
+                          onStateChange={(event) => {
+                            if (event.data === 1) {
+                              setTimeout(() => {
+                                event.target.pauseVideo();
+                              }, 7000);
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="absolute inset-0 pointer-events-none" />
                       <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-teal-500/90 text-white text-xs font-bold z-10">
                         #1 PICK
                       </div>
