@@ -116,6 +116,81 @@ const issueCards = [
   },
 ];
 
+const TiagoVideoCircle = () => {
+  const [isHovered, setIsHovered] = useState(false);
+  const playerRef = useRef(null);
+  
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+  
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (playerRef.current) {
+      playerRef.current.pauseVideo();
+    }
+  };
+
+  return (
+    <div 
+      className="absolute w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
+      style={{
+        right: 'calc(50% + 180px)',
+        animation: 'slideInLeft 0.4s ease-out forwards'
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-teal-500/50 cursor-pointer bg-gradient-to-br from-slate-800 to-slate-900">
+        {/* Static content - shown when not hovered */}
+        <div className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
+          <img 
+            src={clubBadges['Lille']} 
+            alt="Lille" 
+            className="w-16 h-16 object-contain mb-3"
+          />
+          <h3 className="text-white font-bold text-lg">Tiago Santos</h3>
+          <p className="text-teal-400 font-semibold">£12M</p>
+        </div>
+        
+        {/* Video - shown on hover */}
+        {isHovered && (
+          <div className="absolute inset-0 scale-[2]">
+            <YouTube
+              videoId="AtAfGUdYwdg"
+              className="w-full h-full"
+              iframeClassName="w-full h-full"
+              opts={{
+                width: '100%',
+                height: '100%',
+                playerVars: {
+                  autoplay: 1,
+                  mute: 1,
+                  controls: 0,
+                  modestbranding: 1,
+                  rel: 0,
+                  showinfo: 0,
+                  disablekb: 1,
+                },
+              }}
+              onReady={(event) => {
+                playerRef.current = event.target;
+              }}
+              onStateChange={(event) => {
+                if (event.data === 1) {
+                  setTimeout(() => {
+                    event.target.pauseVideo();
+                  }, 7000);
+                }
+              }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const PlayerSwipe = () => {
   const [view, setView] = useState('issues'); // 'issues', 'shortlist', 'candidate'
   const [selectedIssue, setSelectedIssue] = useState(null);
@@ -273,44 +348,7 @@ const PlayerSwipe = () => {
             {animationPhase === 'expanded' && selectedIssue && (
               <>
                 {/* Left replacement card - Tiago Santos with YouTube video (Circle) */}
-                <div 
-                  className="absolute w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
-                  style={{
-                    right: 'calc(50% + 180px)',
-                    animation: 'slideInLeft 0.4s ease-out forwards'
-                  }}
-                >
-                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-teal-500/50 cursor-pointer bg-black">
-                    <div className="absolute inset-0 scale-[2]">
-                      <YouTube
-                        videoId="AtAfGUdYwdg"
-                        className="w-full h-full"
-                        iframeClassName="w-full h-full"
-                        opts={{
-                          width: '100%',
-                          height: '100%',
-                          playerVars: {
-                            autoplay: 1,
-                            mute: 1,
-                            controls: 0,
-                            modestbranding: 1,
-                            rel: 0,
-                            showinfo: 0,
-                            disablekb: 1,
-                          },
-                        }}
-                        onStateChange={(event) => {
-                          if (event.data === 1) {
-                            setTimeout(() => {
-                              event.target.pauseVideo();
-                            }, 7000);
-                          }
-                        }}
-                      />
-                    </div>
-                    <div className="absolute inset-0 pointer-events-none" />
-                  </div>
-                </div>
+                <TiagoVideoCircle />
                 
                 {/* Right replacement card */}
                 <div 
