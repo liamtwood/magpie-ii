@@ -116,6 +116,81 @@ const issueCards = [
   },
 ];
 
+const GustoVideoCircle = ({ videoId = null }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const playerRef = useRef(null);
+  
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+  
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (playerRef.current) {
+      playerRef.current.pauseVideo();
+    }
+  };
+
+  return (
+    <div 
+      className="absolute w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
+      style={{
+        left: 'calc(50% + 180px)',
+        animation: 'slideInRight 0.4s ease-out forwards'
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-teal-500/50 cursor-pointer bg-gradient-to-br from-slate-800 to-slate-900">
+        {/* Static content - shown when not hovered */}
+        <div className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 ${isHovered && videoId ? 'opacity-0' : 'opacity-100'}`}>
+          <img 
+            src={clubBadges['Chelsea']} 
+            alt="Chelsea" 
+            className="w-16 h-16 object-contain mb-3"
+          />
+          <h3 className="text-white font-bold text-lg">Malo Gusto</h3>
+          <p className="text-teal-400 font-semibold">£35M</p>
+        </div>
+        
+        {/* Video - shown on hover (if videoId provided) */}
+        {isHovered && videoId && (
+          <div className="absolute inset-0 scale-[2]">
+            <YouTube
+              videoId={videoId}
+              className="w-full h-full"
+              iframeClassName="w-full h-full"
+              opts={{
+                width: '100%',
+                height: '100%',
+                playerVars: {
+                  autoplay: 1,
+                  mute: 1,
+                  controls: 0,
+                  modestbranding: 1,
+                  rel: 0,
+                  showinfo: 0,
+                  disablekb: 1,
+                },
+              }}
+              onReady={(event) => {
+                playerRef.current = event.target;
+              }}
+              onStateChange={(event) => {
+                if (event.data === 1) {
+                  setTimeout(() => {
+                    event.target.pauseVideo();
+                  }, 7000);
+                }
+              }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const TiagoVideoCircle = () => {
   const [isHovered, setIsHovered] = useState(false);
   const playerRef = useRef(null);
@@ -350,46 +425,8 @@ const PlayerSwipe = () => {
                 {/* Left replacement card - Tiago Santos with YouTube video (Circle) */}
                 <TiagoVideoCircle />
                 
-                {/* Right replacement card */}
-                <div 
-                  className="absolute w-72 h-[480px] scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
-                  style={{
-                    left: 'calc(50% + 168px)',
-                    animation: 'slideInRight 0.4s ease-out forwards'
-                  }}
-                >
-                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-teal-500/50 h-full flex flex-col cursor-pointer">
-                    <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50 shrink-0">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <PlayerAvatarSwipe name={selectedIssue.candidates[1]?.name} size="issue" />
-                      </div>
-                      <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-teal-500/90 text-white text-xs font-bold">
-                        #2 PICK
-                      </div>
-                      {selectedIssue.candidates[1]?.club && clubBadges[selectedIssue.candidates[1].club] && (
-                        <div className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full p-1">
-                          <img src={clubBadges[selectedIssue.candidates[1].club]} alt="" className="w-full h-full object-contain" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-5 flex-1">
-                      <h3 className="text-lg font-bold text-white">{selectedIssue.candidates[1]?.name}</h3>
-                      <p className="text-teal-400 text-sm">{selectedIssue.candidates[1]?.club} • {selectedIssue.candidates[1]?.age} yrs</p>
-                      <p className="text-white text-lg font-semibold mt-2">{selectedIssue.candidates[1]?.value}</p>
-                      <div className="mt-3 flex items-center gap-2">
-                        <div className="flex items-center gap-1 text-amber-400">
-                          <Star className="w-4 h-4 fill-current" />
-                          <span className="text-sm font-medium">{selectedIssue.candidates[1]?.rating}</span>
-                        </div>
-                        {selectedIssue.candidates[1]?.confidence && (
-                          <div className="text-slate-400 text-xs">
-                            {selectedIssue.candidates[1].confidence}% confidence
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                {/* Right replacement card - Malo Gusto */}
+                <GustoVideoCircle />
               </>
             )}
             
