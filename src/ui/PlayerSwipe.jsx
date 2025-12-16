@@ -16,6 +16,18 @@ const playerAvatars = {
   'Gonçalo Inácio': 'https://img.a.transfermarkt.technology/portrait/medium/503132-1686650853.jpg',
 };
 
+const clubBadges = {
+  'Newcastle': 'https://tmssl.akamaized.net/images/wappen/head/762.png',
+  'Lille': 'https://tmssl.akamaized.net/images/wappen/head/1082.png',
+  'Chelsea': 'https://tmssl.akamaized.net/images/wappen/head/631.png',
+  'Valencia': 'https://tmssl.akamaized.net/images/wappen/head/1049.png',
+  'Burnley': 'https://tmssl.akamaized.net/images/wappen/head/1132.png',
+  'Nottingham Forest': 'https://tmssl.akamaized.net/images/wappen/head/703.png',
+  'Sporting': 'https://tmssl.akamaized.net/images/wappen/head/336.png',
+  'Lyon': 'https://tmssl.akamaized.net/images/wappen/head/1041.png',
+  'Crystal Palace': 'https://tmssl.akamaized.net/images/wappen/head/873.png',
+};
+
 const PlayerAvatarSwipe = ({ name, size = 'md', className = '' }) => {
   const imageUrl = playerAvatars[name];
   const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
@@ -384,8 +396,16 @@ const PlayerSwipe = () => {
                       </div>
                       
                       {/* Club Badge */}
-                      <div className="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-slate-900/80 text-slate-300 text-xs font-medium">
-                        {candidate.club}
+                      <div className="absolute top-4 left-4 p-1.5 rounded-lg bg-slate-900/80">
+                        {clubBadges[candidate.club] ? (
+                          <img 
+                            src={clubBadges[candidate.club]} 
+                            alt={candidate.club}
+                            className="w-8 h-8 object-contain"
+                          />
+                        ) : (
+                          <span className="text-slate-300 text-xs font-medium px-1">{candidate.club}</span>
+                        )}
                       </div>
                     </div>
                     
