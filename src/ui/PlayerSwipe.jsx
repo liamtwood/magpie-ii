@@ -96,9 +96,9 @@ const issueCards = [
     summary: 'At 34, needs succession plan. Still performing but timeline critical.',
     shortlistId: 'rb-succession',
     candidates: [
-      { rank: 1, name: 'Tiago Santos', age: 23, club: 'Lille', value: '€18M', rating: 8.3, image: '/players/santos_1765321431388.webp', highlights: 'Dynamic attacking fullback from Portugal', pros: ['Young', 'Attacking threat', 'Affordable'], cons: ['Defensive work needed', 'Ligue 1 only'] },
-      { rank: 2, name: 'Malo Gusto', age: 21, club: 'Chelsea', value: '€35M', rating: 8.1, image: '/players/gusto.png', highlights: 'French youth star, Chelsea first choice', pros: ['PL adapted', 'Versatile', 'Young'], cons: ['Chelsea unlikely to sell', 'High price'] },
-      { rank: 3, name: 'Tino Livramento', age: 22, club: 'Newcastle', value: '€25M', rating: 7.9, image: '/players/livramento.png', highlights: 'Already at club, needs minutes', pros: ['In squad', 'Knows system', 'English'], cons: ['Injury history', 'Unproven starter'] },
+      { rank: 1, name: 'Tiago Santos', age: 23, club: 'Lille', value: '€18M', rating: 8.3, confidence: 85, image: '/players/santos_1765321431388.webp', highlights: 'Dynamic attacking fullback from Portugal', pros: ['Young', 'Attacking threat', 'Affordable'], cons: ['Defensive work needed', 'Ligue 1 only'] },
+      { rank: 2, name: 'Malo Gusto', age: 21, club: 'Chelsea', value: '€35M', rating: 8.1, confidence: 45, image: '/players/gusto.png', highlights: 'French youth star, Chelsea first choice', pros: ['PL adapted', 'Versatile', 'Young'], cons: ['Chelsea unlikely to sell', 'High price'] },
+      { rank: 3, name: 'Tino Livramento', age: 22, club: 'Newcastle', value: '€25M', rating: 7.9, confidence: 92, image: '/players/livramento.png', highlights: 'Already at club, needs minutes', pros: ['In squad', 'Knows system', 'English'], cons: ['Injury history', 'Unproven starter'] },
     ]
   },
 ];
@@ -312,29 +312,38 @@ const PlayerSwipe = () => {
           
           {/* Exec Summary */}
           <div className="p-4 bg-slate-800/50 border-b border-slate-700">
-            <div className="flex items-center gap-3 mb-3">
-              <div className={`p-2 rounded-lg ${
-                selectedIssue.type === 'contract' ? 'bg-orange-500/20' : 
-                selectedIssue.type === 'injury' ? 'bg-red-500/20' : 'bg-amber-500/20'
-              }`}>
-                <AlertTriangle className={`w-5 h-5 ${
-                  selectedIssue.type === 'contract' ? 'text-orange-400' : 
-                  selectedIssue.type === 'injury' ? 'text-red-400' : 'text-amber-400'
-                }`} />
-              </div>
-              <div>
-                <div className="text-white font-semibold">{selectedIssue.issue}</div>
-                <div className="text-slate-400 text-sm">{selectedIssue.summary}</div>
+            <div className="flex items-start gap-4 mb-4">
+              {/* Player Avatar */}
+              <PlayerAvatarSwipe name={selectedIssue.player} size="lg" className="shrink-0" />
+              
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                    selectedIssue.type === 'contract' ? 'bg-orange-500/20 text-orange-400' : 
+                    selectedIssue.type === 'injury' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'
+                  }`}>
+                    {selectedIssue.issue}
+                  </span>
+                </div>
+                <p className="text-slate-300 text-sm leading-relaxed">{selectedIssue.summary}</p>
               </div>
             </div>
-            <div className="flex gap-4 text-sm">
+            
+            {/* Stats Row */}
+            <div className="flex items-center gap-6 text-sm border-t border-slate-700 pt-3">
               <div className="flex items-center gap-1.5 text-slate-400">
                 <Users className="w-4 h-4" />
-                <span>{selectedIssue.candidates.length} options</span>
+                <span className="font-medium text-white">{selectedIssue.candidates.length}</span>
+                <span>options</span>
               </div>
               <div className="flex items-center gap-1.5 text-slate-400">
                 <DollarSign className="w-4 h-4" />
-                <span>{selectedIssue.candidates[0].value} - {selectedIssue.candidates[selectedIssue.candidates.length-1].value}</span>
+                <span className="font-medium text-white">{selectedIssue.candidates[selectedIssue.candidates.length-1].value} - {selectedIssue.candidates[0].value}</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-slate-400">
+                <TrendingUp className="w-4 h-4" />
+                <span className="font-medium text-green-400">High</span>
+                <span>confidence</span>
               </div>
             </div>
           </div>
@@ -372,10 +381,19 @@ const PlayerSwipe = () => {
                         <p className="text-slate-500 text-sm truncate">{candidate.highlights}</p>
                       </div>
                       
-                      {/* Rating */}
+                      {/* Rating & Confidence */}
                       <div className="text-right shrink-0">
                         <div className="text-2xl font-bold text-white">{candidate.rating}</div>
-                        <div className="text-xs text-slate-500">FC Rating</div>
+                        <div className="text-xs text-slate-500 mb-1">FC Rating</div>
+                        {candidate.confidence && (
+                          <div className={`text-xs font-medium px-2 py-0.5 rounded ${
+                            candidate.confidence >= 80 ? 'bg-green-500/20 text-green-400' :
+                            candidate.confidence >= 50 ? 'bg-amber-500/20 text-amber-400' :
+                            'bg-red-500/20 text-red-400'
+                          }`}>
+                            {candidate.confidence}% conf
+                          </div>
+                        )}
                       </div>
                       
                       <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-slate-400 transition-colors shrink-0" />
