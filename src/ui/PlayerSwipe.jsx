@@ -133,9 +133,8 @@ const GustoVideoCircle = ({ videoId = null }) => {
 
   return (
     <div 
-      className="absolute w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
+      className="w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
       style={{
-        left: 'calc(50% + 180px)',
         animation: 'slideInRight 0.4s ease-out forwards'
       }}
       onMouseEnter={handleMouseEnter}
@@ -191,6 +190,78 @@ const GustoVideoCircle = ({ videoId = null }) => {
   );
 };
 
+const KieranVideoCircle = () => {
+  const [isHovered, setIsHovered] = useState(false);
+  const playerRef = useRef(null);
+  
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+  
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (playerRef.current) {
+      playerRef.current.pauseVideo();
+    }
+  };
+
+  return (
+    <div 
+      className="w-64 h-64 transition-transform duration-300 ease-out origin-center z-10"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-amber-500/50 cursor-pointer bg-gradient-to-br from-slate-700 to-slate-800">
+        {/* Static content - shown when not hovered */}
+        <div className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
+          <img 
+            src={clubBadges['Newcastle']} 
+            alt="Newcastle" 
+            className="w-16 h-16 object-contain mb-3"
+          />
+          <h3 className="text-white font-bold text-lg">Kieran Trippier</h3>
+          <p className="text-amber-400 font-semibold">CURRENT</p>
+        </div>
+        
+        {/* Video - shown on hover */}
+        {isHovered && (
+          <div className="absolute inset-0 scale-[2]">
+            <YouTube
+              videoId="CCOxEw2wKrA"
+              className="w-full h-full"
+              iframeClassName="w-full h-full"
+              opts={{
+                width: '100%',
+                height: '100%',
+                playerVars: {
+                  autoplay: 1,
+                  mute: 1,
+                  controls: 0,
+                  modestbranding: 1,
+                  rel: 0,
+                  showinfo: 0,
+                  disablekb: 1,
+                  start: 4,
+                },
+              }}
+              onReady={(event) => {
+                playerRef.current = event.target;
+              }}
+              onStateChange={(event) => {
+                if (event.data === 1) {
+                  setTimeout(() => {
+                    event.target.pauseVideo();
+                  }, 5000);
+                }
+              }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const TiagoVideoCircle = () => {
   const [isHovered, setIsHovered] = useState(false);
   const playerRef = useRef(null);
@@ -208,9 +279,8 @@ const TiagoVideoCircle = () => {
 
   return (
     <div 
-      className="absolute w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
+      className="w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
       style={{
-        right: 'calc(50% + 180px)',
         animation: 'slideInLeft 0.4s ease-out forwards'
       }}
       onMouseEnter={handleMouseEnter}
@@ -419,18 +489,22 @@ const PlayerSwipe = () => {
           </div>
           
           <div className="flex-1 flex items-center justify-center relative overflow-hidden">
-            {/* Replacement cards that appear during expanded phase */}
+            {/* All three circles in expanded phase */}
             {animationPhase === 'expanded' && selectedIssue && (
-              <>
-                {/* Left replacement card - Tiago Santos with YouTube video (Circle) */}
+              <div className="flex items-center justify-center gap-8">
+                {/* Left - Tiago Santos */}
                 <TiagoVideoCircle />
                 
-                {/* Right replacement card - Malo Gusto */}
+                {/* Center - Kieran Trippier */}
+                <KieranVideoCircle />
+                
+                {/* Right - Malo Gusto */}
                 <GustoVideoCircle videoId="fd5f4Akuieg" />
-              </>
+              </div>
             )}
             
-            {/* Issue cards / Current player card */}
+            {/* Issue cards / Current player card - hide when expanded */}
+            {animationPhase !== 'expanded' && (
             <div className="flex gap-6 justify-center relative z-10">
               {issueCards.map((issue) => {
                 const isSelected = animatingIssue === issue.id;
@@ -439,9 +513,6 @@ const PlayerSwipe = () => {
                 // Calculate offset to center the selected card
                 const cardPositions = { pope: -312, botman: 0, trippier: 312 };
                 const offset = cardPositions[issue.id] || 0;
-                
-                // Don't render other cards when expanded
-                if (isOther && animationPhase === 'expanded') return null;
                 
                 return (
                   <div
@@ -542,6 +613,7 @@ const PlayerSwipe = () => {
                 );
               })}
             </div>
+            )}
           </div>
         </div>
       )}
