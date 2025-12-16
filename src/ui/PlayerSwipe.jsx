@@ -302,7 +302,7 @@ const PlayerSwipe = () => {
                           if (event.data === 1) {
                             setTimeout(() => {
                               event.target.pauseVideo();
-                            }, 10000);
+                            }, 7000);
                           }
                         }}
                       />
