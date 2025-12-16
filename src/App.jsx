@@ -11,6 +11,7 @@ import {
 import WhatsAppPanel from './ui/WhatsAppPanel';
 import EnhancedPlayerProfile from './ui/EnhancedPlayerProfile';
 import PlayerVisualizer from './ui/PlayerVisualizer';
+import PlayerSwipe from './ui/PlayerSwipe';
 
 // Data source badge component
 const SourceBadge = ({ source }) => {
@@ -291,6 +292,7 @@ export default function MagpieV2() {
     { id: 'shortlists', name: 'Shortlists', icon: ClipboardList },
     { id: 'player-profile', name: 'Player Profile', icon: User },
     { id: 'player-visualizer', name: 'Player Visualizer', icon: Eye },
+    { id: 'player-swipe', name: 'Player Swipe', icon: Zap },
   ];
 
   const currentWindow = {
@@ -3102,6 +3104,7 @@ export default function MagpieV2() {
           {activeScreen === 'shortlists' && renderShortlistsScreen()}
           {activeScreen === 'player-profile' && renderPlayerProfileScreen()}
           {activeScreen === 'player-visualizer' && <PlayerVisualizer />}
+          {activeScreen === 'player-swipe' && <PlayerSwipe />}
         </main>
       </div>
 
