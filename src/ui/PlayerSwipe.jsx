@@ -322,72 +322,28 @@ const PlayerSwipe = () => {
             <div className="w-10" />
           </div>
           
-          {/* Candidate Stack */}
-          <div className="flex-1 p-6 overflow-y-auto">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {/* Current Player Card (Trippier) */}
-              <div className="group relative">
-                <div className="relative bg-slate-600/50 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-500/50 opacity-75">
-                  {/* Player Image */}
-                  <div className="relative h-64 bg-gradient-to-b from-slate-500/30 to-slate-600/30">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <PlayerAvatarSwipe name={selectedIssue.player} size="issue" />
-                    </div>
-                    
-                    {/* Current Badge */}
-                    <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-slate-500/90 text-white text-sm font-bold">
-                      Current
-                    </div>
-                    
-                    {/* Club Badge */}
-                    <div className="absolute top-4 left-4 p-1.5 rounded-lg bg-slate-900/80">
-                      <img 
-                        src={clubBadges['Newcastle']} 
-                        alt="Newcastle"
-                        className="w-8 h-8 object-contain"
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Player Info */}
-                  <div className="p-5">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-bold text-white">{selectedIssue.player}</h3>
-                      <span className="text-slate-300 text-sm">{selectedIssue.age} yrs</span>
-                    </div>
-                    
-                    {/* Issue Badge */}
-                    <div className={`inline-block px-2 py-0.5 rounded text-xs font-bold mb-3 ${
-                      selectedIssue.type === 'contract' ? 'bg-orange-500/20 text-orange-400' : 
-                      selectedIssue.type === 'injury' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'
-                    }`}>
-                      {selectedIssue.issue}
-                    </div>
-                    
-                    <p className="text-slate-400 text-sm line-clamp-2">{selectedIssue.summary}</p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Replacement Candidates */}
+          {/* Candidate Cards - Same layout as Squad Issues */}
+          <div className="flex-1 flex items-center justify-center p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl">
               {selectedIssue.candidates.map((candidate, index) => (
                 <div
                   key={index}
                   onClick={() => handleCandidateSelect(index)}
                   className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105"
                 >
-                  {/* Glow effect for top pick */}
-                  {index === 0 && (
-                    <div 
-                      className="absolute inset-0 rounded-3xl blur-xl opacity-50 transition-opacity group-hover:opacity-80"
-                      style={{
-                        background: 'radial-gradient(circle, rgba(234,179,8,0.4) 0%, transparent 70%)'
-                      }}
-                    />
-                  )}
+                  {/* Glow effect based on rank */}
+                  <div 
+                    className="absolute inset-0 rounded-3xl blur-xl opacity-50 transition-opacity group-hover:opacity-80"
+                    style={{
+                      background: index === 0 
+                        ? 'radial-gradient(circle, rgba(234,179,8,0.4) 0%, transparent 70%)'
+                        : index === 1 
+                          ? 'radial-gradient(circle, rgba(148,163,184,0.3) 0%, transparent 70%)'
+                          : 'radial-gradient(circle, rgba(100,116,139,0.3) 0%, transparent 70%)'
+                    }}
+                  />
                   
-                  <div className={`relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border transition-colors
-                    ${index === 0 ? 'border-yellow-500/50' : 'border-slate-700/50 hover:border-slate-500/50'}`}>
+                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-700/50 hover:border-slate-500/50 transition-colors">
                     {/* Player Image */}
                     <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50">
                       <div className="absolute inset-0 flex items-center justify-center">
@@ -395,10 +351,10 @@ const PlayerSwipe = () => {
                       </div>
                       
                       {/* Rank Badge */}
-                      <div className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg
-                        ${index === 0 ? 'bg-gradient-to-br from-yellow-400 to-amber-500 text-slate-900' : 
-                          index === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-900' :
-                          'bg-slate-700 text-slate-300'}`}>
+                      <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1.5
+                        ${index === 0 ? 'bg-yellow-500/90 text-slate-900' : 
+                          index === 1 ? 'bg-slate-400/90 text-slate-900' : 
+                          'bg-slate-600/90 text-white'}`}>
                         #{candidate.rank}
                       </div>
                       
@@ -422,41 +378,22 @@ const PlayerSwipe = () => {
                         <h3 className="text-xl font-bold text-white">{candidate.name}</h3>
                         <span className="text-slate-400 text-sm">{candidate.age} yrs</span>
                       </div>
+                      <p className={`text-sm font-medium mb-3 text-green-400`}>
+                        {candidate.value}
+                      </p>
+                      <p className="text-slate-500 text-sm line-clamp-2">{candidate.highlights}</p>
                       
-                      {/* Value & Rating */}
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-green-400 font-semibold">{candidate.value}</span>
-                        <div className="flex items-center gap-2">
-                          <div className="text-lg font-bold text-white">{candidate.rating}</div>
-                          <span className="text-slate-500 text-xs">FC</span>
+                      {/* Confidence Preview */}
+                      <div className="mt-4 flex items-center gap-2">
+                        <div className={`px-2 py-1 rounded text-xs font-medium ${
+                          candidate.confidence >= 80 ? 'bg-green-500/20 text-green-400' :
+                          candidate.confidence >= 50 ? 'bg-amber-500/20 text-amber-400' :
+                          'bg-red-500/20 text-red-400'
+                        }`}>
+                          {candidate.confidence}% confidence
                         </div>
+                        <span className="text-slate-500 text-xs">FC {candidate.rating}</span>
                       </div>
-                      
-                      <p className="text-slate-500 text-sm line-clamp-2 mb-3">{candidate.highlights}</p>
-                      
-                      {/* Confidence Bar */}
-                      {candidate.confidence && (
-                        <div>
-                          <div className="flex items-center justify-between text-xs mb-1">
-                            <span className="text-slate-400">Deal Confidence</span>
-                            <span className={`font-medium ${
-                              candidate.confidence >= 80 ? 'text-green-400' :
-                              candidate.confidence >= 50 ? 'text-amber-400' :
-                              'text-red-400'
-                            }`}>{candidate.confidence}%</span>
-                          </div>
-                          <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full rounded-full transition-all ${
-                                candidate.confidence >= 80 ? 'bg-green-500' :
-                                candidate.confidence >= 50 ? 'bg-amber-500' :
-                                'bg-red-500'
-                              }`}
-                              style={{ width: `${candidate.confidence}%` }}
-                            />
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
