@@ -273,13 +273,13 @@ const PlayerSwipe = () => {
               <>
                 {/* Left replacement card */}
                 <div 
-                  className="absolute w-72 h-[480px]"
+                  className="absolute w-72 h-[480px] scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
                   style={{
                     right: 'calc(50% + 168px)',
                     animation: 'slideInLeft 0.4s ease-out forwards'
                   }}
                 >
-                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-teal-500/50 h-full flex flex-col cursor-pointer hover:scale-105 transition-transform">
+                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-teal-500/50 h-full flex flex-col cursor-pointer">
                     <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50 shrink-0">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <PlayerAvatarSwipe name={selectedIssue.candidates[0]?.name} size="issue" />
@@ -314,13 +314,13 @@ const PlayerSwipe = () => {
                 
                 {/* Right replacement card */}
                 <div 
-                  className="absolute w-72 h-[480px]"
+                  className="absolute w-72 h-[480px] scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
                   style={{
                     left: 'calc(50% + 168px)',
                     animation: 'slideInRight 0.4s ease-out forwards'
                   }}
                 >
-                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-teal-500/50 h-full flex flex-col cursor-pointer hover:scale-105 transition-transform">
+                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-teal-500/50 h-full flex flex-col cursor-pointer">
                     <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50 shrink-0">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <PlayerAvatarSwipe name={selectedIssue.candidates[1]?.name} size="issue" />
