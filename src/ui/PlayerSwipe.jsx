@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ChevronRight, ChevronLeft, ChevronDown, ChevronUp, AlertTriangle, Heart, X, Star, Play, Pause, Info, ArrowLeft, Users, Calendar, DollarSign, TrendingUp, Shield, Target } from 'lucide-react';
+import YouTube from 'react-youtube';
 
 const playerAvatars = {
   'Nick Pope': '/players/pope_1765339295872.png',
@@ -271,7 +272,7 @@ const PlayerSwipe = () => {
             {/* Replacement cards that appear during expanded phase */}
             {animationPhase === 'expanded' && selectedIssue && (
               <>
-                {/* Left replacement card */}
+                {/* Left replacement card - Tiago Santos with YouTube video */}
                 <div 
                   className="absolute w-72 h-[480px] scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
                   style={{
@@ -280,15 +281,36 @@ const PlayerSwipe = () => {
                   }}
                 >
                   <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-teal-500/50 h-full flex flex-col cursor-pointer">
-                    <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50 shrink-0">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <PlayerAvatarSwipe name={selectedIssue.candidates[0]?.name} size="issue" />
-                      </div>
-                      <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-teal-500/90 text-white text-xs font-bold">
+                    <div className="relative h-64 bg-black shrink-0 overflow-hidden">
+                      <YouTube
+                        videoId="AtAfGUdYwdg"
+                        className="absolute inset-0"
+                        iframeClassName="w-full h-full"
+                        opts={{
+                          width: '100%',
+                          height: '100%',
+                          playerVars: {
+                            autoplay: 1,
+                            mute: 1,
+                            controls: 0,
+                            modestbranding: 1,
+                            rel: 0,
+                            showinfo: 0,
+                          },
+                        }}
+                        onStateChange={(event) => {
+                          if (event.data === 1) {
+                            setTimeout(() => {
+                              event.target.pauseVideo();
+                            }, 10000);
+                          }
+                        }}
+                      />
+                      <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-teal-500/90 text-white text-xs font-bold z-10">
                         #1 PICK
                       </div>
                       {selectedIssue.candidates[0]?.club && clubBadges[selectedIssue.candidates[0].club] && (
-                        <div className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full p-1">
+                        <div className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full p-1 z-10">
                           <img src={clubBadges[selectedIssue.candidates[0].club]} alt="" className="w-full h-full object-contain" />
                         </div>
                       )}
