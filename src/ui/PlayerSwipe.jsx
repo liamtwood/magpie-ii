@@ -370,7 +370,7 @@ const PlayerSwipe = () => {
                   <div className={`relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border transition-colors
                     ${index === 0 ? 'border-yellow-500/50' : 'border-slate-700/50 hover:border-slate-500/50'}`}>
                     {/* Player Image */}
-                    <div className="relative h-48 bg-gradient-to-b from-slate-700/50 to-slate-800/50">
+                    <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <PlayerAvatarSwipe name={candidate.name} size="issue" />
                       </div>
