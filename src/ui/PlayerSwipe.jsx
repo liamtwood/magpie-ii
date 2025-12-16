@@ -275,7 +275,7 @@ const PlayerSwipe = () => {
                 <div 
                   className="absolute w-72 h-[480px]"
                   style={{
-                    left: 'calc(50% - 460px)',
+                    right: 'calc(50% + 168px)',
                     animation: 'slideInLeft 0.4s ease-out forwards'
                   }}
                 >
@@ -316,7 +316,7 @@ const PlayerSwipe = () => {
                 <div 
                   className="absolute w-72 h-[480px]"
                   style={{
-                    right: 'calc(50% - 460px)',
+                    left: 'calc(50% + 168px)',
                     animation: 'slideInRight 0.4s ease-out forwards'
                   }}
                 >
