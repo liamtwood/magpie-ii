@@ -1,6 +1,54 @@
 import React, { useState } from 'react';
 import { ChevronRight, ChevronLeft, ChevronDown, ChevronUp, AlertTriangle, Heart, X, Star, Play, Pause, Info, ArrowLeft, Users, Calendar, DollarSign, TrendingUp, Shield, Target } from 'lucide-react';
 
+const playerAvatars = {
+  'Nick Pope': '/players/pope_1765339295872.png',
+  'Sven Botman': '/players/botman_1765339295866.png',
+  'Kieran Trippier': '/players/trippier_1765339295873.png',
+  'Tino Livramento': '/players/livramento_1765339295869.png',
+  'Tiago Santos': '/players/santos_1765321431388.webp',
+  'Marc Guéhi': 'https://img.a.transfermarkt.technology/portrait/medium/554846-1714647992.jpg',
+  'Castello Lukeba': 'https://img.a.transfermarkt.technology/portrait/medium/676924-1698847409.jpg',
+  'Malo Gusto': '/players/gusto_1765337067.jpg',
+  'Giorgi Mamardashvili': 'https://img.a.transfermarkt.technology/portrait/medium/433629-1663232878.jpg',
+  'James Trafford': 'https://img.a.transfermarkt.technology/portrait/medium/610777-1693558871.jpg',
+  'Odysseas Vlachodimos': 'https://img.a.transfermarkt.technology/portrait/medium/169949-1695722091.jpg',
+  'Gonçalo Inácio': 'https://img.a.transfermarkt.technology/portrait/medium/503132-1686650853.jpg',
+};
+
+const PlayerAvatarSwipe = ({ name, size = 'md', className = '' }) => {
+  const imageUrl = playerAvatars[name];
+  const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  
+  const sizeClasses = {
+    sm: 'w-8 h-8 text-xs',
+    md: 'w-16 h-16 text-xl',
+    lg: 'w-20 h-20 text-2xl',
+    xl: 'w-32 h-32 text-4xl',
+    issue: 'w-32 h-32 text-4xl',
+  };
+
+  if (imageUrl) {
+    return (
+      <img
+        src={imageUrl}
+        alt={name}
+        className={`${sizeClasses[size]} rounded-full object-cover ${className}`}
+        onError={(e) => {
+          e.target.style.display = 'none';
+          e.target.nextSibling && (e.target.nextSibling.style.display = 'flex');
+        }}
+      />
+    );
+  }
+
+  return (
+    <div className={`${sizeClasses[size]} rounded-full bg-gradient-to-br from-slate-600 to-slate-700 text-white flex items-center justify-center font-bold ${className}`}>
+      {initials}
+    </div>
+  );
+};
+
 const issueCards = [
   {
     id: 'pope',
@@ -195,9 +243,7 @@ const PlayerSwipe = () => {
                     {/* Player Image */}
                     <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50">
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-4xl font-bold text-white">
-                          {issue.player.split(' ').map(n => n[0]).join('')}
-                        </div>
+                        <PlayerAvatarSwipe name={issue.player} size="issue" />
                       </div>
                       
                       {/* Risk Badge */}
@@ -233,8 +279,8 @@ const PlayerSwipe = () => {
                       <div className="mt-4 flex items-center gap-2">
                         <div className="flex -space-x-2">
                           {issue.candidates.slice(0, 3).map((c, i) => (
-                            <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 border-2 border-slate-800 flex items-center justify-center text-[10px] font-bold text-white">
-                              {c.name.split(' ').map(n => n[0]).join('')}
+                            <div key={i} className="border-2 border-slate-800 rounded-full">
+                              <PlayerAvatarSwipe name={c.name} size="sm" />
                             </div>
                           ))}
                         </div>
@@ -314,9 +360,7 @@ const PlayerSwipe = () => {
                       </div>
                       
                       {/* Avatar */}
-                      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-xl font-bold text-white shrink-0">
-                        {candidate.name.split(' ').map(n => n[0]).join('')}
-                      </div>
+                      <PlayerAvatarSwipe name={candidate.name} size="md" className="rounded-xl shrink-0" />
                       
                       {/* Info */}
                       <div className="flex-1 min-w-0">
@@ -428,9 +472,7 @@ const PlayerSwipe = () => {
               
               {/* Basic Info */}
               <div className="flex items-start gap-4 mb-4">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white shrink-0">
-                  {currentCandidate.name.split(' ').map(n => n[0]).join('')}
-                </div>
+                <PlayerAvatarSwipe name={currentCandidate.name} size="lg" className="rounded-2xl shrink-0" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-bold
