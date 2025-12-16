@@ -231,15 +231,12 @@ const PlayerSwipe = () => {
           </div>
           
           <div className="flex-1 flex items-center justify-center">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl">
+            <div className="flex gap-6 justify-center">
               {issueCards.map((issue) => (
                 <div
                   key={issue.id}
                   onClick={() => handleIssueSelect(issue)}
-                  className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105"
-                  style={{
-                    transform: `scale(${0.85 + (issue.risk / 100) * 0.15})`,
-                  }}
+                  className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 w-72 h-[420px] shrink-0"
                 >
                   {/* Glow effect based on risk */}
                   <div 
@@ -253,9 +250,9 @@ const PlayerSwipe = () => {
                     }}
                   />
                   
-                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-700/50 hover:border-slate-500/50 transition-colors">
+                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-700/50 hover:border-slate-500/50 transition-colors h-full flex flex-col">
                     {/* Player Image */}
-                    <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50">
+                    <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50 shrink-0">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <PlayerAvatarSwipe name={issue.player} size="issue" />
                       </div>
@@ -276,7 +273,7 @@ const PlayerSwipe = () => {
                     </div>
                     
                     {/* Player Info */}
-                    <div className="p-5">
+                    <div className="p-5 flex-1">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-xl font-bold text-white">{issue.player}</h3>
                         <span className="text-slate-400 text-sm">{issue.age} yrs</span>
@@ -342,10 +339,10 @@ const PlayerSwipe = () => {
               <div className="flex gap-6 flex-1 justify-center">
                 {/* Kieran Trippier Card (Current Player) - Only show when scroll is at 0 */}
                 {candidateScrollIndex === 0 && (
-                  <div className="group relative w-72 shrink-0">
-                    <div className="relative bg-slate-600/60 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-500/50">
+                  <div className="group relative w-72 h-[420px] shrink-0">
+                    <div className="relative bg-slate-600/60 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-500/50 h-full flex flex-col">
                       {/* Player Image */}
-                      <div className="relative h-64 bg-gradient-to-b from-slate-500/30 to-slate-600/30">
+                      <div className="relative h-64 bg-gradient-to-b from-slate-500/30 to-slate-600/30 shrink-0">
                         <div className="absolute inset-0 flex items-center justify-center">
                           <PlayerAvatarSwipe name={selectedIssue.player} size="issue" />
                         </div>
@@ -366,7 +363,7 @@ const PlayerSwipe = () => {
                       </div>
                       
                       {/* Player Info */}
-                      <div className="p-5">
+                      <div className="p-5 flex-1">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="text-xl font-bold text-white">{selectedIssue.player}</h3>
                           <span className="text-slate-300 text-sm">{selectedIssue.age} yrs</span>
@@ -390,7 +387,7 @@ const PlayerSwipe = () => {
                     <div
                       key={actualIndex}
                       onClick={() => handleCandidateSelect(actualIndex)}
-                      className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 w-72 shrink-0"
+                      className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 w-72 h-[420px] shrink-0"
                     >
                       {/* Glow effect based on rank */}
                       <div 
@@ -404,9 +401,9 @@ const PlayerSwipe = () => {
                         }}
                       />
                       
-                      <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-700/50 hover:border-slate-500/50 transition-colors">
+                      <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-700/50 hover:border-slate-500/50 transition-colors h-full flex flex-col">
                         {/* Player Image */}
-                        <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50">
+                        <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50 shrink-0">
                           <div className="absolute inset-0 flex items-center justify-center">
                             <PlayerAvatarSwipe name={candidate.name} size="issue" />
                           </div>
@@ -434,7 +431,7 @@ const PlayerSwipe = () => {
                         </div>
                         
                         {/* Player Info */}
-                        <div className="p-5">
+                        <div className="p-5 flex-1">
                           <div className="flex items-center justify-between mb-2">
                             <h3 className="text-xl font-bold text-white">{candidate.name}</h3>
                             <span className="text-slate-400 text-sm">{candidate.age} yrs</span>
