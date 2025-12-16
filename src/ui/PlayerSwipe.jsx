@@ -322,47 +322,54 @@ const PlayerSwipe = () => {
             <div className="w-10" />
           </div>
           
-          {/* Exec Summary */}
-          <div className="p-4 bg-slate-800/50 border-b border-slate-700">
-            <div className="flex items-start gap-4 mb-4">
-              {/* Player Avatar */}
-              <PlayerAvatarSwipe name={selectedIssue.player} size="lg" className="shrink-0" />
-              
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-                    selectedIssue.type === 'contract' ? 'bg-orange-500/20 text-orange-400' : 
-                    selectedIssue.type === 'injury' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'
-                  }`}>
-                    {selectedIssue.issue}
-                  </span>
-                </div>
-                <p className="text-slate-300 text-sm leading-relaxed">{selectedIssue.summary}</p>
-              </div>
-            </div>
-            
-            {/* Stats Row */}
-            <div className="flex items-center gap-6 text-sm border-t border-slate-700 pt-3">
-              <div className="flex items-center gap-1.5 text-slate-400">
-                <Users className="w-4 h-4" />
-                <span className="font-medium text-white">{selectedIssue.candidates.length}</span>
-                <span>options</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-slate-400">
-                <DollarSign className="w-4 h-4" />
-                <span className="font-medium text-white">{selectedIssue.candidates[selectedIssue.candidates.length-1].value} - {selectedIssue.candidates[0].value}</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-slate-400">
-                <TrendingUp className="w-4 h-4" />
-                <span className="font-medium text-green-400">High</span>
-                <span>confidence</span>
-              </div>
-            </div>
-          </div>
-          
           {/* Candidate Stack */}
           <div className="flex-1 p-6 overflow-y-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {/* Current Player Card (Trippier) */}
+              <div className="group relative">
+                <div className="relative bg-slate-600/50 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-500/50 opacity-75">
+                  {/* Player Image */}
+                  <div className="relative h-64 bg-gradient-to-b from-slate-500/30 to-slate-600/30">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <PlayerAvatarSwipe name={selectedIssue.player} size="issue" />
+                    </div>
+                    
+                    {/* Current Badge */}
+                    <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-slate-500/90 text-white text-sm font-bold">
+                      Current
+                    </div>
+                    
+                    {/* Club Badge */}
+                    <div className="absolute top-4 left-4 p-1.5 rounded-lg bg-slate-900/80">
+                      <img 
+                        src={clubBadges['Newcastle']} 
+                        alt="Newcastle"
+                        className="w-8 h-8 object-contain"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Player Info */}
+                  <div className="p-5">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-xl font-bold text-white">{selectedIssue.player}</h3>
+                      <span className="text-slate-300 text-sm">{selectedIssue.age} yrs</span>
+                    </div>
+                    
+                    {/* Issue Badge */}
+                    <div className={`inline-block px-2 py-0.5 rounded text-xs font-bold mb-3 ${
+                      selectedIssue.type === 'contract' ? 'bg-orange-500/20 text-orange-400' : 
+                      selectedIssue.type === 'injury' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'
+                    }`}>
+                      {selectedIssue.issue}
+                    </div>
+                    
+                    <p className="text-slate-400 text-sm line-clamp-2">{selectedIssue.summary}</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Replacement Candidates */}
               {selectedIssue.candidates.map((candidate, index) => (
                 <div
                   key={index}
