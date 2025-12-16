@@ -375,7 +375,7 @@ const PlayerSwipe = () => {
                     className={`group relative w-72 h-[480px] shrink-0 transition-all duration-500 ease-out
                       ${animationPhase === 'idle' ? 'cursor-pointer hover:scale-105' : ''}`}
                     style={{
-                      transform: isSelected && animationPhase !== 'idle' 
+                      transform: isSelected && animationPhase === 'center'
                         ? `translateX(${-offset}px) scale(1.02)` 
                         : 'translateX(0) scale(1)',
                       opacity: isOther ? 0 : 1,
