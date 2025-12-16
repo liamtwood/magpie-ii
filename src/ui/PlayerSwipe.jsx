@@ -119,6 +119,7 @@ const PlayerSwipe = () => {
   const [view, setView] = useState('issues'); // 'issues', 'shortlist', 'candidate'
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [currentCandidateIndex, setCurrentCandidateIndex] = useState(0);
+  const [candidateScrollIndex, setCandidateScrollIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [showDetails, setShowDetails] = useState(false);
   const [swipeDirection, setSwipeDirection] = useState(null);
@@ -128,6 +129,7 @@ const PlayerSwipe = () => {
   const handleIssueSelect = (issue) => {
     setSelectedIssue(issue);
     setCurrentCandidateIndex(0);
+    setCandidateScrollIndex(0);
     setView('shortlist');
   };
 
@@ -322,82 +324,154 @@ const PlayerSwipe = () => {
             <div className="w-10" />
           </div>
           
-          {/* Candidate Cards - Same layout as Squad Issues */}
+          {/* Carousel with Kieran + 2 candidates visible */}
           <div className="flex-1 flex items-center justify-center p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl">
-              {selectedIssue.candidates.map((candidate, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleCandidateSelect(index)}
-                  className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105"
+            <div className="flex items-center gap-4 max-w-6xl w-full">
+              {/* Left Arrow (if scrolled) */}
+              {candidateScrollIndex > 0 && (
+                <button 
+                  onClick={() => setCandidateScrollIndex(Math.max(0, candidateScrollIndex - 1))}
+                  className="p-3 bg-slate-800 hover:bg-slate-700 rounded-full transition-colors shrink-0"
                 >
-                  {/* Glow effect based on rank */}
-                  <div 
-                    className="absolute inset-0 rounded-3xl blur-xl opacity-50 transition-opacity group-hover:opacity-80"
-                    style={{
-                      background: index === 0 
-                        ? 'radial-gradient(circle, rgba(234,179,8,0.4) 0%, transparent 70%)'
-                        : index === 1 
-                          ? 'radial-gradient(circle, rgba(148,163,184,0.3) 0%, transparent 70%)'
-                          : 'radial-gradient(circle, rgba(100,116,139,0.3) 0%, transparent 70%)'
-                    }}
-                  />
-                  
-                  <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-700/50 hover:border-slate-500/50 transition-colors">
-                    {/* Player Image */}
-                    <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <PlayerAvatarSwipe name={candidate.name} size="issue" />
-                      </div>
-                      
-                      {/* Rank Badge */}
-                      <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1.5
-                        ${index === 0 ? 'bg-yellow-500/90 text-slate-900' : 
-                          index === 1 ? 'bg-slate-400/90 text-slate-900' : 
-                          'bg-slate-600/90 text-white'}`}>
-                        #{candidate.rank}
-                      </div>
-                      
-                      {/* Club Badge */}
-                      <div className="absolute top-4 left-4 p-1.5 rounded-lg bg-slate-900/80">
-                        {clubBadges[candidate.club] ? (
+                  <ChevronLeft className="w-6 h-6 text-white" />
+                </button>
+              )}
+              {candidateScrollIndex === 0 && <div className="w-12 shrink-0" />}
+              
+              {/* Cards Container */}
+              <div className="flex gap-6 flex-1 justify-center">
+                {/* Kieran Trippier Card (Current Player) - Only show when scroll is at 0 */}
+                {candidateScrollIndex === 0 && (
+                  <div className="group relative w-72 shrink-0">
+                    <div className="relative bg-slate-600/60 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-500/50">
+                      {/* Player Image */}
+                      <div className="relative h-64 bg-gradient-to-b from-slate-500/30 to-slate-600/30">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <PlayerAvatarSwipe name={selectedIssue.player} size="issue" />
+                        </div>
+                        
+                        {/* Current Badge */}
+                        <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-slate-500/90 text-white text-sm font-bold">
+                          Current
+                        </div>
+                        
+                        {/* Club Badge */}
+                        <div className="absolute top-4 left-4 p-1.5 rounded-lg bg-slate-900/80">
                           <img 
-                            src={clubBadges[candidate.club]} 
-                            alt={candidate.club}
+                            src={clubBadges['Newcastle']} 
+                            alt="Newcastle"
                             className="w-8 h-8 object-contain"
                           />
-                        ) : (
-                          <span className="text-slate-300 text-xs font-medium px-1">{candidate.club}</span>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Player Info */}
-                    <div className="p-5">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-xl font-bold text-white">{candidate.name}</h3>
-                        <span className="text-slate-400 text-sm">{candidate.age} yrs</span>
-                      </div>
-                      <p className={`text-sm font-medium mb-3 text-green-400`}>
-                        {candidate.value}
-                      </p>
-                      <p className="text-slate-500 text-sm line-clamp-2">{candidate.highlights}</p>
-                      
-                      {/* Confidence Preview */}
-                      <div className="mt-4 flex items-center gap-2">
-                        <div className={`px-2 py-1 rounded text-xs font-medium ${
-                          candidate.confidence >= 80 ? 'bg-green-500/20 text-green-400' :
-                          candidate.confidence >= 50 ? 'bg-amber-500/20 text-amber-400' :
-                          'bg-red-500/20 text-red-400'
-                        }`}>
-                          {candidate.confidence}% confidence
                         </div>
-                        <span className="text-slate-500 text-xs">FC {candidate.rating}</span>
+                      </div>
+                      
+                      {/* Player Info */}
+                      <div className="p-5">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-xl font-bold text-white">{selectedIssue.player}</h3>
+                          <span className="text-slate-300 text-sm">{selectedIssue.age} yrs</span>
+                        </div>
+                        <p className={`text-sm font-medium mb-3 ${
+                          selectedIssue.type === 'contract' ? 'text-orange-400' : 
+                          selectedIssue.type === 'injury' ? 'text-red-400' : 'text-amber-400'
+                        }`}>
+                          {selectedIssue.issue}
+                        </p>
+                        <p className="text-slate-400 text-sm line-clamp-2">{selectedIssue.summary}</p>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )}
+                
+                {/* Visible Candidates (2 at a time) */}
+                {selectedIssue.candidates.slice(candidateScrollIndex, candidateScrollIndex + 2).map((candidate, idx) => {
+                  const actualIndex = candidateScrollIndex + idx;
+                  return (
+                    <div
+                      key={actualIndex}
+                      onClick={() => handleCandidateSelect(actualIndex)}
+                      className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 w-72 shrink-0"
+                    >
+                      {/* Glow effect based on rank */}
+                      <div 
+                        className="absolute inset-0 rounded-3xl blur-xl opacity-50 transition-opacity group-hover:opacity-80"
+                        style={{
+                          background: actualIndex === 0 
+                            ? 'radial-gradient(circle, rgba(234,179,8,0.4) 0%, transparent 70%)'
+                            : actualIndex === 1 
+                              ? 'radial-gradient(circle, rgba(148,163,184,0.3) 0%, transparent 70%)'
+                              : 'radial-gradient(circle, rgba(100,116,139,0.3) 0%, transparent 70%)'
+                        }}
+                      />
+                      
+                      <div className="relative bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-700/50 hover:border-slate-500/50 transition-colors">
+                        {/* Player Image */}
+                        <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <PlayerAvatarSwipe name={candidate.name} size="issue" />
+                          </div>
+                          
+                          {/* Rank Badge */}
+                          <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1.5
+                            ${actualIndex === 0 ? 'bg-yellow-500/90 text-slate-900' : 
+                              actualIndex === 1 ? 'bg-slate-400/90 text-slate-900' : 
+                              'bg-slate-600/90 text-white'}`}>
+                            #{candidate.rank}
+                          </div>
+                          
+                          {/* Club Badge */}
+                          <div className="absolute top-4 left-4 p-1.5 rounded-lg bg-slate-900/80">
+                            {clubBadges[candidate.club] ? (
+                              <img 
+                                src={clubBadges[candidate.club]} 
+                                alt={candidate.club}
+                                className="w-8 h-8 object-contain"
+                              />
+                            ) : (
+                              <span className="text-slate-300 text-xs font-medium px-1">{candidate.club}</span>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Player Info */}
+                        <div className="p-5">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-xl font-bold text-white">{candidate.name}</h3>
+                            <span className="text-slate-400 text-sm">{candidate.age} yrs</span>
+                          </div>
+                          <p className="text-sm font-medium mb-3 text-green-400">
+                            {candidate.value}
+                          </p>
+                          <p className="text-slate-500 text-sm line-clamp-2">{candidate.highlights}</p>
+                          
+                          {/* Confidence Preview */}
+                          <div className="mt-4 flex items-center gap-2">
+                            <div className={`px-2 py-1 rounded text-xs font-medium ${
+                              candidate.confidence >= 80 ? 'bg-green-500/20 text-green-400' :
+                              candidate.confidence >= 50 ? 'bg-amber-500/20 text-amber-400' :
+                              'bg-red-500/20 text-red-400'
+                            }`}>
+                              {candidate.confidence}% confidence
+                            </div>
+                            <span className="text-slate-500 text-xs">FC {candidate.rating}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Right Arrow (if more candidates) */}
+              {candidateScrollIndex + 2 < selectedIssue.candidates.length && (
+                <button 
+                  onClick={() => setCandidateScrollIndex(Math.min(selectedIssue.candidates.length - 2, candidateScrollIndex + 1))}
+                  className="p-3 bg-slate-800 hover:bg-slate-700 rounded-full transition-colors shrink-0"
+                >
+                  <ChevronRight className="w-6 h-6 text-white" />
+                </button>
+              )}
+              {candidateScrollIndex + 2 >= selectedIssue.candidates.length && <div className="w-12 shrink-0" />}
             </div>
           </div>
         </div>
