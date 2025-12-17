@@ -284,7 +284,7 @@ const KieranLoopingVideo = ({ size = 'card' }) => {
     : { width: '288', height: '256', scale: 'scale(2.5)' };
 
   return (
-    <div className="absolute inset-0 overflow-hidden rounded-3xl">
+    <div className={`absolute inset-0 overflow-hidden ${size === 'card' ? 'rounded-t-3xl' : ''}`}>
       <div className="absolute inset-0 flex items-center justify-center" style={{ transform: dimensions.scale, transformOrigin: 'center center' }}>
         <YouTube
           videoId="CCOxEw2wKrA"
@@ -315,17 +315,17 @@ const KieranLoopingVideo = ({ size = 'card' }) => {
 
 const KieranExpandedCard = ({ issue, onBack }) => {
   return (
-    <div className="relative w-[500px] h-[500px] rounded-3xl overflow-hidden border-2 border-amber-500/50 shadow-2xl">
+    <div className="relative w-[500px] h-[500px] overflow-hidden border-2 border-amber-500/50 shadow-2xl">
       <KieranLoopingVideo size="expanded" />
       
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-10" />
       
       <div className="absolute inset-0 z-20 flex flex-col justify-between p-6">
         <div className="flex items-start justify-between">
-          <div className="px-3 py-1.5 rounded-lg bg-slate-900/80 text-slate-300 text-sm font-medium">
+          <div className="px-3 py-1.5 bg-slate-900/80 text-slate-300 text-sm font-medium">
             {issue.position}
           </div>
-          <div className="px-3 py-1.5 rounded-lg bg-amber-500/90 text-slate-900 text-sm font-bold">
+          <div className="px-3 py-1.5 bg-amber-500/90 text-slate-900 text-sm font-bold">
             CURRENT
           </div>
         </div>
@@ -345,7 +345,7 @@ const KieranExpandedCard = ({ issue, onBack }) => {
             </div>
           </div>
           
-          <div className="bg-slate-900/60 backdrop-blur-sm rounded-xl p-4">
+          <div className="bg-slate-900/60 backdrop-blur-sm p-4">
             <p className={`text-lg font-semibold mb-2
               ${issue.type === 'contract' ? 'text-orange-400' : 
                 issue.type === 'injury' ? 'text-red-400' : 
