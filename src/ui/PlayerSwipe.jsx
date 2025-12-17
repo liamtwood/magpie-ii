@@ -266,17 +266,16 @@ const KieranLoopingVideo = () => {
   const playerRef = useRef(null);
   
   const onReady = (event) => {
+    playerRef.current = event.target;
     event.target.mute();
+    event.target.seekTo(4, true);
     event.target.playVideo();
   };
   
-  const onStateChange = (event) => {
-    if (event.data === 1) {
-      setTimeout(() => {
-        if (playerRef.current) {
-          playerRef.current.seekTo(4, true);
-        }
-      }, 5000);
+  const onEnd = () => {
+    if (playerRef.current) {
+      playerRef.current.seekTo(4, true);
+      playerRef.current.playVideo();
     }
   };
 
@@ -292,7 +291,6 @@ const KieranLoopingVideo = () => {
               autoplay: 1,
               controls: 0,
               mute: 1,
-              loop: 1,
               start: 4,
               end: 9,
               modestbranding: 1,
@@ -300,12 +298,10 @@ const KieranLoopingVideo = () => {
               showinfo: 0,
               fs: 0,
               disablekb: 1,
-              playlist: 'CCOxEw2wKrA',
             },
           }}
           onReady={onReady}
-          onStateChange={onStateChange}
-          ref={playerRef}
+          onEnd={onEnd}
           className="pointer-events-none"
         />
       </div>
