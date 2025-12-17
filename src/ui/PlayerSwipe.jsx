@@ -116,7 +116,7 @@ const issueCards = [
   },
 ];
 
-const GustoVideoCircle = ({ videoId = null }) => {
+const GustoVideoCircle = ({ videoId = null, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
   const playerRef = useRef(null);
   
@@ -133,10 +133,11 @@ const GustoVideoCircle = ({ videoId = null }) => {
 
   return (
     <div 
-      className="w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
+      className="w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center cursor-pointer"
       style={{
         animation: 'slideInRight 0.4s ease-out forwards'
       }}
+      onClick={onClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -360,7 +361,177 @@ const KieranExpandedCard = ({ issue, onBack }) => {
   );
 };
 
-const TiagoVideoCircle = () => {
+const TiagoLoopingVideo = () => {
+  const playerRef = useRef(null);
+  
+  const onReady = (event) => {
+    playerRef.current = event.target;
+    event.target.mute();
+    event.target.seekTo(0, true);
+    event.target.playVideo();
+  };
+  
+  const onEnd = () => {
+    if (playerRef.current) {
+      playerRef.current.seekTo(0, true);
+      playerRef.current.playVideo();
+    }
+  };
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 flex items-center justify-center" style={{ transform: 'scale(1.8)', transformOrigin: 'center center' }}>
+        <YouTube
+          videoId="AtAfGUdYwdg"
+          opts={{
+            width: '600',
+            height: '600',
+            playerVars: {
+              autoplay: 1,
+              controls: 0,
+              mute: 1,
+              start: 0,
+              end: 7,
+              modestbranding: 1,
+              rel: 0,
+              showinfo: 0,
+              fs: 0,
+              disablekb: 1,
+            },
+          }}
+          onReady={onReady}
+          onEnd={onEnd}
+          className="pointer-events-none"
+        />
+      </div>
+    </div>
+  );
+};
+
+const GustoLoopingVideo = () => {
+  const playerRef = useRef(null);
+  
+  const onReady = (event) => {
+    playerRef.current = event.target;
+    event.target.mute();
+    event.target.seekTo(0, true);
+    event.target.playVideo();
+  };
+  
+  const onEnd = () => {
+    if (playerRef.current) {
+      playerRef.current.seekTo(0, true);
+      playerRef.current.playVideo();
+    }
+  };
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 flex items-center justify-center" style={{ transform: 'scale(1.8)', transformOrigin: 'center center' }}>
+        <YouTube
+          videoId="fd5f4Akuieg"
+          opts={{
+            width: '600',
+            height: '600',
+            playerVars: {
+              autoplay: 1,
+              controls: 0,
+              mute: 1,
+              start: 0,
+              end: 5,
+              modestbranding: 1,
+              rel: 0,
+              showinfo: 0,
+              fs: 0,
+              disablekb: 1,
+            },
+          }}
+          onReady={onReady}
+          onEnd={onEnd}
+          className="pointer-events-none"
+        />
+      </div>
+    </div>
+  );
+};
+
+const GustoExpandedCard = () => {
+  return (
+    <div className="relative w-[500px] h-[500px] overflow-hidden border-2 border-teal-500/50 shadow-2xl">
+      <GustoLoopingVideo />
+      
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-10" />
+      
+      <div className="absolute inset-0 z-20 flex flex-col justify-between p-6">
+        <div className="flex items-start justify-between">
+          <div className="px-3 py-1.5 bg-slate-900/80 text-slate-300 text-sm font-medium">
+            RB
+          </div>
+          <div className="px-3 py-1.5 bg-teal-500/90 text-white text-sm font-bold">
+            CANDIDATE #2
+          </div>
+        </div>
+        
+        <div>
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <h2 className="text-4xl font-bold text-white mb-1">Malo Gusto</h2>
+              <p className="text-slate-300 text-lg">21 years old • Chelsea</p>
+            </div>
+            <div className="px-4 py-2 bg-teal-500/90 text-white text-lg font-bold">
+              €35M
+            </div>
+          </div>
+          
+          <div className="bg-slate-900/60 backdrop-blur-sm p-4">
+            <p className="text-teal-400 text-lg font-semibold mb-2">French youth star</p>
+            <p className="text-slate-300">PL adapted, versatile, young. Chelsea unlikely to sell but high ceiling.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const TiagoExpandedCard = () => {
+  return (
+    <div className="relative w-[500px] h-[500px] overflow-hidden border-2 border-teal-500/50 shadow-2xl">
+      <TiagoLoopingVideo />
+      
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-10" />
+      
+      <div className="absolute inset-0 z-20 flex flex-col justify-between p-6">
+        <div className="flex items-start justify-between">
+          <div className="px-3 py-1.5 bg-slate-900/80 text-slate-300 text-sm font-medium">
+            RB
+          </div>
+          <div className="px-3 py-1.5 bg-teal-500/90 text-white text-sm font-bold">
+            CANDIDATE #1
+          </div>
+        </div>
+        
+        <div>
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <h2 className="text-4xl font-bold text-white mb-1">Tiago Santos</h2>
+              <p className="text-slate-300 text-lg">23 years old • Lille</p>
+            </div>
+            <div className="px-4 py-2 bg-teal-500/90 text-white text-lg font-bold">
+              €18M
+            </div>
+          </div>
+          
+          <div className="bg-slate-900/60 backdrop-blur-sm p-4">
+            <p className="text-teal-400 text-lg font-semibold mb-2">Dynamic attacking fullback</p>
+            <p className="text-slate-300">Young, attacking threat, affordable. Defensive work needed but high potential.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const KieranCircle = ({ issue, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
   const playerRef = useRef(null);
   
@@ -377,15 +548,86 @@ const TiagoVideoCircle = () => {
 
   return (
     <div 
-      className="w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center"
-      style={{
-        animation: 'slideInLeft 0.4s ease-out forwards'
-      }}
+      className="w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center cursor-pointer"
+      onClick={onClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-teal-500/50 cursor-pointer bg-gradient-to-br from-slate-800 to-slate-900">
-        {/* Static content - shown when not hovered */}
+      <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-amber-500/50 bg-gradient-to-br from-slate-800 to-slate-900">
+        <div className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
+          <img 
+            src={clubBadges['Newcastle']} 
+            alt="Newcastle" 
+            className="w-16 h-16 object-contain mb-3"
+          />
+          <h3 className="text-white font-bold text-lg">{issue?.player}</h3>
+          <p className="text-amber-400 font-semibold">CURRENT</p>
+        </div>
+        
+        {isHovered && (
+          <div className="absolute inset-0 scale-[2]">
+            <YouTube
+              videoId="CCOxEw2wKrA"
+              className="w-full h-full"
+              iframeClassName="w-full h-full"
+              opts={{
+                width: '100%',
+                height: '100%',
+                playerVars: {
+                  autoplay: 1,
+                  mute: 1,
+                  controls: 0,
+                  start: 4,
+                  modestbranding: 1,
+                  rel: 0,
+                  showinfo: 0,
+                  disablekb: 1,
+                },
+              }}
+              onReady={(event) => {
+                playerRef.current = event.target;
+              }}
+              onStateChange={(event) => {
+                if (event.data === 1) {
+                  setTimeout(() => {
+                    event.target.pauseVideo();
+                  }, 5000);
+                }
+              }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const TiagoVideoCircle = ({ onClick }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const playerRef = useRef(null);
+  
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+  
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (playerRef.current) {
+      playerRef.current.pauseVideo();
+    }
+  };
+
+  return (
+    <div 
+      className="w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center cursor-pointer"
+      style={{
+        animation: 'slideInLeft 0.4s ease-out forwards'
+      }}
+      onClick={onClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-teal-500/50 bg-gradient-to-br from-slate-800 to-slate-900">
         <div className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
           <img 
             src={clubBadges['Lille']} 
@@ -393,10 +635,9 @@ const TiagoVideoCircle = () => {
             className="w-16 h-16 object-contain mb-3"
           />
           <h3 className="text-white font-bold text-lg">Tiago Santos</h3>
-          <p className="text-teal-400 font-semibold">£12M</p>
+          <p className="text-teal-400 font-semibold">€18M</p>
         </div>
         
-        {/* Video - shown on hover */}
         {isHovered && (
           <div className="absolute inset-0 scale-[2]">
             <YouTube
@@ -448,6 +689,7 @@ const PlayerSwipe = () => {
   // Animation states - single page mode
   const [animatingIssue, setAnimatingIssue] = useState(null);
   const [animationPhase, setAnimationPhase] = useState('idle'); // 'idle', 'center', 'expanded'
+  const [focusedPlayer, setFocusedPlayer] = useState('current'); // 'current', 'tiago', 'gusto'
 
   const handleIssueSelect = (issue) => {
     setSelectedIssue(issue);
@@ -455,6 +697,7 @@ const PlayerSwipe = () => {
     setAnimationPhase('center');
     setCurrentCandidateIndex(0);
     setCandidateScrollIndex(0);
+    setFocusedPlayer('current');
     
     // Phase 1: Move selected card to center, fade others
     setTimeout(() => {
@@ -462,8 +705,13 @@ const PlayerSwipe = () => {
     }, 500);
   };
   
+  const handlePlayerSwap = (playerId) => {
+    setFocusedPlayer(playerId);
+  };
+  
   const handleBackToIssues = () => {
     setAnimationPhase('center');
+    setFocusedPlayer('current');
     setTimeout(() => {
       setAnimationPhase('idle');
       setAnimatingIssue(null);
@@ -590,19 +838,35 @@ const PlayerSwipe = () => {
             {/* Expanded view with large card and replacement circles */}
             {animationPhase === 'expanded' && selectedIssue && (
               <>
-                {/* Left - Tiago Santos */}
+                {/* Left circle */}
                 <div className="absolute" style={{ right: 'calc(50% + 290px)' }}>
-                  <TiagoVideoCircle />
+                  {focusedPlayer === 'current' ? (
+                    <TiagoVideoCircle onClick={() => handlePlayerSwap('tiago')} />
+                  ) : focusedPlayer === 'tiago' ? (
+                    <KieranCircle issue={selectedIssue} onClick={() => handlePlayerSwap('current')} />
+                  ) : (
+                    <TiagoVideoCircle onClick={() => handlePlayerSwap('tiago')} />
+                  )}
                 </div>
                 
                 {/* Center - Large expanded card */}
-                {selectedIssue.id === 'trippier' && (
+                {selectedIssue.id === 'trippier' && focusedPlayer === 'current' && (
                   <KieranExpandedCard issue={selectedIssue} onBack={handleBackToIssues} />
                 )}
+                {selectedIssue.id === 'trippier' && focusedPlayer === 'tiago' && (
+                  <TiagoExpandedCard />
+                )}
+                {selectedIssue.id === 'trippier' && focusedPlayer === 'gusto' && (
+                  <GustoExpandedCard />
+                )}
                 
-                {/* Right - Malo Gusto */}
+                {/* Right circle */}
                 <div className="absolute" style={{ left: 'calc(50% + 290px)' }}>
-                  <GustoVideoCircle videoId="fd5f4Akuieg" />
+                  {focusedPlayer === 'gusto' ? (
+                    <KieranCircle issue={selectedIssue} onClick={() => handlePlayerSwap('current')} />
+                  ) : (
+                    <GustoVideoCircle videoId="fd5f4Akuieg" onClick={() => handlePlayerSwap('gusto')} />
+                  )}
                 </div>
               </>
             )}
