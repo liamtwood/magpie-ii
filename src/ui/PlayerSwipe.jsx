@@ -262,6 +262,57 @@ const KieranVideoCircle = () => {
   );
 };
 
+const KieranLoopingVideo = () => {
+  const playerRef = useRef(null);
+  
+  const onReady = (event) => {
+    event.target.mute();
+    event.target.playVideo();
+  };
+  
+  const onStateChange = (event) => {
+    if (event.data === 1) {
+      setTimeout(() => {
+        if (playerRef.current) {
+          playerRef.current.seekTo(4, true);
+        }
+      }, 5000);
+    }
+  };
+
+  return (
+    <div className="w-32 h-32 rounded-xl overflow-hidden">
+      <div className="relative w-full h-full" style={{ transform: 'scale(2)', transformOrigin: 'center center' }}>
+        <YouTube
+          videoId="CCOxEw2wKrA"
+          opts={{
+            width: '128',
+            height: '128',
+            playerVars: {
+              autoplay: 1,
+              controls: 0,
+              mute: 1,
+              loop: 1,
+              start: 4,
+              end: 9,
+              modestbranding: 1,
+              rel: 0,
+              showinfo: 0,
+              fs: 0,
+              disablekb: 1,
+              playlist: 'CCOxEw2wKrA',
+            },
+          }}
+          onReady={onReady}
+          onStateChange={onStateChange}
+          ref={playerRef}
+          className="pointer-events-none"
+        />
+      </div>
+    </div>
+  );
+};
+
 const TiagoVideoCircle = () => {
   const [isHovered, setIsHovered] = useState(false);
   const playerRef = useRef(null);
@@ -554,7 +605,11 @@ const PlayerSwipe = () => {
                       {/* Player Image */}
                       <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50 shrink-0">
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <PlayerAvatarSwipe name={issue.player} size="issue" />
+                          {issue.id === 'trippier' ? (
+                            <KieranLoopingVideo />
+                          ) : (
+                            <PlayerAvatarSwipe name={issue.player} size="issue" />
+                          )}
                         </div>
                         
                         {/* Current badge for selected */}
