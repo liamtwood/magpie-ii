@@ -281,13 +281,13 @@ const KieranLoopingVideo = () => {
   };
 
   return (
-    <div className="w-32 h-32 rounded-xl overflow-hidden">
-      <div className="relative w-full h-full" style={{ transform: 'scale(2)', transformOrigin: 'center center' }}>
+    <div className="absolute inset-0 overflow-hidden rounded-t-3xl">
+      <div className="absolute inset-0 flex items-center justify-center" style={{ transform: 'scale(2.5)', transformOrigin: 'center center' }}>
         <YouTube
           videoId="CCOxEw2wKrA"
           opts={{
-            width: '128',
-            height: '128',
+            width: '288',
+            height: '256',
             playerVars: {
               autoplay: 1,
               controls: 0,
@@ -604,24 +604,24 @@ const PlayerSwipe = () => {
                         : 'bg-slate-800/80 border-slate-700/50 hover:border-slate-500/50'}`}>
                       {/* Player Image */}
                       <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50 shrink-0">
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          {issue.id === 'trippier' ? (
-                            <KieranLoopingVideo />
-                          ) : (
+                        {issue.id === 'trippier' ? (
+                          <KieranLoopingVideo />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
                             <PlayerAvatarSwipe name={issue.player} size="issue" />
-                          )}
-                        </div>
+                          </div>
+                        )}
                         
                         {/* Current badge for selected */}
                         {isSelected && animationPhase !== 'idle' && (
-                          <div className="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-amber-500/90 text-slate-900 text-xs font-bold">
+                          <div className="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-amber-500/90 text-slate-900 text-xs font-bold z-10">
                             CURRENT
                           </div>
                         )}
                         
                         {/* Risk Badge - show only in idle */}
                         {animationPhase === 'idle' && (
-                          <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1.5
+                          <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1.5 z-10
                             ${issue.risk > 90 ? 'bg-red-500/90 text-white' : 
                               issue.risk > 80 ? 'bg-orange-500/90 text-white' : 
                               'bg-yellow-500/90 text-slate-900'}`}>
@@ -632,7 +632,7 @@ const PlayerSwipe = () => {
                         
                         {/* Position Badge - show only in idle */}
                         {animationPhase === 'idle' && (
-                          <div className="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-slate-900/80 text-slate-300 text-xs font-medium">
+                          <div className="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-slate-900/80 text-slate-300 text-xs font-medium z-10">
                             {issue.position}
                           </div>
                         )}
