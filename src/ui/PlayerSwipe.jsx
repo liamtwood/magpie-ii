@@ -155,10 +155,10 @@ const GustoVideoCircle = ({ videoId = null, onClick }) => {
         
         {/* Video - shown on hover (if videoId provided) */}
         {isHovered && videoId && (
-          <div className="absolute inset-0 scale-[2]">
+          <div className="absolute inset-0 scale-[2] pointer-events-none">
             <YouTube
               videoId={videoId}
-              className="w-full h-full"
+              className="w-full h-full pointer-events-none"
               iframeClassName="w-full h-full"
               opts={{
                 width: '100%',
@@ -565,10 +565,10 @@ const KieranCircle = ({ issue, onClick }) => {
         </div>
         
         {isHovered && (
-          <div className="absolute inset-0 scale-[2]">
+          <div className="absolute inset-0 scale-[2] pointer-events-none">
             <YouTube
               videoId="CCOxEw2wKrA"
-              className="w-full h-full"
+              className="w-full h-full pointer-events-none"
               iframeClassName="w-full h-full"
               opts={{
                 width: '100%',
@@ -639,10 +639,10 @@ const TiagoVideoCircle = ({ onClick }) => {
         </div>
         
         {isHovered && (
-          <div className="absolute inset-0 scale-[2]">
+          <div className="absolute inset-0 scale-[2] pointer-events-none">
             <YouTube
               videoId="AtAfGUdYwdg"
-              className="w-full h-full"
+              className="w-full h-full pointer-events-none"
               iframeClassName="w-full h-full"
               opts={{
                 width: '100%',
