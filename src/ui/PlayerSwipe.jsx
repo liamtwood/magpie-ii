@@ -81,23 +81,6 @@ const issueCards = [
     ]
   },
   {
-    id: 'botman',
-    player: 'Sven Botman',
-    position: 'CB',
-    age: 24,
-    image: '/players/botman.png',
-    issue: 'Long-term injury (ACL)',
-    risk: 88,
-    type: 'injury',
-    summary: 'ACL injury sustained March 2024. Expected return unclear. Need cover.',
-    shortlistId: 'cb-cover',
-    candidates: [
-      { rank: 1, name: 'Marc Guéhi', age: 24, club: 'Crystal Palace', value: '€65M', rating: 8.6, image: '/players/guehi.png', highlights: 'England international, ball-playing CB', pros: ['PL proven', 'Leadership', 'Ball progression'], cons: ['Very expensive', 'Palace reluctant'] },
-      { rank: 2, name: 'Castello Lukeba', age: 21, club: 'RB Leipzig', value: '€45M', rating: 8.2, image: '/players/lukeba.png', highlights: 'French talent, rapid development', pros: ['Young', 'Pace', 'UCL experience'], cons: ['Limited PL knowledge', 'Leipzig price'] },
-      { rank: 3, name: 'Gonçalo Inácio', age: 23, club: 'Sporting CP', value: '€40M', rating: 8.0, image: '/players/inacio.png', highlights: 'Portuguese international, composed', pros: ['Release clause', 'Left-footed', 'Technical'], cons: ['Liga Portugal only', 'Physical questions'] },
-    ]
-  },
-  {
     id: 'trippier',
     player: 'Kieran Trippier',
     position: 'RB',
@@ -112,6 +95,23 @@ const issueCards = [
       { rank: 1, name: 'Tiago Santos', age: 23, club: 'Lille', value: '€18M', rating: 8.3, confidence: 85, image: '/players/santos_1765321431388.webp', highlights: 'Dynamic attacking fullback from Portugal', pros: ['Young', 'Attacking threat', 'Affordable'], cons: ['Defensive work needed', 'Ligue 1 only'] },
       { rank: 2, name: 'Malo Gusto', age: 21, club: 'Chelsea', value: '€35M', rating: 8.1, confidence: 45, image: '/players/gusto.png', highlights: 'French youth star, Chelsea first choice', pros: ['PL adapted', 'Versatile', 'Young'], cons: ['Chelsea unlikely to sell', 'High price'] },
       { rank: 3, name: 'Tino Livramento', age: 22, club: 'Newcastle', value: '€25M', rating: 7.9, confidence: 92, image: '/players/livramento.png', highlights: 'Already at club, needs minutes', pros: ['In squad', 'Knows system', 'English'], cons: ['Injury history', 'Unproven starter'] },
+    ]
+  },
+  {
+    id: 'botman',
+    player: 'Sven Botman',
+    position: 'CB',
+    age: 24,
+    image: '/players/botman.png',
+    issue: 'Long-term injury (ACL)',
+    risk: 88,
+    type: 'injury',
+    summary: 'ACL injury sustained March 2024. Expected return unclear. Need cover.',
+    shortlistId: 'cb-cover',
+    candidates: [
+      { rank: 1, name: 'Marc Guéhi', age: 24, club: 'Crystal Palace', value: '€65M', rating: 8.6, image: '/players/guehi.png', highlights: 'England international, ball-playing CB', pros: ['PL proven', 'Leadership', 'Ball progression'], cons: ['Very expensive', 'Palace reluctant'] },
+      { rank: 2, name: 'Castello Lukeba', age: 21, club: 'RB Leipzig', value: '€45M', rating: 8.2, image: '/players/lukeba.png', highlights: 'French talent, rapid development', pros: ['Young', 'Pace', 'UCL experience'], cons: ['Limited PL knowledge', 'Leipzig price'] },
+      { rank: 3, name: 'Gonçalo Inácio', age: 23, club: 'Sporting CP', value: '€40M', rating: 8.0, image: '/players/inacio.png', highlights: 'Portuguese international, composed', pros: ['Release clause', 'Left-footed', 'Technical'], cons: ['Liga Portugal only', 'Physical questions'] },
     ]
   },
 ];
@@ -511,7 +511,7 @@ const PlayerSwipe = () => {
                 const isOther = animatingIssue && !isSelected;
                 
                 // Calculate offset to center the selected card
-                const cardPositions = { pope: -312, botman: 0, trippier: 312 };
+                const cardPositions = { pope: -312, trippier: 0, botman: 312 };
                 const offset = cardPositions[issue.id] || 0;
                 
                 // Don't render other cards when expanded
