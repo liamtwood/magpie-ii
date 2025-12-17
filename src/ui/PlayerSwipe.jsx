@@ -945,6 +945,8 @@ const PlayerSwipe = () => {
   const [animationPhase, setAnimationPhase] = useState('idle'); // 'idle', 'center', 'expanded'
   const [focusedPlayer, setFocusedPlayer] = useState('current'); // 'current', 'tiago', 'gusto'
   const [centerIssueId, setCenterIssueId] = useState('trippier'); // Which issue is in center for idle view
+  const [previewIssueId, setPreviewIssueId] = useState('botman'); // Which issue is shown in the right circle
+  const [previewPlayer, setPreviewPlayer] = useState('tiago'); // Which replacement is shown in the right circle
 
   const handleIssueSelect = (issue) => {
     setSelectedIssue(issue);
@@ -1098,9 +1100,9 @@ const PlayerSwipe = () => {
                   className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-32 h-64 bg-slate-700/60 hover:bg-slate-600/80 border-r-2 border-slate-500/50 cursor-pointer transition-all duration-300 flex items-center justify-end pr-4"
                   style={{ borderRadius: '0 100% 100% 0 / 0 50% 50% 0' }}
                   onClick={() => {
-                    const order = ['pope', 'trippier', 'botman'];
-                    const idx = order.indexOf(centerIssueId);
-                    setCenterIssueId(order[(idx - 1 + order.length) % order.length]);
+                    const order = ['pope', 'trippier', 'botman'].filter(id => id !== centerIssueId);
+                    const idx = order.indexOf(previewIssueId);
+                    setPreviewIssueId(order[(idx - 1 + order.length) % order.length]);
                   }}
                 >
                   <span className="text-slate-300 text-xs font-bold tracking-widest" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>PREVIOUS</span>
@@ -1111,9 +1113,9 @@ const PlayerSwipe = () => {
                   className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-32 h-64 bg-slate-700/60 hover:bg-slate-600/80 border-l-2 border-slate-500/50 cursor-pointer transition-all duration-300 flex items-center justify-start pl-4"
                   style={{ borderRadius: '100% 0 0 100% / 50% 0 0 50%' }}
                   onClick={() => {
-                    const order = ['pope', 'trippier', 'botman'];
-                    const idx = order.indexOf(centerIssueId);
-                    setCenterIssueId(order[(idx + 1) % order.length]);
+                    const order = ['pope', 'trippier', 'botman'].filter(id => id !== centerIssueId);
+                    const idx = order.indexOf(previewIssueId);
+                    setPreviewIssueId(order[(idx + 1) % order.length]);
                   }}
                 >
                   <span className="text-slate-300 text-xs font-bold tracking-widest" style={{ writingMode: 'vertical-rl' }}>NEXT</span>
@@ -1136,16 +1138,28 @@ const PlayerSwipe = () => {
                   </div>
                 )}
                 
-                {/* Right circle - shows next player in rotation */}
+                {/* Right circle - shows preview player, click to swap */}
                 <div className="absolute" style={{ left: 'calc(50% + 290px)' }}>
-                  {centerIssueId === 'trippier' && (
-                    <BotmanCircle onClick={() => setCenterIssueId('botman')} />
+                  {previewIssueId === 'trippier' && (
+                    <TrippierCircle onClick={() => {
+                      const oldCenter = centerIssueId;
+                      setCenterIssueId('trippier');
+                      setPreviewIssueId(oldCenter);
+                    }} />
                   )}
-                  {centerIssueId === 'botman' && (
-                    <PopeCircle onClick={() => setCenterIssueId('pope')} />
+                  {previewIssueId === 'botman' && (
+                    <BotmanCircle onClick={() => {
+                      const oldCenter = centerIssueId;
+                      setCenterIssueId('botman');
+                      setPreviewIssueId(oldCenter);
+                    }} />
                   )}
-                  {centerIssueId === 'pope' && (
-                    <TrippierCircle onClick={() => setCenterIssueId('trippier')} />
+                  {previewIssueId === 'pope' && (
+                    <PopeCircle onClick={() => {
+                      const oldCenter = centerIssueId;
+                      setCenterIssueId('pope');
+                      setPreviewIssueId(oldCenter);
+                    }} />
                   )}
                 </div>
               </>
@@ -1159,9 +1173,9 @@ const PlayerSwipe = () => {
                   className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-32 h-64 bg-slate-700/60 hover:bg-slate-600/80 border-r-2 border-slate-500/50 cursor-pointer transition-all duration-300 flex items-center justify-end pr-4 z-30"
                   style={{ borderRadius: '0 100% 100% 0 / 0 50% 50% 0' }}
                   onClick={() => {
-                    const order = ['current', 'tiago', 'gusto'];
-                    const idx = order.indexOf(focusedPlayer);
-                    handlePlayerSwap(order[(idx - 1 + order.length) % order.length]);
+                    const order = ['current', 'tiago', 'gusto'].filter(id => id !== focusedPlayer);
+                    const idx = order.indexOf(previewPlayer);
+                    setPreviewPlayer(order[(idx - 1 + order.length) % order.length]);
                   }}
                 >
                   <span className="text-slate-300 text-xs font-bold tracking-widest" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>PREVIOUS</span>
@@ -1172,9 +1186,9 @@ const PlayerSwipe = () => {
                   className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-32 h-64 bg-slate-700/60 hover:bg-slate-600/80 border-l-2 border-slate-500/50 cursor-pointer transition-all duration-300 flex items-center justify-start pl-4 z-30"
                   style={{ borderRadius: '100% 0 0 100% / 50% 0 0 50%' }}
                   onClick={() => {
-                    const order = ['current', 'tiago', 'gusto'];
-                    const idx = order.indexOf(focusedPlayer);
-                    handlePlayerSwap(order[(idx + 1) % order.length]);
+                    const order = ['current', 'tiago', 'gusto'].filter(id => id !== focusedPlayer);
+                    const idx = order.indexOf(previewPlayer);
+                    setPreviewPlayer(order[(idx + 1) % order.length]);
                   }}
                 >
                   <span className="text-slate-300 text-xs font-bold tracking-widest" style={{ writingMode: 'vertical-rl' }}>NEXT</span>
@@ -1191,16 +1205,28 @@ const PlayerSwipe = () => {
                   <GustoExpandedCard />
                 )}
                 
-                {/* Right circle - shows next player in rotation */}
+                {/* Right circle - shows preview player, click to swap */}
                 <div className="absolute" style={{ left: 'calc(50% + 290px)' }}>
-                  {focusedPlayer === 'current' && (
-                    <TiagoVideoCircle onClick={() => handlePlayerSwap('tiago')} />
+                  {previewPlayer === 'current' && (
+                    <KieranCircle issue={selectedIssue} onClick={() => {
+                      const oldFocused = focusedPlayer;
+                      setFocusedPlayer('current');
+                      setPreviewPlayer(oldFocused);
+                    }} />
                   )}
-                  {focusedPlayer === 'tiago' && (
-                    <GustoVideoCircle videoId="fd5f4Akuieg" onClick={() => handlePlayerSwap('gusto')} />
+                  {previewPlayer === 'tiago' && (
+                    <TiagoVideoCircle onClick={() => {
+                      const oldFocused = focusedPlayer;
+                      setFocusedPlayer('tiago');
+                      setPreviewPlayer(oldFocused);
+                    }} />
                   )}
-                  {focusedPlayer === 'gusto' && (
-                    <KieranCircle issue={selectedIssue} onClick={() => handlePlayerSwap('current')} />
+                  {previewPlayer === 'gusto' && (
+                    <GustoVideoCircle videoId="fd5f4Akuieg" onClick={() => {
+                      const oldFocused = focusedPlayer;
+                      setFocusedPlayer('gusto');
+                      setPreviewPlayer(oldFocused);
+                    }} />
                   )}
                 </div>
               </>
