@@ -1119,15 +1119,6 @@ const PlayerSwipe = () => {
                   <span className="text-slate-300 text-xs font-bold tracking-widest" style={{ writingMode: 'vertical-rl' }}>NEXT</span>
                 </div>
                 
-                {/* Left circle */}
-                <div className="absolute" style={{ right: 'calc(50% + 290px)' }}>
-                  {centerIssueId === 'pope' ? (
-                    <TrippierCircle onClick={() => setCenterIssueId('trippier')} />
-                  ) : (
-                    <PopeCircle onClick={() => setCenterIssueId('pope')} />
-                  )}
-                </div>
-                
                 {/* Center - Large expanded card */}
                 {centerIssueId === 'trippier' && (
                   <div className="cursor-pointer" onClick={() => handleIssueSelect(issueCards.find(i => i.id === 'trippier'))}>
@@ -1145,12 +1136,16 @@ const PlayerSwipe = () => {
                   </div>
                 )}
                 
-                {/* Right circle */}
+                {/* Right circle - shows next player in rotation */}
                 <div className="absolute" style={{ left: 'calc(50% + 290px)' }}>
-                  {centerIssueId === 'botman' ? (
-                    <TrippierCircle onClick={() => setCenterIssueId('trippier')} />
-                  ) : (
+                  {centerIssueId === 'trippier' && (
                     <BotmanCircle onClick={() => setCenterIssueId('botman')} />
+                  )}
+                  {centerIssueId === 'botman' && (
+                    <PopeCircle onClick={() => setCenterIssueId('pope')} />
+                  )}
+                  {centerIssueId === 'pope' && (
+                    <TrippierCircle onClick={() => setCenterIssueId('trippier')} />
                   )}
                 </div>
               </>
@@ -1185,17 +1180,6 @@ const PlayerSwipe = () => {
                   <span className="text-slate-300 text-xs font-bold tracking-widest" style={{ writingMode: 'vertical-rl' }}>NEXT</span>
                 </div>
                 
-                {/* Left circle */}
-                <div className="absolute" style={{ right: 'calc(50% + 290px)' }}>
-                  {focusedPlayer === 'current' ? (
-                    <TiagoVideoCircle onClick={() => handlePlayerSwap('tiago')} />
-                  ) : focusedPlayer === 'tiago' ? (
-                    <KieranCircle issue={selectedIssue} onClick={() => handlePlayerSwap('current')} />
-                  ) : (
-                    <TiagoVideoCircle onClick={() => handlePlayerSwap('tiago')} />
-                  )}
-                </div>
-                
                 {/* Center - Large expanded card */}
                 {selectedIssue.id === 'trippier' && focusedPlayer === 'current' && (
                   <KieranExpandedCard issue={selectedIssue} onBack={handleBackToIssues} />
@@ -1207,12 +1191,16 @@ const PlayerSwipe = () => {
                   <GustoExpandedCard />
                 )}
                 
-                {/* Right circle */}
+                {/* Right circle - shows next player in rotation */}
                 <div className="absolute" style={{ left: 'calc(50% + 290px)' }}>
-                  {focusedPlayer === 'gusto' ? (
-                    <KieranCircle issue={selectedIssue} onClick={() => handlePlayerSwap('current')} />
-                  ) : (
+                  {focusedPlayer === 'current' && (
+                    <TiagoVideoCircle onClick={() => handlePlayerSwap('tiago')} />
+                  )}
+                  {focusedPlayer === 'tiago' && (
                     <GustoVideoCircle videoId="fd5f4Akuieg" onClick={() => handlePlayerSwap('gusto')} />
+                  )}
+                  {focusedPlayer === 'gusto' && (
+                    <KieranCircle issue={selectedIssue} onClick={() => handlePlayerSwap('current')} />
                   )}
                 </div>
               </>
