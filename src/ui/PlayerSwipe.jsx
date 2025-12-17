@@ -611,6 +611,251 @@ const KieranCircle = ({ issue, onClick }) => {
   );
 };
 
+const PopeCircle = ({ issue, onClick }) => {
+  return (
+    <div 
+      className="w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-red-500/50 bg-gradient-to-br from-slate-800 to-slate-900">
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <img 
+            src={clubBadges['Newcastle']} 
+            alt="Newcastle" 
+            className="w-16 h-16 object-contain mb-3"
+          />
+          <h3 className="text-white font-bold text-lg">Nick Pope</h3>
+          <p className="text-red-400 font-semibold">95% Risk</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const BotmanCircle = ({ issue, onClick }) => {
+  return (
+    <div 
+      className="w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-orange-500/50 bg-gradient-to-br from-slate-800 to-slate-900">
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <img 
+            src={clubBadges['Newcastle']} 
+            alt="Newcastle" 
+            className="w-16 h-16 object-contain mb-3"
+          />
+          <h3 className="text-white font-bold text-lg">Sven Botman</h3>
+          <p className="text-orange-400 font-semibold">88% Risk</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PopeExpandedCard = ({ issue }) => {
+  return (
+    <div className="relative w-[500px] h-[500px] overflow-hidden border-2 border-red-500/50 shadow-2xl">
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900" />
+      <div className="absolute inset-0 flex items-center justify-center opacity-20">
+        <img src={clubBadges['Newcastle']} alt="Newcastle" className="w-64 h-64 object-contain" />
+      </div>
+      
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-10" />
+      
+      <div className="absolute inset-0 z-20 flex flex-col justify-between p-6">
+        <div className="flex items-start justify-between">
+          <div className="px-3 py-1.5 bg-slate-900/80 text-slate-300 text-sm font-medium">
+            GK
+          </div>
+          <div className="px-3 py-1.5 bg-red-500/90 text-white text-sm font-bold">
+            95% RISK
+          </div>
+        </div>
+        
+        <div>
+          <div className="flex items-end justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <img src={clubBadges['Newcastle']} alt="Newcastle" className="w-16 h-16 object-contain" />
+              <div>
+                <h2 className="text-4xl font-bold text-white mb-1">Nick Pope</h2>
+                <p className="text-slate-300 text-lg">33 years old</p>
+              </div>
+            </div>
+            <div className="px-4 py-2 bg-red-500/90 text-white text-lg font-bold flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" />
+              Critical
+            </div>
+          </div>
+          
+          <div className="bg-slate-900/60 backdrop-blur-sm p-4">
+            <p className="text-orange-400 text-lg font-semibold mb-2">Contract expiring + Age concern</p>
+            <p className="text-slate-300">Contract ends 2026. At 33, likely final major contract. High departure risk.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const BotmanExpandedCard = ({ issue }) => {
+  return (
+    <div className="relative w-[500px] h-[500px] overflow-hidden border-2 border-orange-500/50 shadow-2xl">
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900" />
+      <div className="absolute inset-0 flex items-center justify-center opacity-20">
+        <img src={clubBadges['Newcastle']} alt="Newcastle" className="w-64 h-64 object-contain" />
+      </div>
+      
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-10" />
+      
+      <div className="absolute inset-0 z-20 flex flex-col justify-between p-6">
+        <div className="flex items-start justify-between">
+          <div className="px-3 py-1.5 bg-slate-900/80 text-slate-300 text-sm font-medium">
+            CB
+          </div>
+          <div className="px-3 py-1.5 bg-orange-500/90 text-white text-sm font-bold">
+            88% RISK
+          </div>
+        </div>
+        
+        <div>
+          <div className="flex items-end justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <img src={clubBadges['Newcastle']} alt="Newcastle" className="w-16 h-16 object-contain" />
+              <div>
+                <h2 className="text-4xl font-bold text-white mb-1">Sven Botman</h2>
+                <p className="text-slate-300 text-lg">24 years old</p>
+              </div>
+            </div>
+            <div className="px-4 py-2 bg-orange-500/90 text-white text-lg font-bold flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" />
+              High
+            </div>
+          </div>
+          
+          <div className="bg-slate-900/60 backdrop-blur-sm p-4">
+            <p className="text-red-400 text-lg font-semibold mb-2">Long-term injury (ACL)</p>
+            <p className="text-slate-300">ACL injury sustained March 2024. Expected return unclear. Need cover.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const TrippierCircle = ({ issue, onClick }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const playerRef = useRef(null);
+  
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+  
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (playerRef.current) {
+      playerRef.current.pauseVideo();
+    }
+  };
+
+  return (
+    <div 
+      className="w-64 h-64 scale-90 hover:scale-100 transition-transform duration-300 ease-out origin-center cursor-pointer"
+      onClick={onClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-amber-500/50 bg-gradient-to-br from-slate-800 to-slate-900">
+        <div className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
+          <img 
+            src={clubBadges['Newcastle']} 
+            alt="Newcastle" 
+            className="w-16 h-16 object-contain mb-3"
+          />
+          <h3 className="text-white font-bold text-lg">Kieran Trippier</h3>
+          <p className="text-amber-400 font-semibold">82% Risk</p>
+        </div>
+        
+        {isHovered && (
+          <div className="absolute inset-0 scale-[2] pointer-events-none">
+            <YouTube
+              videoId="CCOxEw2wKrA"
+              className="w-full h-full pointer-events-none"
+              iframeClassName="w-full h-full"
+              opts={{
+                width: '100%',
+                height: '100%',
+                playerVars: {
+                  autoplay: 1,
+                  mute: 1,
+                  controls: 0,
+                  start: 4,
+                  modestbranding: 1,
+                  rel: 0,
+                  showinfo: 0,
+                  disablekb: 1,
+                },
+              }}
+              onReady={(event) => {
+                playerRef.current = event.target;
+              }}
+              onStateChange={(event) => {
+                if (event.data === 1) {
+                  setTimeout(() => {
+                    event.target.pauseVideo();
+                  }, 5000);
+                }
+              }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const TrippierExpandedCard = ({ issue }) => {
+  return (
+    <div className="relative w-[500px] h-[500px] overflow-hidden border-2 border-amber-500/50 shadow-2xl">
+      <KieranLoopingVideo size="expanded" />
+      
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-10" />
+      
+      <div className="absolute inset-0 z-20 flex flex-col justify-between p-6">
+        <div className="flex items-start justify-between">
+          <div className="px-3 py-1.5 bg-slate-900/80 text-slate-300 text-sm font-medium">
+            RB
+          </div>
+          <div className="px-3 py-1.5 bg-amber-500/90 text-slate-900 text-sm font-bold">
+            82% RISK
+          </div>
+        </div>
+        
+        <div>
+          <div className="flex items-end justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <img src={clubBadges['Newcastle']} alt="Newcastle" className="w-16 h-16 object-contain" />
+              <div>
+                <h2 className="text-4xl font-bold text-white mb-1">Kieran Trippier</h2>
+                <p className="text-slate-300 text-lg">34 years old</p>
+              </div>
+            </div>
+            <div className="px-4 py-2 bg-amber-500/90 text-slate-900 text-lg font-bold flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" />
+              Moderate
+            </div>
+          </div>
+          
+          <div className="bg-slate-900/60 backdrop-blur-sm p-4">
+            <p className="text-amber-400 text-lg font-semibold mb-2">Age + succession planning</p>
+            <p className="text-slate-300">At 34, needs succession plan. Still performing but timeline critical.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const TiagoVideoCircle = ({ onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
   const playerRef = useRef(null);
@@ -699,6 +944,7 @@ const PlayerSwipe = () => {
   const [animatingIssue, setAnimatingIssue] = useState(null);
   const [animationPhase, setAnimationPhase] = useState('idle'); // 'idle', 'center', 'expanded'
   const [focusedPlayer, setFocusedPlayer] = useState('current'); // 'current', 'tiago', 'gusto'
+  const [centerIssueId, setCenterIssueId] = useState('trippier'); // Which issue is in center for idle view
 
   const handleIssueSelect = (issue) => {
     setSelectedIssue(issue);
@@ -844,6 +1090,46 @@ const PlayerSwipe = () => {
           </div>
           
           <div className="flex-1 flex items-center justify-center relative overflow-hidden">
+            {/* Idle view - Squad Issues with square+circles pattern */}
+            {animationPhase === 'idle' && (
+              <>
+                {/* Left circle */}
+                <div className="absolute" style={{ right: 'calc(50% + 290px)' }}>
+                  {centerIssueId === 'pope' ? (
+                    <TrippierCircle onClick={() => setCenterIssueId('trippier')} />
+                  ) : (
+                    <PopeCircle onClick={() => setCenterIssueId('pope')} />
+                  )}
+                </div>
+                
+                {/* Center - Large expanded card */}
+                {centerIssueId === 'trippier' && (
+                  <div className="cursor-pointer" onClick={() => handleIssueSelect(issueCards.find(i => i.id === 'trippier'))}>
+                    <TrippierExpandedCard issue={issueCards.find(i => i.id === 'trippier')} />
+                  </div>
+                )}
+                {centerIssueId === 'pope' && (
+                  <div className="cursor-pointer" onClick={() => handleIssueSelect(issueCards.find(i => i.id === 'pope'))}>
+                    <PopeExpandedCard issue={issueCards.find(i => i.id === 'pope')} />
+                  </div>
+                )}
+                {centerIssueId === 'botman' && (
+                  <div className="cursor-pointer" onClick={() => handleIssueSelect(issueCards.find(i => i.id === 'botman'))}>
+                    <BotmanExpandedCard issue={issueCards.find(i => i.id === 'botman')} />
+                  </div>
+                )}
+                
+                {/* Right circle */}
+                <div className="absolute" style={{ left: 'calc(50% + 290px)' }}>
+                  {centerIssueId === 'botman' ? (
+                    <TrippierCircle onClick={() => setCenterIssueId('trippier')} />
+                  ) : (
+                    <BotmanCircle onClick={() => setCenterIssueId('botman')} />
+                  )}
+                </div>
+              </>
+            )}
+            
             {/* Expanded view with large card and replacement circles */}
             {animationPhase === 'expanded' && selectedIssue && (
               <>
@@ -879,123 +1165,6 @@ const PlayerSwipe = () => {
                 </div>
               </>
             )}
-            
-            {/* Issue cards / Current player card */}
-            <div className="flex gap-6 justify-center relative z-10">
-              {issueCards.map((issue) => {
-                const isSelected = animatingIssue === issue.id;
-                const isOther = animatingIssue && !isSelected;
-                
-                // Calculate offset to center the selected card
-                const cardPositions = { pope: -312, trippier: 0, botman: 312 };
-                const offset = cardPositions[issue.id] || 0;
-                
-                // Don't render any cards when expanded (we show the large expanded card instead)
-                if (animationPhase === 'expanded') return null;
-                
-                return (
-                  <div
-                    key={issue.id}
-                    onClick={() => animationPhase === 'idle' && handleIssueSelect(issue)}
-                    className={`group relative w-72 h-[480px] shrink-0 transition-all duration-500 ease-out
-                      ${animationPhase === 'idle' ? 'cursor-pointer hover:scale-105' : ''}`}
-                    style={{
-                      transform: isSelected && animationPhase === 'center'
-                        ? `translateX(${-offset}px) scale(1.02)` 
-                        : 'translateX(0) scale(1)',
-                      opacity: isOther ? 0 : 1,
-                      zIndex: isSelected ? 10 : 1,
-                      pointerEvents: animationPhase !== 'idle' && !isSelected ? 'none' : 'auto'
-                    }}
-                  >
-                    {/* Glow effect */}
-                    <div 
-                      className={`absolute inset-0 rounded-3xl blur-xl transition-opacity
-                        ${animationPhase === 'idle' ? 'opacity-50 group-hover:opacity-80' : 'opacity-30'}`}
-                      style={{
-                        background: isSelected && animationPhase !== 'idle'
-                          ? 'radial-gradient(circle, rgba(251,191,36,0.3) 0%, transparent 70%)'
-                          : issue.risk > 90 
-                            ? 'radial-gradient(circle, rgba(239,68,68,0.4) 0%, transparent 70%)'
-                            : issue.risk > 80 
-                              ? 'radial-gradient(circle, rgba(251,146,60,0.4) 0%, transparent 70%)'
-                              : 'radial-gradient(circle, rgba(250,204,21,0.4) 0%, transparent 70%)'
-                      }}
-                    />
-                    
-                    <div className={`relative backdrop-blur-sm rounded-3xl overflow-hidden border transition-all duration-500 h-full flex flex-col
-                      ${isSelected && animationPhase !== 'idle' 
-                        ? 'bg-slate-600/60 border-amber-500/50' 
-                        : 'bg-slate-800/80 border-slate-700/50 hover:border-slate-500/50'}`}>
-                      {/* Player Image */}
-                      <div className="relative h-64 bg-gradient-to-b from-slate-700/50 to-slate-800/50 shrink-0">
-                        {issue.id === 'trippier' ? (
-                          <KieranLoopingVideo />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <PlayerAvatarSwipe name={issue.player} size="issue" />
-                          </div>
-                        )}
-                        
-                        {/* Current badge for selected */}
-                        {isSelected && animationPhase !== 'idle' && (
-                          <div className="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-amber-500/90 text-slate-900 text-xs font-bold z-10">
-                            CURRENT
-                          </div>
-                        )}
-                        
-                        {/* Risk Badge - show only in idle */}
-                        {animationPhase === 'idle' && (
-                          <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1.5 z-10
-                            ${issue.risk > 90 ? 'bg-red-500/90 text-white' : 
-                              issue.risk > 80 ? 'bg-orange-500/90 text-white' : 
-                              'bg-yellow-500/90 text-slate-900'}`}>
-                            <AlertTriangle className="w-4 h-4" />
-                            {issue.risk}%
-                          </div>
-                        )}
-                        
-                        {/* Position Badge - show only in idle */}
-                        {animationPhase === 'idle' && (
-                          <div className="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-slate-900/80 text-slate-300 text-xs font-medium z-10">
-                            {issue.position}
-                          </div>
-                        )}
-                      </div>
-                      
-                      {/* Player Info */}
-                      <div className="p-5 flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-xl font-bold text-white">{issue.player}</h3>
-                          <span className="text-slate-400 text-sm">{issue.age} yrs</span>
-                        </div>
-                        <p className={`text-sm font-medium mb-3
-                          ${issue.type === 'contract' ? 'text-orange-400' : 
-                            issue.type === 'injury' ? 'text-red-400' : 
-                            'text-amber-400'}`}>
-                          {issue.issue}
-                        </p>
-                        <p className="text-slate-500 text-sm line-clamp-2">{issue.summary}</p>
-                        
-                        {/* Candidates Preview - show only in idle */}
-                        {animationPhase === 'idle' && (
-                          <div className="mt-4 flex items-center gap-2">
-                            <div className="flex -space-x-2">
-                              {issue.candidates.slice(0, 3).map((c, i) => (
-                                <div key={i} className="border-2 border-slate-800 rounded-lg">
-                                  <PlayerAvatarSwipe name={c.name} size="sm" />
-                                </div>
-                              ))}
-                            </div>
-                            <span className="text-slate-400 text-xs">{issue.candidates.length} candidates</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
         </div>
       )}
