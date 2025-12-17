@@ -481,7 +481,7 @@ const PlayerSwipe = () => {
                   <ArrowLeft className="w-6 h-6 text-white" />
                 </button>
                 <div>
-                  <h1 className="text-2xl font-bold text-white">{selectedIssue?.player} Replacement</h1>
+                  <h1 className="text-3xl font-bold text-white">{selectedIssue?.player} Replacement</h1>
                   <p className="text-slate-400 text-sm">{selectedIssue?.candidates?.length} candidates ranked</p>
                 </div>
               </div>
