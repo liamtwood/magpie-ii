@@ -333,9 +333,12 @@ const KieranExpandedCard = ({ issue, onBack }) => {
         
         <div>
           <div className="flex items-end justify-between mb-4">
-            <div>
-              <h2 className="text-4xl font-bold text-white mb-1">{issue.player}</h2>
-              <p className="text-slate-300 text-lg">{issue.age} years old</p>
+            <div className="flex items-center gap-4">
+              <img src={clubBadges['Newcastle']} alt="Newcastle" className="w-16 h-16 object-contain" />
+              <div>
+                <h2 className="text-4xl font-bold text-white mb-1">{issue.player}</h2>
+                <p className="text-slate-300 text-lg">{issue.age} years old</p>
+              </div>
             </div>
             <div className={`px-4 py-2 rounded-full text-lg font-bold flex items-center gap-2
               ${issue.risk > 90 ? 'bg-red-500/90 text-white' : 
@@ -474,9 +477,12 @@ const GustoExpandedCard = () => {
         
         <div>
           <div className="flex items-end justify-between mb-4">
-            <div>
-              <h2 className="text-4xl font-bold text-white mb-1">Malo Gusto</h2>
-              <p className="text-slate-300 text-lg">21 years old • Chelsea</p>
+            <div className="flex items-center gap-4">
+              <img src={clubBadges['Chelsea']} alt="Chelsea" className="w-16 h-16 object-contain" />
+              <div>
+                <h2 className="text-4xl font-bold text-white mb-1">Malo Gusto</h2>
+                <p className="text-slate-300 text-lg">21 years old</p>
+              </div>
             </div>
             <div className="px-4 py-2 bg-teal-500/90 text-white text-lg font-bold">
               €35M
@@ -512,9 +518,12 @@ const TiagoExpandedCard = () => {
         
         <div>
           <div className="flex items-end justify-between mb-4">
-            <div>
-              <h2 className="text-4xl font-bold text-white mb-1">Tiago Santos</h2>
-              <p className="text-slate-300 text-lg">23 years old • Lille</p>
+            <div className="flex items-center gap-4">
+              <img src={clubBadges['Lille']} alt="Lille" className="w-16 h-16 object-contain" />
+              <div>
+                <h2 className="text-4xl font-bold text-white mb-1">Tiago Santos</h2>
+                <p className="text-slate-300 text-lg">23 years old</p>
+              </div>
             </div>
             <div className="px-4 py-2 bg-teal-500/90 text-white text-lg font-bold">
               €18M
