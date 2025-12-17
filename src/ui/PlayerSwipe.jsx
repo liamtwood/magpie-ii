@@ -947,6 +947,7 @@ const PlayerSwipe = () => {
   const [centerIssueId, setCenterIssueId] = useState('trippier'); // Which issue is in center for idle view
   const [previewIssueId, setPreviewIssueId] = useState('botman'); // Which issue is shown in the right circle
   const [previewPlayer, setPreviewPlayer] = useState('tiago'); // Which replacement is shown in the right circle
+  const [circleAnimating, setCircleAnimating] = useState(false); // Animation state for circle
 
   const handleIssueSelect = (issue) => {
     setSelectedIssue(issue);
@@ -1113,9 +1114,13 @@ const PlayerSwipe = () => {
                   className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-32 h-64 bg-slate-700/60 hover:bg-slate-600/80 border-l-2 border-slate-500/50 cursor-pointer transition-all duration-300 flex items-center justify-start pl-4"
                   style={{ borderRadius: '100% 0 0 100% / 50% 0 0 50%' }}
                   onClick={() => {
-                    const order = ['pope', 'trippier', 'botman'].filter(id => id !== centerIssueId);
-                    const idx = order.indexOf(previewIssueId);
-                    setPreviewIssueId(order[(idx + 1) % order.length]);
+                    setCircleAnimating(true);
+                    setTimeout(() => {
+                      const order = ['pope', 'trippier', 'botman'].filter(id => id !== centerIssueId);
+                      const idx = order.indexOf(previewIssueId);
+                      setPreviewIssueId(order[(idx + 1) % order.length]);
+                      setTimeout(() => setCircleAnimating(false), 300);
+                    }, 150);
                   }}
                 >
                   <span className="text-slate-300 text-xs font-bold tracking-widest" style={{ writingMode: 'vertical-rl' }}>NEXT</span>
@@ -1139,7 +1144,10 @@ const PlayerSwipe = () => {
                 )}
                 
                 {/* Right circle - shows preview player, click to swap */}
-                <div className="absolute" style={{ left: 'calc(50% + 290px)' }}>
+                <div 
+                  className={`absolute transition-all duration-300 ease-out ${circleAnimating ? 'translate-x-32 opacity-0' : 'translate-x-0 opacity-100'}`} 
+                  style={{ left: 'calc(50% + 290px)' }}
+                >
                   {previewIssueId === 'trippier' && (
                     <TrippierCircle onClick={() => {
                       const oldCenter = centerIssueId;
@@ -1186,9 +1194,13 @@ const PlayerSwipe = () => {
                   className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-32 h-64 bg-slate-700/60 hover:bg-slate-600/80 border-l-2 border-slate-500/50 cursor-pointer transition-all duration-300 flex items-center justify-start pl-4 z-30"
                   style={{ borderRadius: '100% 0 0 100% / 50% 0 0 50%' }}
                   onClick={() => {
-                    const order = ['current', 'tiago', 'gusto'].filter(id => id !== focusedPlayer);
-                    const idx = order.indexOf(previewPlayer);
-                    setPreviewPlayer(order[(idx + 1) % order.length]);
+                    setCircleAnimating(true);
+                    setTimeout(() => {
+                      const order = ['current', 'tiago', 'gusto'].filter(id => id !== focusedPlayer);
+                      const idx = order.indexOf(previewPlayer);
+                      setPreviewPlayer(order[(idx + 1) % order.length]);
+                      setTimeout(() => setCircleAnimating(false), 300);
+                    }, 150);
                   }}
                 >
                   <span className="text-slate-300 text-xs font-bold tracking-widest" style={{ writingMode: 'vertical-rl' }}>NEXT</span>
@@ -1206,7 +1218,10 @@ const PlayerSwipe = () => {
                 )}
                 
                 {/* Right circle - shows preview player, click to swap */}
-                <div className="absolute" style={{ left: 'calc(50% + 290px)' }}>
+                <div 
+                  className={`absolute transition-all duration-300 ease-out ${circleAnimating ? 'translate-x-32 opacity-0' : 'translate-x-0 opacity-100'}`}
+                  style={{ left: 'calc(50% + 290px)' }}
+                >
                   {previewPlayer === 'current' && (
                     <KieranCircle issue={selectedIssue} onClick={() => {
                       const oldFocused = focusedPlayer;
