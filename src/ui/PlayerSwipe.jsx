@@ -262,7 +262,7 @@ const KieranVideoCircle = () => {
   );
 };
 
-const KieranLoopingVideo = () => {
+const KieranLoopingVideo = ({ size = 'card' }) => {
   const playerRef = useRef(null);
   
   const onReady = (event) => {
@@ -279,14 +279,18 @@ const KieranLoopingVideo = () => {
     }
   };
 
+  const dimensions = size === 'expanded' 
+    ? { width: '600', height: '600', scale: 'scale(1.8)' }
+    : { width: '288', height: '256', scale: 'scale(2.5)' };
+
   return (
-    <div className="absolute inset-0 overflow-hidden rounded-t-3xl">
-      <div className="absolute inset-0 flex items-center justify-center" style={{ transform: 'scale(2.5)', transformOrigin: 'center center' }}>
+    <div className="absolute inset-0 overflow-hidden rounded-3xl">
+      <div className="absolute inset-0 flex items-center justify-center" style={{ transform: dimensions.scale, transformOrigin: 'center center' }}>
         <YouTube
           videoId="CCOxEw2wKrA"
           opts={{
-            width: '288',
-            height: '256',
+            width: dimensions.width,
+            height: dimensions.height,
             playerVars: {
               autoplay: 1,
               controls: 0,
@@ -304,6 +308,53 @@ const KieranLoopingVideo = () => {
           onEnd={onEnd}
           className="pointer-events-none"
         />
+      </div>
+    </div>
+  );
+};
+
+const KieranExpandedCard = ({ issue, onBack }) => {
+  return (
+    <div className="relative w-[500px] h-[500px] rounded-3xl overflow-hidden border-2 border-amber-500/50 shadow-2xl">
+      <KieranLoopingVideo size="expanded" />
+      
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-10" />
+      
+      <div className="absolute inset-0 z-20 flex flex-col justify-between p-6">
+        <div className="flex items-start justify-between">
+          <div className="px-3 py-1.5 rounded-lg bg-slate-900/80 text-slate-300 text-sm font-medium">
+            {issue.position}
+          </div>
+          <div className="px-3 py-1.5 rounded-lg bg-amber-500/90 text-slate-900 text-sm font-bold">
+            CURRENT
+          </div>
+        </div>
+        
+        <div>
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <h2 className="text-4xl font-bold text-white mb-1">{issue.player}</h2>
+              <p className="text-slate-300 text-lg">{issue.age} years old</p>
+            </div>
+            <div className={`px-4 py-2 rounded-full text-lg font-bold flex items-center gap-2
+              ${issue.risk > 90 ? 'bg-red-500/90 text-white' : 
+                issue.risk > 80 ? 'bg-orange-500/90 text-white' : 
+                'bg-yellow-500/90 text-slate-900'}`}>
+              <AlertTriangle className="w-5 h-5" />
+              {issue.risk}% Risk
+            </div>
+          </div>
+          
+          <div className="bg-slate-900/60 backdrop-blur-sm rounded-xl p-4">
+            <p className={`text-lg font-semibold mb-2
+              ${issue.type === 'contract' ? 'text-orange-400' : 
+                issue.type === 'injury' ? 'text-red-400' : 
+                'text-amber-400'}`}>
+              {issue.issue}
+            </p>
+            <p className="text-slate-300">{issue.summary}</p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -536,16 +587,21 @@ const PlayerSwipe = () => {
           </div>
           
           <div className="flex-1 flex items-center justify-center relative overflow-hidden">
-            {/* Replacement circles on sides during expanded phase */}
+            {/* Expanded view with large card and replacement circles */}
             {animationPhase === 'expanded' && selectedIssue && (
               <>
                 {/* Left - Tiago Santos */}
-                <div className="absolute" style={{ right: 'calc(50% + 180px)' }}>
+                <div className="absolute" style={{ right: 'calc(50% + 290px)' }}>
                   <TiagoVideoCircle />
                 </div>
                 
+                {/* Center - Large expanded card */}
+                {selectedIssue.id === 'trippier' && (
+                  <KieranExpandedCard issue={selectedIssue} onBack={handleBackToIssues} />
+                )}
+                
                 {/* Right - Malo Gusto */}
-                <div className="absolute" style={{ left: 'calc(50% + 180px)' }}>
+                <div className="absolute" style={{ left: 'calc(50% + 290px)' }}>
                   <GustoVideoCircle videoId="fd5f4Akuieg" />
                 </div>
               </>
@@ -561,8 +617,8 @@ const PlayerSwipe = () => {
                 const cardPositions = { pope: -312, trippier: 0, botman: 312 };
                 const offset = cardPositions[issue.id] || 0;
                 
-                // Don't render other cards when expanded
-                if (isOther && animationPhase === 'expanded') return null;
+                // Don't render any cards when expanded (we show the large expanded card instead)
+                if (animationPhase === 'expanded') return null;
                 
                 return (
                   <div
