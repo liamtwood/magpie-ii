@@ -1159,6 +1159,32 @@ const PlayerSwipe = () => {
             {/* Expanded view with large card and replacement circles */}
             {animationPhase === 'expanded' && selectedIssue && (
               <>
+                {/* Previous half-circle on left edge */}
+                <div 
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-32 h-64 bg-slate-700/60 hover:bg-slate-600/80 border-r-2 border-slate-500/50 cursor-pointer transition-all duration-300 flex items-center justify-end pr-4 z-30"
+                  style={{ borderRadius: '0 100% 100% 0 / 0 50% 50% 0' }}
+                  onClick={() => {
+                    const order = ['current', 'tiago', 'gusto'];
+                    const idx = order.indexOf(focusedPlayer);
+                    handlePlayerSwap(order[(idx - 1 + order.length) % order.length]);
+                  }}
+                >
+                  <span className="text-slate-300 text-xs font-bold tracking-widest" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>PREVIOUS</span>
+                </div>
+                
+                {/* Next half-circle on right edge */}
+                <div 
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-32 h-64 bg-slate-700/60 hover:bg-slate-600/80 border-l-2 border-slate-500/50 cursor-pointer transition-all duration-300 flex items-center justify-start pl-4 z-30"
+                  style={{ borderRadius: '100% 0 0 100% / 50% 0 0 50%' }}
+                  onClick={() => {
+                    const order = ['current', 'tiago', 'gusto'];
+                    const idx = order.indexOf(focusedPlayer);
+                    handlePlayerSwap(order[(idx + 1) % order.length]);
+                  }}
+                >
+                  <span className="text-slate-300 text-xs font-bold tracking-widest" style={{ writingMode: 'vertical-rl' }}>NEXT</span>
+                </div>
+                
                 {/* Left circle */}
                 <div className="absolute" style={{ right: 'calc(50% + 290px)' }}>
                   {focusedPlayer === 'current' ? (
