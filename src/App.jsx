@@ -380,6 +380,7 @@ export default function MagpieV2() {
     { id: 'player-search', name: 'Player Search', icon: Search },
     { id: 'shortlists', name: 'Shortlists', icon: ClipboardList },
     { id: 'user-management', name: 'User Management', icon: Users },
+    { id: 'feature-management', name: 'Feature Management', icon: FileText },
     { 
       id: 'options', 
       name: 'Options', 
@@ -3329,6 +3330,92 @@ export default function MagpieV2() {
                   <p className="text-gray-500 max-w-md mx-auto">
                     This section will allow you to manage users, roles, and permissions for the MAGPIE II platform.
                   </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {activeScreen === 'feature-management' && (
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h1 className="text-2xl font-bold text-gray-900">Feature Management</h1>
+                <div className="text-sm text-gray-500">
+                  {feedbackIssues.length} items
+                </div>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">ID</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Type</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Title</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Description</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Screen</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Parent ID</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Status</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Priority</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Fix By</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Area</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Ideas to Discuss</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Created By</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Created At</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Updated At</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {feedbackIssues.map((issue) => (
+                        <tr key={issue.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-gray-900 font-medium">{issue.id}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              issue.type === 'requirement' ? 'bg-purple-100 text-purple-700' :
+                              issue.type === 'bug' ? 'bg-red-100 text-red-700' :
+                              issue.type === 'enhancement' ? 'bg-blue-100 text-blue-700' :
+                              'bg-gray-100 text-gray-700'
+                            }`}>
+                              {issue.type}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-gray-900 max-w-xs truncate">{issue.title}</td>
+                          <td className="px-4 py-3 text-gray-600 max-w-xs truncate">{issue.description || '-'}</td>
+                          <td className="px-4 py-3 text-gray-600">{issue.screen || '-'}</td>
+                          <td className="px-4 py-3 text-gray-600">{issue.parentId || '-'}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              issue.status === 'new' ? 'bg-blue-100 text-blue-700' :
+                              issue.status === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
+                              issue.status === 'resolved' ? 'bg-green-100 text-green-700' :
+                              issue.status === 'closed' ? 'bg-gray-100 text-gray-700' :
+                              'bg-gray-100 text-gray-700'
+                            }`}>
+                              {issue.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              issue.priority === 'critical' ? 'bg-red-100 text-red-700' :
+                              issue.priority === 'high' ? 'bg-orange-100 text-orange-700' :
+                              issue.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-gray-100 text-gray-700'
+                            }`}>
+                              {issue.priority}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-gray-600">{issue.fixBy || '-'}</td>
+                          <td className="px-4 py-3 text-gray-600">{issue.area || '-'}</td>
+                          <td className="px-4 py-3 text-gray-600 max-w-xs truncate">{issue.ideasToDiscuss || '-'}</td>
+                          <td className="px-4 py-3 text-gray-600">{issue.createdBy || '-'}</td>
+                          <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
+                            {new Date(issue.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
+                            {new Date(issue.updatedAt).toLocaleDateString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
