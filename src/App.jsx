@@ -168,8 +168,18 @@ export default function MagpieV2() {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showIssuesPanel, setShowIssuesPanel] = useState(false);
+  const [issuesPanelFilters, setIssuesPanelFilters] = useState({ type: 'all', screen: 'all' });
   const [feedbackIssues, setFeedbackIssues] = useState([]);
   const [issuesLoading, setIssuesLoading] = useState(true);
+  
+  const getRequirementsForScreen = (screen) => {
+    return feedbackIssues.filter(i => i.type === 'requirement' && i.screen === screen);
+  };
+  
+  const openRequirementsForScreen = (screen) => {
+    setIssuesPanelFilters({ type: 'requirement', screen });
+    setShowIssuesPanel(true);
+  };
   
   useEffect(() => {
     fetchIssues();
@@ -3148,10 +3158,22 @@ export default function MagpieV2() {
       <div className="flex-1 flex flex-col">
         <header className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex items-center gap-4">
               <h1 className="text-xl font-bold text-gray-900">
                 {screens.find(s => s.id === activeScreen)?.name}
               </h1>
+              {getRequirementsForScreen(activeScreen).length > 0 && (
+                <button
+                  onClick={() => openRequirementsForScreen(activeScreen)}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg text-sm font-medium transition-colors"
+                >
+                  <FileText className="h-4 w-4" />
+                  <span>Requirements</span>
+                  <span className="px-1.5 py-0.5 bg-purple-200 rounded text-xs font-bold">
+                    {getRequirementsForScreen(activeScreen).length}
+                  </span>
+                </button>
+              )}
             </div>
             <div className="flex items-center gap-4">
               <div className="text-sm text-gray-500">
@@ -3556,7 +3578,10 @@ export default function MagpieV2() {
 
       <FeedbackButton 
         currentScreen={activeScreen} 
-        onOpenPanel={() => setShowIssuesPanel(true)}
+        onOpenPanel={() => {
+          setIssuesPanelFilters({ type: 'all', screen: 'all' });
+          setShowIssuesPanel(true);
+        }}
         issues={feedbackIssues}
         onAddIssue={handleAddIssue}
       />
@@ -3566,6 +3591,7 @@ export default function MagpieV2() {
         issues={feedbackIssues}
         onUpdateIssue={handleUpdateIssue}
         onDeleteIssue={handleDeleteIssue}
+        initialFilters={issuesPanelFilters}
       />
 
       <style>{`

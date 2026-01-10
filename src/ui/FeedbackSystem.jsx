@@ -221,10 +221,17 @@ const SCREENS = [
   { id: 'player-swipe', label: 'Player Swipe' },
 ];
 
-const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssue, onDeleteIssue }) => {
-  const [filterType, setFilterType] = useState('all');
+const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssue, onDeleteIssue, initialFilters = {} }) => {
+  const [filterType, setFilterType] = useState(initialFilters.type || 'all');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [filterScreen, setFilterScreen] = useState('all');
+  const [filterScreen, setFilterScreen] = useState(initialFilters.screen || 'all');
+  
+  useEffect(() => {
+    if (isOpen) {
+      setFilterType(initialFilters.type || 'all');
+      setFilterScreen(initialFilters.screen || 'all');
+    }
+  }, [isOpen, initialFilters.type, initialFilters.screen]);
 
   const updateIssueStatus = (id, newStatus) => {
     onUpdateIssue(id, { status: newStatus });
