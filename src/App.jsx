@@ -3285,7 +3285,7 @@ export default function MagpieV2() {
             className="absolute inset-0 bg-black/30 transition-opacity"
             onClick={() => setOpenShortlistPanel(null)}
           />
-          <div className="relative w-[600px] bg-white shadow-2xl flex flex-col animate-slide-in-right overflow-hidden">
+          <WidgetHighlight widgetId="shortlist-panel" discoverMode={widgetDiscoverMode} className="relative w-[600px] bg-white shadow-2xl flex flex-col animate-slide-in-right overflow-hidden">
             {(() => {
               const shortlist = openShortlistPanel;
               const config = getSeverityConfig(shortlist.severity);
@@ -3490,7 +3490,7 @@ export default function MagpieV2() {
                 </>
               );
             })()}
-          </div>
+          </WidgetHighlight>
         </div>
       )}
 
@@ -3500,7 +3500,7 @@ export default function MagpieV2() {
             className="absolute inset-0 bg-black/30 transition-opacity"
             onClick={() => setOpenPlayerPanel(null)}
           />
-          <div className="relative w-[600px] bg-white shadow-2xl flex flex-col animate-slide-in-right overflow-hidden">
+          <WidgetHighlight widgetId="player-panel" discoverMode={widgetDiscoverMode} className="relative w-[600px] bg-white shadow-2xl flex flex-col animate-slide-in-right overflow-hidden">
             <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-slate-800 to-slate-900">
               <div className="flex items-start justify-between">
                 <button
@@ -3634,7 +3634,7 @@ export default function MagpieV2() {
                 </button>
               </div>
             </div>
-          </div>
+          </WidgetHighlight>
         </div>
       )}
 
