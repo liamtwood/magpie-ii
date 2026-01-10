@@ -3079,7 +3079,7 @@ export default function MagpieV2() {
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="p-4 space-y-1">
           {screens.map((screen) => (
             <button
               key={screen.id}
@@ -3102,7 +3102,7 @@ export default function MagpieV2() {
           ))}
         </nav>
 
-        <div className="border-t border-gray-200 flex flex-col flex-1 min-h-0">
+        <div className="border-t border-gray-200 flex flex-col flex-1 min-h-[250px]">
           <div className="p-3 border-b border-gray-100">
             <div className="flex items-center gap-2">
               <Zap className="h-4 w-4 text-amber-500" />
