@@ -52,11 +52,25 @@ export const WIDGET_TARGETS = {
 };
 
 export function getWidgetInfo(widgetKey) {
-  for (const page of Object.values(WIDGET_TARGETS)) {
-    if (page.widgets[widgetKey]) {
+  // Check if it's a page-level key first
+  const page = WIDGET_TARGETS[widgetKey];
+  if (page) {
+    return {
+      key: page.key,
+      name: page.name,
+      description: `All widgets and issues on the ${page.name} page`,
+      isPage: true,
+      parentPage: null
+    };
+  }
+  
+  // Otherwise look for widget
+  for (const pg of Object.values(WIDGET_TARGETS)) {
+    if (pg.widgets[widgetKey]) {
       return {
-        ...page.widgets[widgetKey],
-        parentPage: { key: page.key, name: page.name }
+        ...pg.widgets[widgetKey],
+        isPage: false,
+        parentPage: { key: pg.key, name: pg.name }
       };
     }
   }

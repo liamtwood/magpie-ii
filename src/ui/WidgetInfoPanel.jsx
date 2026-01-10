@@ -74,9 +74,12 @@ export function WidgetInfoPanel({ isOpen, onClose, widgetKey, onChangeWidget }) 
           >
             {Object.entries(WIDGET_TARGETS).map(([pageKey, page]) => (
               <optgroup key={pageKey} label={page.name}>
+                <option key={pageKey} value={pageKey} className="font-semibold">
+                  📄 {page.name} (Page)
+                </option>
                 {Object.values(page.widgets).map((widget) => (
                   <option key={widget.key} value={widget.key}>
-                    {widget.name}
+                    &nbsp;&nbsp;└ {widget.name}
                   </option>
                 ))}
               </optgroup>
@@ -90,11 +93,19 @@ export function WidgetInfoPanel({ isOpen, onClose, widgetKey, onChangeWidget }) 
         {widgetInfo && (
           <div className="bg-gray-50 rounded-lg p-4">
             <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
-              <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full font-medium">
-                {widgetInfo.parentPage.name}
-              </span>
-              <span>→</span>
-              <span className="font-medium text-gray-700">{widgetInfo.name}</span>
+              {widgetInfo.isPage ? (
+                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium">
+                  📄 {widgetInfo.name} (Page)
+                </span>
+              ) : (
+                <>
+                  <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full font-medium">
+                    {widgetInfo.parentPage?.name}
+                  </span>
+                  <span>→</span>
+                  <span className="font-medium text-gray-700">{widgetInfo.name}</span>
+                </>
+              )}
             </div>
             <p className="text-sm text-gray-600">{widgetInfo.description}</p>
           </div>

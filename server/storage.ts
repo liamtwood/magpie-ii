@@ -99,13 +99,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getIssuesForTarget(targetKey: string): Promise<Issue[]> {
-    const [target] = await db.select().from(deliveryTargets).where(eq(deliveryTargets.key, targetKey));
-    if (!target) return [];
+    // Page-to-widget mapping for page-level queries
+    const pageWidgets: Record<string, string[]> = {
+      'dashboard': ['dashboard', 'squad-health-check', 'issue-filter', 'issue-cards'],
+      'squad': ['squad', 'pitch-view', 'squad-list'],
+      'player-search': ['player-search', 'search-filters', 'search-results'],
+      'shortlists': ['shortlists', 'shortlist-cards', 'shortlist-panel'],
+      'global': ['global', 'ai-assistant', 'feedback-system', 'player-panel', 'timeline-modal', 'whatsapp-panel', 'create-shortlist-modal'],
+    };
     
-    const assignments = await db.select().from(issueAssignments).where(eq(issueAssignments.targetId, target.id));
+    // Determine which keys to search for (page includes all its widgets)
+    const keysToSearch = pageWidgets[targetKey] || [targetKey];
+    
+    // Get all matching targets
+    const targets = await db.select().from(deliveryTargets).where(inArray(deliveryTargets.key, keysToSearch));
+    if (targets.length === 0) return [];
+    
+    const targetIds = targets.map(t => t.id);
+    const assignments = await db.select().from(issueAssignments).where(inArray(issueAssignments.targetId, targetIds));
     if (assignments.length === 0) return [];
     
-    const issueIds = assignments.map(a => a.issueId);
+    // Deduplicate issue IDs
+    const issueIds = [...new Set(assignments.map(a => a.issueId))];
     return await db.select().from(issues).where(inArray(issues.id, issueIds)).orderBy(desc(issues.createdAt));
   }
 
