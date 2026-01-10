@@ -1,6 +1,6 @@
 import { issues, deliveryTargets, issueAssignments, type Issue, type InsertIssue, type DeliveryTarget, type InsertDeliveryTarget, type IssueAssignment, type InsertIssueAssignment } from "../shared/schema";
 import { db } from "./db";
-import { eq, desc, isNull, inArray } from "drizzle-orm";
+import { eq, asc, isNull, inArray } from "drizzle-orm";
 
 export interface IStorage {
   getAllIssues(): Promise<Issue[]>;
@@ -22,7 +22,7 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getAllIssues(): Promise<Issue[]> {
-    return await db.select().from(issues).orderBy(desc(issues.createdAt));
+    return await db.select().from(issues).orderBy(asc(issues.id));
   }
 
   async getIssue(id: number): Promise<Issue | undefined> {
@@ -40,7 +40,7 @@ export class DatabaseStorage implements IStorage {
 
   async getIssuesByParent(parentId: number | null): Promise<Issue[]> {
     if (parentId === null) {
-      return await db.select().from(issues).where(isNull(issues.parentId)).orderBy(desc(issues.createdAt));
+      return await db.select().from(issues).where(isNull(issues.parentId)).orderBy(asc(issues.id));
     }
     return await db.select().from(issues).where(eq(issues.parentId, parentId)).orderBy(issues.id);
   }
@@ -130,7 +130,7 @@ export class DatabaseStorage implements IStorage {
     
     if (allIssueIds.length === 0) return [];
     
-    return await db.select().from(issues).where(inArray(issues.id, allIssueIds)).orderBy(desc(issues.createdAt));
+    return await db.select().from(issues).where(inArray(issues.id, allIssueIds)).orderBy(asc(issues.id));
   }
 
   async setIssueAssignments(issueId: number, targetIds: number[]): Promise<void> {
