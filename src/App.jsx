@@ -1915,8 +1915,15 @@ export default function MagpieV2() {
       </div>
 
       {squadViewMode === 'list' ? (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <table className="w-full">
+        <div className="space-y-4">
+          <div className="flex items-center">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+              Squad List
+              <InfoButton widgetKey="squad-list" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} />
+            </h2>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr className="text-xs font-semibold text-gray-500 uppercase">
                 <th className="px-3 py-3 text-center w-12">#</th>
@@ -2011,6 +2018,7 @@ export default function MagpieV2() {
             </tbody>
           </table>
         </div>
+      </div>
       ) : (
         <div className="flex gap-6">
           <WidgetHighlight widgetId="pitch-view" discoverMode={widgetDiscoverMode} className="flex-1 bg-gradient-to-b from-green-600 to-green-700 rounded-xl p-6 relative" style={{ minHeight: '600px' }}>
