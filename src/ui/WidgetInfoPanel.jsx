@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, ChevronDown, FileText, AlertCircle, Lightbulb, ExternalLink } from 'lucide-react';
+import { X, ChevronDown, FileText, AlertCircle, Lightbulb, ExternalLink, Bug, Plus } from 'lucide-react';
 import { WIDGET_TARGETS, getWidgetInfo, getAllWidgets } from './WidgetTargets';
 
-export function WidgetInfoPanel({ isOpen, onClose, widgetKey, onChangeWidget }) {
+export function WidgetInfoPanel({ isOpen, onClose, widgetKey, onChangeWidget, onReportIssue }) {
   const [issues, setIssues] = useState([]);
   const [requirements, setRequirements] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -214,7 +214,14 @@ export function WidgetInfoPanel({ isOpen, onClose, widgetKey, onChangeWidget }) 
         </div>
       </div>
       
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
+      <div className="p-4 border-t border-gray-200 bg-gray-50 space-y-3">
+        <button
+          onClick={() => onReportIssue?.(selectedWidget, widgetInfo?.name)}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-white rounded-lg font-medium transition-colors"
+        >
+          <Bug className="h-4 w-4" />
+          <span>Report Issue for {widgetInfo?.isPage ? 'Page' : 'Widget'}</span>
+        </button>
         <p className="text-xs text-gray-500 text-center">
           Click the ? icon on any widget to see its info
         </p>

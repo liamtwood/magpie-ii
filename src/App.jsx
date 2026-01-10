@@ -3744,6 +3744,11 @@ export default function MagpieV2() {
         onClose={() => setShowWidgetInfoPanel(false)}
         widgetKey={activeWidgetKey}
         onChangeWidget={(key) => setActiveWidgetKey(key)}
+        onReportIssue={(widgetKey, widgetName) => {
+          setShowWidgetInfoPanel(false);
+          setIssuesPanelFilters({ type: 'all', screen: widgetKey });
+          setShowIssuesPanel(true);
+        }}
       />
 
       <style>{`
