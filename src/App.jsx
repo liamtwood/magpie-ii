@@ -12,6 +12,7 @@ import WhatsAppPanel from './ui/WhatsAppPanel';
 import EnhancedPlayerProfile from './ui/EnhancedPlayerProfile';
 import PlayerVisualizer from './ui/PlayerVisualizer';
 import PlayerSwipe from './ui/PlayerSwipe';
+import { FeedbackButton, IssuesPanel } from './ui/FeedbackSystem';
 
 // Data source badge component
 const SourceBadge = ({ source }) => {
@@ -166,6 +167,7 @@ export default function MagpieV2() {
   const [expandedShortlist, setExpandedShortlist] = useState('trippier');
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showIssuesPanel, setShowIssuesPanel] = useState(false);
   const [newShortlistData, setNewShortlistData] = useState(null);
   const [showDismissModal, setShowDismissModal] = useState(false);
   const [dismissingIssue, setDismissingIssue] = useState(null);
@@ -3487,6 +3489,15 @@ export default function MagpieV2() {
         messages={activeWhatsAppShortlist ? getWhatsAppGroup(activeWhatsAppShortlist.id).messages : []}
         participants={activeWhatsAppShortlist ? getWhatsAppGroup(activeWhatsAppShortlist.id).participants : []}
         onInitiateGroup={handleInitiateWhatsAppGroup}
+      />
+
+      <FeedbackButton 
+        currentScreen={activeScreen} 
+        onOpenPanel={() => setShowIssuesPanel(true)} 
+      />
+      <IssuesPanel 
+        isOpen={showIssuesPanel} 
+        onClose={() => setShowIssuesPanel(false)} 
       />
 
       <style>{`

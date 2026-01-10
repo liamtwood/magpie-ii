@@ -1,0 +1,414 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Bug, Lightbulb, HelpCircle, X, Send, ChevronDown,
+  AlertCircle, Clock, Zap, Flag, Filter, CheckCircle,
+  Circle, Trash2, Edit2, MessageSquare
+} from 'lucide-react';
+
+const ISSUE_TYPES = [
+  { id: 'bug', label: 'Bug', icon: Bug, color: 'red' },
+  { id: 'enhancement', label: 'Enhancement', icon: Lightbulb, color: 'amber' },
+  { id: 'question', label: 'Question', icon: HelpCircle, color: 'blue' },
+];
+
+const PRIORITIES = [
+  { id: 'low', label: 'Low', color: 'slate' },
+  { id: 'medium', label: 'Medium', color: 'blue' },
+  { id: 'high', label: 'High', color: 'orange' },
+  { id: 'critical', label: 'Critical', color: 'red' },
+];
+
+const FIX_BY = [
+  { id: 'immediately', label: 'Immediately' },
+  { id: 'current-release', label: 'Current Release' },
+  { id: 'future-release', label: 'Future Release' },
+];
+
+const STATUSES = [
+  { id: 'new', label: 'New', color: 'blue' },
+  { id: 'in-progress', label: 'In Progress', color: 'amber' },
+  { id: 'resolved', label: 'Resolved', color: 'green' },
+  { id: 'closed', label: 'Closed', color: 'slate' },
+];
+
+const getStoredIssues = () => {
+  try {
+    const stored = localStorage.getItem('magpie-issues');
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveIssues = (issues) => {
+  localStorage.setItem('magpie-issues', JSON.stringify(issues));
+};
+
+const FeedbackButton = ({ currentScreen, onOpenPanel }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [issues, setIssues] = useState(getStoredIssues);
+  const [formData, setFormData] = useState({
+    type: 'bug',
+    priority: 'medium',
+    fixBy: 'current-release',
+    title: '',
+    description: '',
+  });
+
+  useEffect(() => {
+    saveIssues(issues);
+  }, [issues]);
+
+  const handleSubmit = () => {
+    if (!formData.title.trim()) return;
+
+    const newIssue = {
+      id: Date.now().toString(),
+      ...formData,
+      screen: currentScreen,
+      status: 'new',
+      createdAt: new Date().toISOString(),
+      createdBy: 'Current User',
+    };
+
+    setIssues(prev => [newIssue, ...prev]);
+    setFormData({
+      type: 'bug',
+      priority: 'medium',
+      fixBy: 'current-release',
+      title: '',
+      description: '',
+    });
+    setIsModalOpen(false);
+  };
+
+  const TypeIcon = ISSUE_TYPES.find(t => t.id === formData.type)?.icon || Bug;
+
+  return (
+    <>
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
+        <button
+          onClick={() => onOpenPanel()}
+          className="w-12 h-12 bg-slate-700 hover:bg-slate-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 relative"
+          title="View Issues"
+        >
+          <MessageSquare className="w-5 h-5" />
+          {issues.filter(i => i.status === 'new').length > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+              {issues.filter(i => i.status === 'new').length}
+            </span>
+          )}
+        </button>
+        
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="w-12 h-12 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+          title="Report Issue"
+        >
+          <Bug className="w-5 h-5" />
+        </button>
+      </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-800 rounded-xl border border-slate-700 w-full max-w-md shadow-2xl">
+            <div className="flex items-center justify-between p-4 border-b border-slate-700">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
+                  <TypeIcon className="w-5 h-5 text-amber-400" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-white">Report Issue</h2>
+                  <p className="text-xs text-slate-400">From: {currentScreen}</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
+
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Type</label>
+                <div className="flex gap-2">
+                  {ISSUE_TYPES.map(type => {
+                    const Icon = type.icon;
+                    return (
+                      <button
+                        key={type.id}
+                        onClick={() => setFormData(prev => ({ ...prev, type: type.id }))}
+                        className={`flex-1 py-2 px-3 rounded-lg border flex items-center justify-center gap-2 transition-all ${
+                          formData.type === type.id
+                            ? type.color === 'red' ? 'bg-red-500/20 border-red-500 text-red-400'
+                            : type.color === 'amber' ? 'bg-amber-500/20 border-amber-500 text-amber-400'
+                            : 'bg-blue-500/20 border-blue-500 text-blue-400'
+                            : 'bg-slate-700/50 border-slate-600 text-slate-400 hover:border-slate-500'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span className="text-sm">{type.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Title</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Brief description of the issue..."
+                  className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Provide more details..."
+                  rows={3}
+                  className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Priority</label>
+                  <select
+                    value={formData.priority}
+                    onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
+                    className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
+                  >
+                    {PRIORITIES.map(p => (
+                      <option key={p.id} value={p.id}>{p.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Fix By</label>
+                  <select
+                    value={formData.fixBy}
+                    onChange={(e) => setFormData(prev => ({ ...prev, fixBy: e.target.value }))}
+                    className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
+                  >
+                    {FIX_BY.map(f => (
+                      <option key={f.id} value={f.id}>{f.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-slate-700 flex gap-3">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="flex-1 py-2 px-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={!formData.title.trim()}
+                className="flex-1 py-2 px-4 bg-amber-500 hover:bg-amber-400 text-slate-900 font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <Send className="w-4 h-4" />
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+const IssuesPanel = ({ isOpen, onClose }) => {
+  const [issues, setIssues] = useState(getStoredIssues);
+  const [filterType, setFilterType] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
+
+  useEffect(() => {
+    const handleStorage = () => setIssues(getStoredIssues());
+    window.addEventListener('storage', handleStorage);
+    if (isOpen) setIssues(getStoredIssues());
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [isOpen]);
+
+  const updateIssueStatus = (id, newStatus) => {
+    const updated = issues.map(issue => 
+      issue.id === id ? { ...issue, status: newStatus } : issue
+    );
+    setIssues(updated);
+    saveIssues(updated);
+  };
+
+  const deleteIssue = (id) => {
+    const updated = issues.filter(issue => issue.id !== id);
+    setIssues(updated);
+    saveIssues(updated);
+  };
+
+  const filteredIssues = issues.filter(issue => {
+    if (filterType !== 'all' && issue.type !== filterType) return false;
+    if (filterStatus !== 'all' && issue.status !== filterStatus) return false;
+    return true;
+  });
+
+  const getTypeIcon = (type) => {
+    const found = ISSUE_TYPES.find(t => t.id === type);
+    return found?.icon || Bug;
+  };
+
+  const getTypeColor = (type) => {
+    const found = ISSUE_TYPES.find(t => t.id === type);
+    return found?.color || 'slate';
+  };
+
+  const getPriorityColor = (priority) => {
+    const found = PRIORITIES.find(p => p.id === priority);
+    return found?.color || 'slate';
+  };
+
+  const getStatusColor = (status) => {
+    const found = STATUSES.find(s => s.id === status);
+    return found?.color || 'slate';
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-y-0 right-0 w-[480px] bg-slate-800 border-l border-slate-700 z-50 shadow-2xl flex flex-col">
+      <div className="flex items-center justify-between p-4 border-b border-slate-700">
+        <div>
+          <h2 className="text-lg font-bold text-white">Issues</h2>
+          <p className="text-xs text-slate-400">{issues.length} total, {issues.filter(i => i.status === 'new').length} new</p>
+        </div>
+        <button 
+          onClick={onClose}
+          className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+        >
+          <X className="w-5 h-5 text-slate-400" />
+        </button>
+      </div>
+
+      <div className="p-4 border-b border-slate-700 flex gap-2">
+        <select
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+          className="px-3 py-1.5 bg-slate-700/50 border border-slate-600 rounded-lg text-sm text-white focus:outline-none"
+        >
+          <option value="all">All Types</option>
+          {ISSUE_TYPES.map(t => (
+            <option key={t.id} value={t.id}>{t.label}</option>
+          ))}
+        </select>
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="px-3 py-1.5 bg-slate-700/50 border border-slate-600 rounded-lg text-sm text-white focus:outline-none"
+        >
+          <option value="all">All Statuses</option>
+          {STATUSES.map(s => (
+            <option key={s.id} value={s.id}>{s.label}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {filteredIssues.length === 0 ? (
+          <div className="text-center py-12 text-slate-500">
+            <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <p>No issues found</p>
+          </div>
+        ) : (
+          filteredIssues.map(issue => {
+            const TypeIcon = getTypeIcon(issue.type);
+            const typeColor = getTypeColor(issue.type);
+            const priorityColor = getPriorityColor(issue.priority);
+            const statusColor = getStatusColor(issue.status);
+
+            return (
+              <div 
+                key={issue.id} 
+                className="bg-slate-700/50 border border-slate-600 rounded-lg p-4"
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                    typeColor === 'red' ? 'bg-red-500/20' :
+                    typeColor === 'amber' ? 'bg-amber-500/20' :
+                    'bg-blue-500/20'
+                  }`}>
+                    <TypeIcon className={`w-4 h-4 ${
+                      typeColor === 'red' ? 'text-red-400' :
+                      typeColor === 'amber' ? 'text-amber-400' :
+                      'text-blue-400'
+                    }`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-white truncate">{issue.title}</h3>
+                    {issue.description && (
+                      <p className="text-sm text-slate-400 mt-1 line-clamp-2">{issue.description}</p>
+                    )}
+                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                        priorityColor === 'red' ? 'bg-red-500/20 text-red-400' :
+                        priorityColor === 'orange' ? 'bg-orange-500/20 text-orange-400' :
+                        priorityColor === 'blue' ? 'bg-blue-500/20 text-blue-400' :
+                        'bg-slate-500/20 text-slate-400'
+                      }`}>
+                        {issue.priority}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                        statusColor === 'green' ? 'bg-green-500/20 text-green-400' :
+                        statusColor === 'amber' ? 'bg-amber-500/20 text-amber-400' :
+                        statusColor === 'blue' ? 'bg-blue-500/20 text-blue-400' :
+                        'bg-slate-500/20 text-slate-400'
+                      }`}>
+                        {issue.status}
+                      </span>
+                      <span className="text-xs text-slate-500">{issue.screen}</span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-2 text-xs text-slate-500">
+                      <Clock className="w-3 h-3" />
+                      <span>{new Date(issue.createdAt).toLocaleDateString()}</span>
+                      <span>•</span>
+                      <span>{issue.fixBy.replace('-', ' ')}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-600">
+                  <select
+                    value={issue.status}
+                    onChange={(e) => updateIssueStatus(issue.id, e.target.value)}
+                    className="px-2 py-1 bg-slate-600/50 border border-slate-500 rounded text-xs text-white focus:outline-none"
+                  >
+                    {STATUSES.map(s => (
+                      <option key={s.id} value={s.id}>{s.label}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => deleteIssue(issue.id)}
+                    className="ml-auto p-1.5 hover:bg-red-500/20 rounded text-slate-400 hover:text-red-400 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+};
+
+export { FeedbackButton, IssuesPanel, getStoredIssues, saveIssues };
