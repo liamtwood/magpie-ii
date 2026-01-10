@@ -1589,7 +1589,7 @@ export default function MagpieV2() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-xl font-bold text-gray-900 flex items-center">
-                Squad Health Check
+                Issues Summary
                 <InfoButton widgetKey="squad-health-check" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} />
               </h2>
               <p className="text-gray-500 mt-1">Proactive risk detection across your squad</p>
@@ -1648,8 +1648,8 @@ export default function MagpieV2() {
           </div>
         </div>
 
-        <div>
-          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+        <div className="space-y-4">
+          <h2 className="text-xl font-bold text-gray-900 flex items-center">
             Issues
             <InfoButton widgetKey="issue-cards" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} />
           </h2>
