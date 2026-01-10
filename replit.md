@@ -135,7 +135,13 @@ The application follows a full-stack architecture with React frontend and Expres
 - **Database Persistence**: Issues stored in PostgreSQL database via REST API
 - **Requirements Tracking**: 13 pre-populated Web-App Phase 1 requirements with screen assignments and "Ideas to Discuss" notes
 - **Area Field**: Track which area (e.g., Recruitment) the requirement belongs to
-- **API Endpoints**: GET/POST/PATCH/DELETE at `/api/issues`
+- **Hierarchical Requirements**: Parent-child relationships allow breaking high-level requirements into child stories
+- **Tree View**: Expand/collapse requirements to see child stories with visual hierarchy indicators
+- **Add Story Button**: Create child stories directly from parent requirements
+- **Delivery Targets**: Assign requirements to pages (Dashboard, Squad, etc.) or widgets (AI Assistant, Player Panel, etc.)
+- **Grouped Filtering**: Filter panel shows pages and widgets in separate optgroups
+- **API Endpoints**: GET/POST/PATCH/DELETE at `/api/issues`, GET at `/api/delivery-targets`
+- **Database Tables**: `issues` (with parentId), `delivery_targets`, `issue_assignments`
 - **Component**: `src/ui/FeedbackSystem.jsx`
 
 ### 13. Player Swipe (Dating App Style)
