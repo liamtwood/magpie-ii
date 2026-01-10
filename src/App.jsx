@@ -12,7 +12,7 @@ import WhatsAppPanel from './ui/WhatsAppPanel';
 import EnhancedPlayerProfile from './ui/EnhancedPlayerProfile';
 import PlayerVisualizer from './ui/PlayerVisualizer';
 import PlayerSwipe from './ui/PlayerSwipe';
-import { FeedbackButton, IssuesPanel } from './ui/FeedbackSystem';
+import { FeedbackButton, IssuesPanel, getStoredIssues, saveIssues } from './ui/FeedbackSystem';
 
 // Data source badge component
 const SourceBadge = ({ source }) => {
@@ -168,6 +168,18 @@ export default function MagpieV2() {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showIssuesPanel, setShowIssuesPanel] = useState(false);
+  const [feedbackIssues, setFeedbackIssues] = useState(getStoredIssues);
+  
+  const handleAddIssue = (newIssue) => {
+    const updated = [newIssue, ...feedbackIssues];
+    setFeedbackIssues(updated);
+    saveIssues(updated);
+  };
+  
+  const handleUpdateIssues = (updated) => {
+    setFeedbackIssues(updated);
+    saveIssues(updated);
+  };
   const [newShortlistData, setNewShortlistData] = useState(null);
   const [showDismissModal, setShowDismissModal] = useState(false);
   const [dismissingIssue, setDismissingIssue] = useState(null);
@@ -3493,11 +3505,15 @@ export default function MagpieV2() {
 
       <FeedbackButton 
         currentScreen={activeScreen} 
-        onOpenPanel={() => setShowIssuesPanel(true)} 
+        onOpenPanel={() => setShowIssuesPanel(true)}
+        issues={feedbackIssues}
+        onAddIssue={handleAddIssue}
       />
       <IssuesPanel 
         isOpen={showIssuesPanel} 
-        onClose={() => setShowIssuesPanel(false)} 
+        onClose={() => setShowIssuesPanel(false)}
+        issues={feedbackIssues}
+        onUpdateIssues={handleUpdateIssues}
       />
 
       <style>{`

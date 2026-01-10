@@ -116,6 +116,17 @@ The application follows a client-side only architecture with no backend:
 - **Visual Styling**: Color-coded tabs matching issue severity (red, amber, green, gray)
 - **Empty States**: Friendly messages when no issues exist in a category
 
+### 14. Feedback System (Bug/Enhancement Tracking)
+- **Floating Button**: Always-visible button in bottom-right corner on all screens
+- **Context-Aware**: Automatically captures which screen the issue was reported from
+- **Issue Types**: Bug, Enhancement, Question (expandable)
+- **Priority Levels**: Low, Medium, High, Critical
+- **Fix By Options**: Immediately, Current Release, Future Release
+- **Status Tracking**: New, In Progress, Resolved, Closed
+- **Issues Panel**: Slide-out panel to view/manage all issues with filtering
+- **localStorage Persistence**: Issues persist between sessions
+- **Component**: `src/ui/FeedbackSystem.jsx`
+
 ### 13. Player Swipe (Dating App Style)
 - **Issue Cards View**: Large cards showing squad issues (contract expiring, injuries, succession) with risk percentages
 - **Card Sizing**: Card size and glow intensity reflects issue criticality (higher risk = bigger/brighter)

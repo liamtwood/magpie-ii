@@ -44,9 +44,8 @@ const saveIssues = (issues) => {
   localStorage.setItem('magpie-issues', JSON.stringify(issues));
 };
 
-const FeedbackButton = ({ currentScreen, onOpenPanel }) => {
+const FeedbackButton = ({ currentScreen, onOpenPanel, issues = [], onAddIssue }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [issues, setIssues] = useState(getStoredIssues);
   const [formData, setFormData] = useState({
     type: 'bug',
     priority: 'medium',
@@ -54,10 +53,6 @@ const FeedbackButton = ({ currentScreen, onOpenPanel }) => {
     title: '',
     description: '',
   });
-
-  useEffect(() => {
-    saveIssues(issues);
-  }, [issues]);
 
   const handleSubmit = () => {
     if (!formData.title.trim()) return;
@@ -71,7 +66,7 @@ const FeedbackButton = ({ currentScreen, onOpenPanel }) => {
       createdBy: 'Current User',
     };
 
-    setIssues(prev => [newIssue, ...prev]);
+    onAddIssue(newIssue);
     setFormData({
       type: 'bug',
       priority: 'medium',
@@ -230,30 +225,20 @@ const FeedbackButton = ({ currentScreen, onOpenPanel }) => {
   );
 };
 
-const IssuesPanel = ({ isOpen, onClose }) => {
-  const [issues, setIssues] = useState(getStoredIssues);
+const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssues }) => {
   const [filterType, setFilterType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
-
-  useEffect(() => {
-    const handleStorage = () => setIssues(getStoredIssues());
-    window.addEventListener('storage', handleStorage);
-    if (isOpen) setIssues(getStoredIssues());
-    return () => window.removeEventListener('storage', handleStorage);
-  }, [isOpen]);
 
   const updateIssueStatus = (id, newStatus) => {
     const updated = issues.map(issue => 
       issue.id === id ? { ...issue, status: newStatus } : issue
     );
-    setIssues(updated);
-    saveIssues(updated);
+    onUpdateIssues(updated);
   };
 
   const deleteIssue = (id) => {
     const updated = issues.filter(issue => issue.id !== id);
-    setIssues(updated);
-    saveIssues(updated);
+    onUpdateIssues(updated);
   };
 
   const filteredIssues = issues.filter(issue => {
