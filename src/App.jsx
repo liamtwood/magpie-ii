@@ -1589,7 +1589,7 @@ export default function MagpieV2() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-xl font-bold text-gray-900 flex items-center">
-                Issues Summary
+                Squad Health Check
                 <InfoButton widgetKey="squad-health-check" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} />
               </h2>
               <p className="text-gray-500 mt-1">Proactive risk detection across your squad</p>
@@ -1650,8 +1650,8 @@ export default function MagpieV2() {
 
         <div className="space-y-4">
           <h2 className="text-xl font-bold text-gray-900 flex items-center">
-            Issues
-            <InfoButton widgetKey="issue-cards" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} />
+            Issues Summary
+            <InfoButton widgetKey="issue-filter" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} />
           </h2>
           <div className="flex gap-2 mb-4">
             <button
@@ -1704,81 +1704,88 @@ export default function MagpieV2() {
             </button>
           </div>
 
-          {issuesTab === 'critical' && (
-            <div className="space-y-3">
-              {criticalIssues.length > 0 ? (
-                criticalIssues.map(issue => <IssueCard key={issue.id} issue={issue} />)
-              ) : (
-                <div className="bg-green-50 rounded-xl border border-green-200 p-6 text-center">
-                  <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                  <p className="text-green-700 font-medium">No critical issues</p>
-                </div>
-              )}
-            </div>
-          )}
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+              Issues List
+              <InfoButton widgetKey="issue-cards" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} />
+            </h2>
 
-          {issuesTab === 'moderate' && (
-            <div className="space-y-3">
-              {moderateIssues.length > 0 ? (
-                moderateIssues.map(issue => <IssueCard key={issue.id} issue={issue} />)
-              ) : (
-                <div className="bg-green-50 rounded-xl border border-green-200 p-6 text-center">
-                  <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                  <p className="text-green-700 font-medium">No moderate issues</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {issuesTab === 'resolved' && (
-            <div className="space-y-3">
-              {Object.keys(dismissedIssues).length > 0 ? (
-                squadIssues.filter(i => dismissedIssues[i.id]).map(issue => (
-                  <div key={issue.id} className="bg-green-50 rounded-xl border border-green-200 p-4 flex items-center gap-4">
-                    <PlayerAvatar name={issue.player.name} image={playerAvatars[issue.player.name]} size="md" />
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900">{issue.player.name}</div>
-                      <div className="text-sm text-gray-600">{issue.title}</div>
-                    </div>
-                    <div className="flex items-center gap-2 text-green-600">
-                      <CheckCircle2 className="h-5 w-5" />
-                      <span className="text-sm font-medium">Resolved</span>
-                    </div>
+            {issuesTab === 'critical' && (
+              <div className="space-y-3">
+                {criticalIssues.length > 0 ? (
+                  criticalIssues.map(issue => <IssueCard key={issue.id} issue={issue} />)
+                ) : (
+                  <div className="bg-green-50 rounded-xl border border-green-200 p-6 text-center">
+                    <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                    <p className="text-green-700 font-medium">No critical issues</p>
                   </div>
-                ))
-              ) : (
-                <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 text-center">
-                  <p className="text-gray-500">No resolved issues yet</p>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
 
-          {issuesTab === 'snoozed' && (
-            <div className="space-y-3">
-              {Object.keys(snoozedIssues).length > 0 ? (
-                squadIssues.filter(i => snoozedIssues[i.id]).map(issue => (
-                  <div key={issue.id} className="bg-gray-50 rounded-xl border border-gray-200 p-4 flex items-center gap-4">
-                    <PlayerAvatar name={issue.player.name} image={playerAvatars[issue.player.name]} size="md" />
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900">{issue.player.name}</div>
-                      <div className="text-sm text-gray-600">{issue.title}</div>
-                    </div>
-                    <div className="flex items-center gap-2 text-amber-600">
-                      <Pause className="h-5 w-5" />
-                      <span className="text-sm font-medium">
-                        Until {snoozedIssues[issue.id].until === 'jan2026' ? 'Jan 2026' : snoozedIssues[issue.id].until}
-                      </span>
-                    </div>
+            {issuesTab === 'moderate' && (
+              <div className="space-y-3">
+                {moderateIssues.length > 0 ? (
+                  moderateIssues.map(issue => <IssueCard key={issue.id} issue={issue} />)
+                ) : (
+                  <div className="bg-green-50 rounded-xl border border-green-200 p-6 text-center">
+                    <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                    <p className="text-green-700 font-medium">No moderate issues</p>
                   </div>
-                ))
-              ) : (
-                <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 text-center">
-                  <p className="text-gray-500">No snoozed issues</p>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+
+            {issuesTab === 'resolved' && (
+              <div className="space-y-3">
+                {Object.keys(dismissedIssues).length > 0 ? (
+                  squadIssues.filter(i => dismissedIssues[i.id]).map(issue => (
+                    <div key={issue.id} className="bg-green-50 rounded-xl border border-green-200 p-4 flex items-center gap-4">
+                      <PlayerAvatar name={issue.player.name} image={playerAvatars[issue.player.name]} size="md" />
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900">{issue.player.name}</div>
+                        <div className="text-sm text-gray-600">{issue.title}</div>
+                      </div>
+                      <div className="flex items-center gap-2 text-green-600">
+                        <CheckCircle2 className="h-5 w-5" />
+                        <span className="text-sm font-medium">Resolved</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 text-center">
+                    <p className="text-gray-500">No resolved issues yet</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {issuesTab === 'snoozed' && (
+              <div className="space-y-3">
+                {Object.keys(snoozedIssues).length > 0 ? (
+                  squadIssues.filter(i => snoozedIssues[i.id]).map(issue => (
+                    <div key={issue.id} className="bg-gray-50 rounded-xl border border-gray-200 p-4 flex items-center gap-4">
+                      <PlayerAvatar name={issue.player.name} image={playerAvatars[issue.player.name]} size="md" />
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900">{issue.player.name}</div>
+                        <div className="text-sm text-gray-600">{issue.title}</div>
+                      </div>
+                      <div className="flex items-center gap-2 text-amber-600">
+                        <Pause className="h-5 w-5" />
+                        <span className="text-sm font-medium">
+                          Until {snoozedIssues[issue.id].until === 'jan2026' ? 'Jan 2026' : snoozedIssues[issue.id].until}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 text-center">
+                    <p className="text-gray-500">No snoozed issues</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
