@@ -111,17 +111,26 @@ export class DatabaseStorage implements IStorage {
     // Determine which keys to search for (page includes all its widgets)
     const keysToSearch = pageWidgets[targetKey] || [targetKey];
     
-    // Get all matching targets
+    // Get issues from issue_assignments table
     const targets = await db.select().from(deliveryTargets).where(inArray(deliveryTargets.key, keysToSearch));
-    if (targets.length === 0) return [];
+    let assignedIssueIds: number[] = [];
     
-    const targetIds = targets.map(t => t.id);
-    const assignments = await db.select().from(issueAssignments).where(inArray(issueAssignments.targetId, targetIds));
-    if (assignments.length === 0) return [];
+    if (targets.length > 0) {
+      const targetIds = targets.map(t => t.id);
+      const assignments = await db.select().from(issueAssignments).where(inArray(issueAssignments.targetId, targetIds));
+      assignedIssueIds = assignments.map(a => a.issueId);
+    }
     
-    // Deduplicate issue IDs
-    const issueIds = [...new Set(assignments.map(a => a.issueId))];
-    return await db.select().from(issues).where(inArray(issues.id, issueIds)).orderBy(desc(issues.createdAt));
+    // Also get issues where the screen field matches any of the keys
+    const screenIssues = await db.select().from(issues).where(inArray(issues.screen, keysToSearch));
+    const screenIssueIds = screenIssues.map(i => i.id);
+    
+    // Combine and deduplicate
+    const allIssueIds = [...new Set([...assignedIssueIds, ...screenIssueIds])];
+    
+    if (allIssueIds.length === 0) return [];
+    
+    return await db.select().from(issues).where(inArray(issues.id, allIssueIds)).orderBy(desc(issues.createdAt));
   }
 
   async setIssueAssignments(issueId: number, targetIds: number[]): Promise<void> {
