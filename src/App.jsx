@@ -12,7 +12,7 @@ import WhatsAppPanel from './ui/WhatsAppPanel';
 import EnhancedPlayerProfile from './ui/EnhancedPlayerProfile';
 import PlayerVisualizer from './ui/PlayerVisualizer';
 import PlayerSwipe from './ui/PlayerSwipe';
-import { FeedbackButton, IssuesPanel, getStoredIssues, saveIssues } from './ui/FeedbackSystem';
+import { FeedbackButton, IssuesPanel } from './ui/FeedbackSystem';
 
 // Data source badge component
 const SourceBadge = ({ source }) => {
@@ -168,17 +168,68 @@ export default function MagpieV2() {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showIssuesPanel, setShowIssuesPanel] = useState(false);
-  const [feedbackIssues, setFeedbackIssues] = useState(getStoredIssues);
+  const [feedbackIssues, setFeedbackIssues] = useState([]);
+  const [issuesLoading, setIssuesLoading] = useState(true);
   
-  const handleAddIssue = (newIssue) => {
-    const updated = [newIssue, ...feedbackIssues];
-    setFeedbackIssues(updated);
-    saveIssues(updated);
+  useEffect(() => {
+    fetchIssues();
+  }, []);
+  
+  const fetchIssues = async () => {
+    try {
+      const response = await fetch('/api/issues');
+      if (response.ok) {
+        const data = await response.json();
+        setFeedbackIssues(data);
+      }
+    } catch (error) {
+      console.error('Error fetching issues:', error);
+    } finally {
+      setIssuesLoading(false);
+    }
   };
   
-  const handleUpdateIssues = (updated) => {
-    setFeedbackIssues(updated);
-    saveIssues(updated);
+  const handleAddIssue = async (newIssue) => {
+    try {
+      const response = await fetch('/api/issues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newIssue),
+      });
+      if (response.ok) {
+        const created = await response.json();
+        setFeedbackIssues(prev => [created, ...prev]);
+      }
+    } catch (error) {
+      console.error('Error creating issue:', error);
+    }
+  };
+  
+  const handleUpdateIssue = async (id, updates) => {
+    try {
+      const response = await fetch(`/api/issues/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      if (response.ok) {
+        const updated = await response.json();
+        setFeedbackIssues(prev => prev.map(issue => issue.id === id ? updated : issue));
+      }
+    } catch (error) {
+      console.error('Error updating issue:', error);
+    }
+  };
+  
+  const handleDeleteIssue = async (id) => {
+    try {
+      const response = await fetch(`/api/issues/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        setFeedbackIssues(prev => prev.filter(issue => issue.id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting issue:', error);
+    }
   };
   const [newShortlistData, setNewShortlistData] = useState(null);
   const [showDismissModal, setShowDismissModal] = useState(false);
@@ -3513,7 +3564,8 @@ export default function MagpieV2() {
         isOpen={showIssuesPanel} 
         onClose={() => setShowIssuesPanel(false)}
         issues={feedbackIssues}
-        onUpdateIssues={handleUpdateIssues}
+        onUpdateIssue={handleUpdateIssue}
+        onDeleteIssue={handleDeleteIssue}
       />
 
       <style>{`

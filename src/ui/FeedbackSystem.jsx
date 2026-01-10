@@ -9,6 +9,7 @@ const ISSUE_TYPES = [
   { id: 'bug', label: 'Bug', icon: Bug, color: 'red' },
   { id: 'enhancement', label: 'Enhancement', icon: Lightbulb, color: 'amber' },
   { id: 'question', label: 'Question', icon: HelpCircle, color: 'blue' },
+  { id: 'requirement', label: 'Requirement', icon: Flag, color: 'purple' },
 ];
 
 const PRIORITIES = [
@@ -139,6 +140,7 @@ const FeedbackButton = ({ currentScreen, onOpenPanel, issues = [], onAddIssue })
                           formData.type === type.id
                             ? type.color === 'red' ? 'bg-red-500/20 border-red-500 text-red-400'
                             : type.color === 'amber' ? 'bg-amber-500/20 border-amber-500 text-amber-400'
+                            : type.color === 'purple' ? 'bg-purple-500/20 border-purple-500 text-purple-400'
                             : 'bg-blue-500/20 border-blue-500 text-blue-400'
                             : 'bg-slate-700/50 border-slate-600 text-slate-400 hover:border-slate-500'
                         }`}
@@ -225,20 +227,16 @@ const FeedbackButton = ({ currentScreen, onOpenPanel, issues = [], onAddIssue })
   );
 };
 
-const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssues }) => {
+const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssue, onDeleteIssue }) => {
   const [filterType, setFilterType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
 
   const updateIssueStatus = (id, newStatus) => {
-    const updated = issues.map(issue => 
-      issue.id === id ? { ...issue, status: newStatus } : issue
-    );
-    onUpdateIssues(updated);
+    onUpdateIssue(id, { status: newStatus });
   };
 
   const deleteIssue = (id) => {
-    const updated = issues.filter(issue => issue.id !== id);
-    onUpdateIssues(updated);
+    onDeleteIssue(id);
   };
 
   const filteredIssues = issues.filter(issue => {
@@ -329,11 +327,13 @@ const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssues }) => {
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                     typeColor === 'red' ? 'bg-red-500/20' :
                     typeColor === 'amber' ? 'bg-amber-500/20' :
+                    typeColor === 'purple' ? 'bg-purple-500/20' :
                     'bg-blue-500/20'
                   }`}>
                     <TypeIcon className={`w-4 h-4 ${
                       typeColor === 'red' ? 'text-red-400' :
                       typeColor === 'amber' ? 'text-amber-400' :
+                      typeColor === 'purple' ? 'text-purple-400' :
                       'text-blue-400'
                     }`} />
                   </div>
@@ -396,4 +396,4 @@ const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssues }) => {
   );
 };
 
-export { FeedbackButton, IssuesPanel, getStoredIssues, saveIssues };
+export { FeedbackButton, IssuesPanel };
