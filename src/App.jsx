@@ -3715,6 +3715,8 @@ export default function MagpieV2() {
           }}
           issues={feedbackIssues}
           onAddIssue={handleAddIssue}
+          onShowWidgetInfo={() => handleWidgetInfoClick('feedback-system')}
+          discoverMode={widgetDiscoverMode}
         />
       </WidgetHighlight>
       <IssuesPanel 
