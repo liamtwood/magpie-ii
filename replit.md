@@ -146,12 +146,15 @@ The application follows a full-stack architecture with React frontend and Expres
 
 ### 15. Widget Discover Mode
 - **Toggle Button**: "Show Widgets" button in page header to enable/disable discover mode
-- **Visual Highlights**: When enabled, widgets get colored outlines and floating labels
-- **Widget Legend**: Appears in bottom-left showing all widgets with color-coded entries
-- **Click-to-Scroll**: Clicking a widget in the legend scrolls to and highlights that component
-- **Currently Wrapped Widgets**: AI Assistant, Feedback System, Pitch View, Shortlist Panel, Player Panel
-- **Component**: `src/ui/WidgetHighlight.jsx`
-- **State**: `widgetDiscoverMode` in App.jsx controls visibility
+- **"?" Info Buttons**: When discover mode is enabled, small "?" icons appear next to widget titles
+- **Widget Info Panel**: Clicking "?" opens a slide-out panel showing:
+  - Widget name and description with page hierarchy (e.g., Dashboard → Squad Health Check)
+  - Associated requirements and issues from the database
+  - Navigation dropdown to browse all pages/widgets without closing the panel
+- **Non-Invasive Design**: Replaced previous colored outline approach with subtle info buttons
+- **Currently Instrumented Widgets**: Squad Health Check, Issues, AI Assistant, Squad Overview, Shortlist Panel, Player Panel, Pitch View
+- **Components**: `src/ui/InfoButton.jsx`, `src/ui/WidgetInfoPanel.jsx`, `src/ui/WidgetTargets.js`
+- **State**: `widgetDiscoverMode`, `showWidgetInfoPanel`, `activeWidgetKey` in App.jsx
 
 ### 13. Player Swipe (Dating App Style)
 - **Issue Cards View**: Large cards showing squad issues (contract expiring, injuries, succession) with risk percentages
