@@ -1487,16 +1487,41 @@ export default function MagpieV2() {
     const IssueCard = ({ issue }) => {
       const severityConfig = getSeverityConfig(issue.severity);
       
+      const handlePlayerClick = () => {
+        const playerData = squad.find(p => p.name === issue.player.name);
+        if (playerData) {
+          setOpenPlayerPanel(playerData);
+        } else {
+          setOpenPlayerPanel({
+            name: issue.player.name,
+            position: issue.player.position,
+            age: issue.player.age || 28,
+            club: 'Newcastle United',
+            value: issue.player.value || '£20M',
+            contract: issue.player.contract || '2026',
+            injury: { risk: 'low', daysOut: 0 },
+            flag: issue.title
+          });
+        }
+      };
+      
       return (
         <div className={`bg-white rounded-xl border-l-4 ${severityConfig.border} border border-gray-200 p-4 hover:shadow-md transition-shadow`}>
           <div className="flex items-start gap-4">
-            <PlayerAvatar name={issue.player.name} size="lg" className="flex-shrink-0" />
+            <div onClick={handlePlayerClick} className="cursor-pointer flex-shrink-0">
+              <PlayerAvatar name={issue.player.name} size="lg" />
+            </div>
             
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900">{issue.player.name}</span>
+                    <span 
+                      onClick={handlePlayerClick}
+                      className="font-semibold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors"
+                    >
+                      {issue.player.name}
+                    </span>
                     <span className="px-2 py-0.5 bg-gray-100 rounded text-xs font-medium text-gray-600">{issue.player.position}</span>
                     {issue.hasActiveShortlist && (
                       <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">Shortlist Active</span>
