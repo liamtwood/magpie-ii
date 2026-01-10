@@ -6,7 +6,7 @@ import {
   Circle, Clock, TrendingUp, Activity, Zap, Shield, Heart,
   Send, X, MoreHorizontal, Filter, ArrowUpDown, Phone, Eye,
   ArrowUp, ArrowDown, ExternalLink, GripVertical, MessageCircle,
-  Home, Trophy, Flag, List, LayoutGrid, FileText
+  Home, Trophy, Flag, List, LayoutGrid, FileText, Settings
 } from 'lucide-react';
 import WhatsAppPanel from './ui/WhatsAppPanel';
 import EnhancedPlayerProfile from './ui/EnhancedPlayerProfile';
@@ -164,6 +164,7 @@ const PlayerAvatar = ({ name, size = 'md', className = '' }) => {
 
 export default function MagpieV2() {
   const [activeScreen, setActiveScreen] = useState('dashboard');
+  const [expandedMenu, setExpandedMenu] = useState(null);
   const [expandedShortlist, setExpandedShortlist] = useState('trippier');
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -365,9 +366,16 @@ export default function MagpieV2() {
     { id: 'squad', name: 'Squad', icon: Users },
     { id: 'player-search', name: 'Player Search', icon: Search },
     { id: 'shortlists', name: 'Shortlists', icon: ClipboardList },
-    { id: 'player-profile', name: 'Player Profile', icon: User },
-    { id: 'player-visualizer', name: 'Player Visualizer', icon: Eye },
-    { id: 'player-swipe', name: 'Player Swipe', icon: Zap },
+    { 
+      id: 'options', 
+      name: 'Options', 
+      icon: Settings,
+      children: [
+        { id: 'player-profile', name: 'Player Profile', icon: User },
+        { id: 'player-visualizer', name: 'Player Visualizer', icon: Eye },
+        { id: 'player-swipe', name: 'Player Swipe', icon: Zap },
+      ]
+    },
   ];
 
   const currentWindow = {
@@ -3106,24 +3114,60 @@ export default function MagpieV2() {
 
         <nav className="p-4 space-y-1">
           {screens.map((screen) => (
-            <button
-              key={screen.id}
-              onClick={() => setActiveScreen(screen.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                activeScreen === screen.id 
-                  ? 'bg-slate-900 text-white' 
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-              }`}
-            >
-              <screen.icon className="h-5 w-5" />
-              <span className="font-medium">{screen.name}</span>
-              {screen.id === 'shortlists' && (
-                <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${activeScreen === screen.id ? 'bg-red-500 text-white' : 'bg-red-100 text-red-700'}`}>{criticalCount}</span>
+            <div key={screen.id}>
+              {screen.children ? (
+                <>
+                  <button
+                    onClick={() => setExpandedMenu(expandedMenu === screen.id ? null : screen.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                      screen.children.some(c => c.id === activeScreen)
+                        ? 'bg-slate-900 text-white' 
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
+                  >
+                    <screen.icon className="h-5 w-5" />
+                    <span className="font-medium">{screen.name}</span>
+                    <ChevronDown className={`ml-auto h-4 w-4 transition-transform ${expandedMenu === screen.id ? 'rotate-180' : ''}`} />
+                  </button>
+                  {expandedMenu === screen.id && (
+                    <div className="ml-4 mt-1 space-y-1">
+                      {screen.children.map((child) => (
+                        <button
+                          key={child.id}
+                          onClick={() => setActiveScreen(child.id)}
+                          className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left transition-colors ${
+                            activeScreen === child.id 
+                              ? 'bg-slate-800 text-white' 
+                              : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                          }`}
+                        >
+                          <child.icon className="h-4 w-4" />
+                          <span className="text-sm">{child.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <button
+                  onClick={() => setActiveScreen(screen.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                    activeScreen === screen.id 
+                      ? 'bg-slate-900 text-white' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                >
+                  <screen.icon className="h-5 w-5" />
+                  <span className="font-medium">{screen.name}</span>
+                  {screen.id === 'shortlists' && (
+                    <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${activeScreen === screen.id ? 'bg-red-500 text-white' : 'bg-red-100 text-red-700'}`}>{criticalCount}</span>
+                  )}
+                  {screen.id === 'dashboard' && criticalIssues.length > 0 && (
+                    <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${activeScreen === screen.id ? 'bg-red-500 text-white' : 'bg-red-100 text-red-700'}`}>{criticalIssues.length}</span>
+                  )}
+                </button>
               )}
-              {screen.id === 'dashboard' && criticalIssues.length > 0 && (
-                <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${activeScreen === screen.id ? 'bg-red-500 text-white' : 'bg-red-100 text-red-700'}`}>{criticalIssues.length}</span>
-              )}
-            </button>
+            </div>
           ))}
         </nav>
 
@@ -3185,7 +3229,8 @@ export default function MagpieV2() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <h1 className="text-xl font-bold text-gray-900">
-                {screens.find(s => s.id === activeScreen)?.name}
+                {screens.find(s => s.id === activeScreen)?.name || 
+                 screens.flatMap(s => s.children || []).find(c => c.id === activeScreen)?.name}
               </h1>
               {getRequirementsForScreen(activeScreen).length > 0 && (
                 <button
