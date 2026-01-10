@@ -32,6 +32,160 @@ const STATUSES = [
   { id: 'closed', label: 'Closed', color: 'slate' },
 ];
 
+const ReportIssueModal = ({ isOpen, onClose, currentScreen, onAddIssue }) => {
+  const [formData, setFormData] = useState({
+    type: 'bug',
+    priority: 'medium',
+    fixBy: 'current-release',
+    title: '',
+    description: '',
+  });
+
+  const handleSubmit = () => {
+    if (!formData.title.trim()) return;
+
+    const newIssue = {
+      ...formData,
+      screen: currentScreen,
+      status: 'new',
+      createdBy: 'Current User',
+    };
+
+    onAddIssue(newIssue);
+    setFormData({
+      type: 'bug',
+      priority: 'medium',
+      fixBy: 'current-release',
+      title: '',
+      description: '',
+    });
+    onClose();
+  };
+
+  const TypeIcon = ISSUE_TYPES.find(t => t.id === formData.type)?.icon || Bug;
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
+      <div className="bg-slate-800 rounded-xl border border-slate-700 w-full max-w-md shadow-2xl">
+        <div className="flex items-center justify-between p-4 border-b border-slate-700">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
+              <TypeIcon className="w-5 h-5 text-amber-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">Report Issue</h2>
+              <p className="text-xs text-slate-400">For: {currentScreen}</p>
+            </div>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5 text-slate-400" />
+          </button>
+        </div>
+
+        <div className="p-4 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Type</label>
+            <div className="flex gap-2">
+              {ISSUE_TYPES.map(type => {
+                const Icon = type.icon;
+                return (
+                  <button
+                    key={type.id}
+                    onClick={() => setFormData(prev => ({ ...prev, type: type.id }))}
+                    className={`flex-1 py-2 px-3 rounded-lg border flex items-center justify-center gap-2 transition-all ${
+                      formData.type === type.id
+                        ? type.color === 'red' ? 'bg-red-500/20 border-red-500 text-red-400'
+                        : type.color === 'amber' ? 'bg-amber-500/20 border-amber-500 text-amber-400'
+                        : type.color === 'purple' ? 'bg-purple-500/20 border-purple-500 text-purple-400'
+                        : 'bg-blue-500/20 border-blue-500 text-blue-400'
+                        : 'bg-slate-700/50 border-slate-600 text-slate-400 hover:border-slate-500'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="text-sm">{type.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Title</label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              placeholder="Brief description of the issue..."
+              className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Provide more details..."
+              rows={3}
+              className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 resize-none"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Priority</label>
+              <select
+                value={formData.priority}
+                onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
+                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
+              >
+                {PRIORITIES.map(p => (
+                  <option key={p.id} value={p.id}>{p.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Fix By</label>
+              <select
+                value={formData.fixBy}
+                onChange={(e) => setFormData(prev => ({ ...prev, fixBy: e.target.value }))}
+                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
+              >
+                {FIX_BY.map(f => (
+                  <option key={f.id} value={f.id}>{f.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 border-t border-slate-700 flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 py-2 px-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={!formData.title.trim()}
+            className="flex-1 py-2 px-4 bg-amber-500 hover:bg-amber-400 text-slate-900 font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            <Send className="w-4 h-4" />
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const FeedbackButton = ({ currentScreen, onOpenPanel, issues = [], onAddIssue, onShowWidgetInfo, discoverMode }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -591,4 +745,4 @@ const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssue, onDeleteIssu
   );
 };
 
-export { FeedbackButton, IssuesPanel };
+export { FeedbackButton, IssuesPanel, ReportIssueModal };

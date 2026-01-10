@@ -12,7 +12,7 @@ import WhatsAppPanel from './ui/WhatsAppPanel';
 import EnhancedPlayerProfile from './ui/EnhancedPlayerProfile';
 import PlayerVisualizer from './ui/PlayerVisualizer';
 import PlayerSwipe from './ui/PlayerSwipe';
-import { FeedbackButton, IssuesPanel } from './ui/FeedbackSystem';
+import { FeedbackButton, IssuesPanel, ReportIssueModal } from './ui/FeedbackSystem';
 import { WidgetHighlight, WidgetLegend } from './ui/WidgetHighlight';
 import { InfoButton } from './ui/InfoButton';
 import { WidgetInfoPanel } from './ui/WidgetInfoPanel';
@@ -276,6 +276,8 @@ export default function MagpieV2() {
   const [widgetDiscoverMode, setWidgetDiscoverMode] = useState(false);
   const [showWidgetInfoPanel, setShowWidgetInfoPanel] = useState(false);
   const [activeWidgetKey, setActiveWidgetKey] = useState(null);
+  const [showReportIssueModal, setShowReportIssueModal] = useState(false);
+  const [reportIssueContext, setReportIssueContext] = useState(null);
   
   const handleWidgetInfoClick = (widgetKey) => {
     setActiveWidgetKey(widgetKey);
@@ -3745,10 +3747,19 @@ export default function MagpieV2() {
         widgetKey={activeWidgetKey}
         onChangeWidget={(key) => setActiveWidgetKey(key)}
         onReportIssue={(widgetKey, widgetName) => {
-          setShowWidgetInfoPanel(false);
-          setIssuesPanelFilters({ type: 'all', screen: widgetKey });
-          setShowIssuesPanel(true);
+          setReportIssueContext({ key: widgetKey, name: widgetName });
+          setShowReportIssueModal(true);
         }}
+      />
+
+      <ReportIssueModal
+        isOpen={showReportIssueModal}
+        onClose={() => {
+          setShowReportIssueModal(false);
+          setReportIssueContext(null);
+        }}
+        currentScreen={reportIssueContext?.name || reportIssueContext?.key || activeScreen}
+        onAddIssue={handleAddIssue}
       />
 
       <style>{`
