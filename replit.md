@@ -144,6 +144,15 @@ The application follows a full-stack architecture with React frontend and Expres
 - **Database Tables**: `issues` (with parentId), `delivery_targets`, `issue_assignments`
 - **Component**: `src/ui/FeedbackSystem.jsx`
 
+### 15. Widget Discover Mode
+- **Toggle Button**: "Show Widgets" button in page header to enable/disable discover mode
+- **Visual Highlights**: When enabled, widgets get colored outlines and floating labels
+- **Widget Legend**: Appears in bottom-left showing all widgets with color-coded entries
+- **Click-to-Scroll**: Clicking a widget in the legend scrolls to and highlights that component
+- **Currently Wrapped Widgets**: AI Assistant, Feedback System, Pitch View, Shortlist Panel, Player Panel
+- **Component**: `src/ui/WidgetHighlight.jsx`
+- **State**: `widgetDiscoverMode` in App.jsx controls visibility
+
 ### 13. Player Swipe (Dating App Style)
 - **Issue Cards View**: Large cards showing squad issues (contract expiring, injuries, succession) with risk percentages
 - **Card Sizing**: Card size and glow intensity reflects issue criticality (higher risk = bigger/brighter)
