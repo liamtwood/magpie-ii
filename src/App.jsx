@@ -3277,20 +3277,6 @@ export default function MagpieV2() {
                 {screens.find(s => s.id === activeScreen)?.name || 
                  screens.flatMap(s => s.children || []).find(c => c.id === activeScreen)?.name}
               </h1>
-              {getRequirementsForScreen(activeScreen).length > 0 && (
-                <button
-                  onClick={() => openRequirementsForScreen(activeScreen)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    widgetDiscoverMode ? 'hidden' : 'bg-purple-100 hover:bg-purple-200 text-purple-700'
-                  }`}
-                >
-                  <FileText className="h-4 w-4" />
-                  <span>Requirements</span>
-                  <span className="px-1.5 py-0.5 bg-purple-200 rounded text-xs font-bold">
-                    {getRequirementsForScreen(activeScreen).length}
-                  </span>
-                </button>
-              )}
               {widgetDiscoverMode && (
                 <InfoButton 
                   widgetKey={activeScreen} 
