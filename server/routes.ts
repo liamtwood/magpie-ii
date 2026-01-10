@@ -14,7 +14,7 @@ router.get("/api/issues", async (_req: Request, res: Response) => {
   }
 });
 
-router.get("/api/issues/:id", async (req: Request, res: Response) => {
+router.get("/api/issues/:id", async (req: Request<{id: string}>, res: Response) => {
   try {
     const id = parseInt(req.params.id);
     const issue = await storage.getIssue(id);
@@ -39,7 +39,7 @@ router.post("/api/issues", async (req: Request, res: Response) => {
   }
 });
 
-router.patch("/api/issues/:id", async (req: Request, res: Response) => {
+router.patch("/api/issues/:id", async (req: Request<{id: string}>, res: Response) => {
   try {
     const id = parseInt(req.params.id);
     const updates: Partial<InsertIssue> = req.body;
@@ -54,7 +54,7 @@ router.patch("/api/issues/:id", async (req: Request, res: Response) => {
   }
 });
 
-router.delete("/api/issues/:id", async (req: Request, res: Response) => {
+router.delete("/api/issues/:id", async (req: Request<{id: string}>, res: Response) => {
   try {
     const id = parseInt(req.params.id);
     const deleted = await storage.deleteIssue(id);
