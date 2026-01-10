@@ -19,6 +19,14 @@ const targets = [
   { type: "widget", key: "whatsapp-panel", name: "WhatsApp Panel", description: "WhatsApp group chat integration" },
   { type: "widget", key: "create-shortlist-modal", name: "Create Shortlist Modal", description: "AI-assisted shortlist creation" },
   { type: "widget", key: "data-sources", name: "Data Sources", description: "Integration with StatsBomb, Impect, etc." },
+  
+  { type: "widget", key: "squad-health-check", name: "Squad Health Check", description: "Proactive risk detection across your squad" },
+  { type: "widget", key: "issue-filter", name: "Issue Filter", description: "Filter issues by Critical, Moderate, Resolved, Snoozed" },
+  { type: "widget", key: "issue-cards", name: "Issue Cards", description: "Individual issue cards with recommendations and actions" },
+  { type: "widget", key: "squad-list", name: "Squad List", description: "Tabular view of all squad players" },
+  { type: "widget", key: "search-filters", name: "Search Filters", description: "Position, age, and attribute filters" },
+  { type: "widget", key: "search-results", name: "Search Results", description: "Player search results grid" },
+  { type: "widget", key: "shortlist-cards", name: "Shortlist Cards", description: "Overview of all active shortlists" },
 ];
 
 async function seedTargets() {

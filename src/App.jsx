@@ -14,6 +14,8 @@ import PlayerVisualizer from './ui/PlayerVisualizer';
 import PlayerSwipe from './ui/PlayerSwipe';
 import { FeedbackButton, IssuesPanel } from './ui/FeedbackSystem';
 import { WidgetHighlight, WidgetLegend } from './ui/WidgetHighlight';
+import { InfoButton } from './ui/InfoButton';
+import { WidgetInfoPanel } from './ui/WidgetInfoPanel';
 
 // Data source badge component
 const SourceBadge = ({ source }) => {
@@ -272,6 +274,13 @@ export default function MagpieV2() {
   const [selectedPitchPosition, setSelectedPitchPosition] = useState(null);
   const [issuesTab, setIssuesTab] = useState('critical');
   const [widgetDiscoverMode, setWidgetDiscoverMode] = useState(false);
+  const [showWidgetInfoPanel, setShowWidgetInfoPanel] = useState(false);
+  const [activeWidgetKey, setActiveWidgetKey] = useState(null);
+  
+  const handleWidgetInfoClick = (widgetKey) => {
+    setActiveWidgetKey(widgetKey);
+    setShowWidgetInfoPanel(true);
+  };
   
   const standardStatusOptions = [
     { id: 'available', label: 'Available', color: 'bg-green-100 text-green-700' },
@@ -1579,7 +1588,10 @@ export default function MagpieV2() {
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Squad Health Check</h2>
+              <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                Squad Health Check
+                <InfoButton widgetKey="squad-health-check" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} />
+              </h2>
               <p className="text-gray-500 mt-1">Proactive risk detection across your squad</p>
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -1637,7 +1649,10 @@ export default function MagpieV2() {
         </div>
 
         <div>
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Issues</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+            Issues
+            <InfoButton widgetKey="issue-cards" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} />
+          </h2>
           <div className="flex gap-2 mb-4">
             <button
               onClick={() => setIssuesTab('critical')}
@@ -1784,7 +1799,10 @@ export default function MagpieV2() {
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Squad Overview</h2>
+            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+              Squad Overview
+              <InfoButton widgetKey="squad-list" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} />
+            </h2>
             <p className="text-gray-500 mt-1">Current squad composition and status</p>
           </div>
           <div className="flex gap-2">
@@ -1996,6 +2014,12 @@ export default function MagpieV2() {
       ) : (
         <div className="flex gap-6">
           <WidgetHighlight widgetId="pitch-view" discoverMode={widgetDiscoverMode} className="flex-1 bg-gradient-to-b from-green-600 to-green-700 rounded-xl p-6 relative" style={{ minHeight: '600px' }}>
+            {widgetDiscoverMode && (
+              <div className="absolute top-2 left-2 z-10 flex items-center gap-1 bg-white/90 rounded-lg px-2 py-1 shadow-sm">
+                <span className="text-xs font-medium text-gray-700">Pitch View</span>
+                <InfoButton widgetKey="pitch-view" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} className="w-4 h-4" />
+              </div>
+            )}
             <div className="absolute inset-4 border-2 border-white/30 rounded-lg" />
             <div className="absolute left-1/2 top-4 bottom-4 w-0.5 bg-white/30 -translate-x-1/2" />
             <div className="absolute left-1/2 top-1/2 w-24 h-24 border-2 border-white/30 rounded-full -translate-x-1/2 -translate-y-1/2" />
@@ -3178,6 +3202,7 @@ export default function MagpieV2() {
             <div className="flex items-center gap-2">
               <Zap className="h-4 w-4 text-amber-500" />
               <span className="text-sm font-semibold">AI Assistant</span>
+              <InfoButton widgetKey="ai-assistant" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} />
             </div>
           </div>
           <div className="flex-1 p-3 overflow-auto space-y-2 min-h-0" style={{ maxHeight: '200px' }}>
@@ -3310,7 +3335,10 @@ export default function MagpieV2() {
                           {shortlist.position}
                         </div>
                         <div>
-                          <h2 className="text-xl font-bold text-gray-900">{shortlist.title}</h2>
+                          <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                            {shortlist.title}
+                            <InfoButton widgetKey="shortlist-panel" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} />
+                          </h2>
                           <p className="text-sm text-gray-600">{shortlist.trigger}</p>
                         </div>
                       </div>
@@ -3512,7 +3540,10 @@ export default function MagpieV2() {
                 <div className="flex-1 flex items-center gap-4 ml-2">
                   <PlayerAvatar name={openPlayerPanel.name} src={openPlayerPanel.image} size="xl" />
                   <div className="text-white">
-                    <h2 className="text-xl font-bold">{openPlayerPanel.name}</h2>
+                    <h2 className="text-xl font-bold flex items-center">
+                      {openPlayerPanel.name}
+                      <InfoButton widgetKey="player-panel" discoverMode={widgetDiscoverMode} onClick={handleWidgetInfoClick} className="bg-white/20 hover:bg-white/30 text-white" />
+                    </h2>
                     <p className="text-white/70">{openPlayerPanel.position} • Age {openPlayerPanel.age}</p>
                     <div className="flex gap-2 mt-2">
                       <SourceBadge source="statsbomb" />
@@ -3681,20 +3712,12 @@ export default function MagpieV2() {
         initialFilters={issuesPanelFilters}
       />
 
-      {widgetDiscoverMode && (
-        <div className="fixed bottom-4 left-72 z-50 animate-fade-in">
-          <WidgetLegend 
-            onScrollToWidget={(widgetId) => {
-              const el = document.querySelector(`[data-widget-id="${widgetId}"]`);
-              if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                el.classList.add('ring-4', 'ring-yellow-400');
-                setTimeout(() => el.classList.remove('ring-4', 'ring-yellow-400'), 2000);
-              }
-            }}
-          />
-        </div>
-      )}
+      <WidgetInfoPanel
+        isOpen={showWidgetInfoPanel}
+        onClose={() => setShowWidgetInfoPanel(false)}
+        widgetKey={activeWidgetKey}
+        onChangeWidget={(key) => setActiveWidgetKey(key)}
+      />
 
       <style>{`
         @keyframes slide-in-right {
