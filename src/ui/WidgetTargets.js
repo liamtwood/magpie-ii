@@ -36,6 +36,12 @@ export const WIDGET_TARGETS = {
       'shortlist-panel': { key: 'shortlist-panel', name: 'Shortlist Panel', description: 'Detailed shortlist view with candidates' },
     }
   },
+  'user-management': {
+    key: 'user-management',
+    name: 'User Management',
+    type: 'page',
+    widgets: {}
+  },
   global: {
     key: 'global',
     name: 'Global',
