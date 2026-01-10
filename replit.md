@@ -17,7 +17,7 @@ Preferred communication style: Simple, everyday language.
 - **State Management**: React's built-in useState hooks (no external state management library)
 
 ### Application Structure
-The application follows a client-side only architecture with no backend:
+The application follows a full-stack architecture with React frontend and Express backend:
 - `/src` - Main source directory containing React components and data files
 - `/src/App.jsx` - Main application component with all screens and features
 - `/src/main.jsx` - Application entry point
@@ -25,10 +25,18 @@ The application follows a client-side only architecture with no backend:
 - `/src/data-*.js` - Static data files for squad and shortlist information
 - `/src/utils-helpers-js.js` - Shared utility functions for formatting and calculations
 - `/src/ui/` - Reusable UI components (modals, panels)
+- `/server` - Express backend with API endpoints
+- `/shared` - Shared TypeScript schemas (Drizzle ORM)
+
+### Backend Architecture
+- **Framework**: Express.js with TypeScript
+- **Database**: PostgreSQL with Drizzle ORM
+- **API**: RESTful endpoints for issues/requirements management
+- **Port**: Backend runs on port 3001, proxied via Vite
 
 ### Data Management
 - **Static Data Pattern**: Player data, squad information, and shortlist candidates are stored in JavaScript modules as exported objects/arrays
-- **No Database**: Currently operates without a backend database - all data is client-side
+- **Database**: Issues and requirements are stored in PostgreSQL database
 - **Data Structure**: Players have comprehensive attributes including personal info, contract details, statistics, transfer history, and performance ratings
 
 ### Component Patterns
@@ -116,15 +124,18 @@ The application follows a client-side only architecture with no backend:
 - **Visual Styling**: Color-coded tabs matching issue severity (red, amber, green, gray)
 - **Empty States**: Friendly messages when no issues exist in a category
 
-### 14. Feedback System (Bug/Enhancement Tracking)
+### 14. Feedback & Requirements System (Database-Backed)
 - **Floating Button**: Always-visible button in bottom-right corner on all screens
 - **Context-Aware**: Automatically captures which screen the issue was reported from
-- **Issue Types**: Bug, Enhancement, Question (expandable)
+- **Issue Types**: Bug, Enhancement, Question, Requirement
 - **Priority Levels**: Low, Medium, High, Critical
 - **Fix By Options**: Immediately, Current Release, Future Release
 - **Status Tracking**: New, In Progress, Resolved, Closed
-- **Issues Panel**: Slide-out panel to view/manage all issues with filtering
-- **localStorage Persistence**: Issues persist between sessions
+- **Issues Panel**: Slide-out panel to view/manage all issues with filtering by type, status, and screen
+- **Database Persistence**: Issues stored in PostgreSQL database via REST API
+- **Requirements Tracking**: 13 pre-populated Web-App Phase 1 requirements with screen assignments and "Ideas to Discuss" notes
+- **Area Field**: Track which area (e.g., Recruitment) the requirement belongs to
+- **API Endpoints**: GET/POST/PATCH/DELETE at `/api/issues`
 - **Component**: `src/ui/FeedbackSystem.jsx`
 
 ### 13. Player Swipe (Dating App Style)
@@ -161,8 +172,9 @@ The application references several football data providers through badge compone
 
 *Note: These are display labels only - no actual API integrations exist currently.*
 
-### No Backend Services
-- No database connection
-- No authentication system
-- No server-side API
-- All data is static and bundled with the frontend
+### Backend Services
+- **Database**: PostgreSQL (Neon-backed) for issues/requirements storage
+- **API Server**: Express.js running on port 3001
+- **ORM**: Drizzle ORM for database schema and queries
+- **No authentication system** (yet)
+- Player data remains static and bundled with the frontend

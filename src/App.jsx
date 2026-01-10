@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, Search, ClipboardList, User, Target, BarChart3, Video,
   ChevronDown, ChevronUp, ChevronRight, Plus, Star, AlertCircle,

@@ -32,19 +32,6 @@ const STATUSES = [
   { id: 'closed', label: 'Closed', color: 'slate' },
 ];
 
-const getStoredIssues = () => {
-  try {
-    const stored = localStorage.getItem('magpie-issues');
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-};
-
-const saveIssues = (issues) => {
-  localStorage.setItem('magpie-issues', JSON.stringify(issues));
-};
-
 const FeedbackButton = ({ currentScreen, onOpenPanel, issues = [], onAddIssue }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -59,11 +46,9 @@ const FeedbackButton = ({ currentScreen, onOpenPanel, issues = [], onAddIssue })
     if (!formData.title.trim()) return;
 
     const newIssue = {
-      id: Date.now().toString(),
       ...formData,
       screen: currentScreen,
       status: 'new',
-      createdAt: new Date().toISOString(),
       createdBy: 'Current User',
     };
 
@@ -227,9 +212,19 @@ const FeedbackButton = ({ currentScreen, onOpenPanel, issues = [], onAddIssue })
   );
 };
 
+const SCREENS = [
+  { id: 'dashboard', label: 'Dashboard' },
+  { id: 'squad', label: 'Squad' },
+  { id: 'shortlists', label: 'Shortlists' },
+  { id: 'player-profile', label: 'Player Profile' },
+  { id: 'player-visualizer', label: 'Player Visualizer' },
+  { id: 'player-swipe', label: 'Player Swipe' },
+];
+
 const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssue, onDeleteIssue }) => {
   const [filterType, setFilterType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [filterScreen, setFilterScreen] = useState('all');
 
   const updateIssueStatus = (id, newStatus) => {
     onUpdateIssue(id, { status: newStatus });
@@ -242,8 +237,12 @@ const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssue, onDeleteIssu
   const filteredIssues = issues.filter(issue => {
     if (filterType !== 'all' && issue.type !== filterType) return false;
     if (filterStatus !== 'all' && issue.status !== filterStatus) return false;
+    if (filterScreen !== 'all' && issue.screen !== filterScreen) return false;
     return true;
   });
+  
+  const requirementCount = issues.filter(i => i.type === 'requirement').length;
+  const bugCount = issues.filter(i => i.type === 'bug').length;
 
   const getTypeIcon = (type) => {
     const found = ISSUE_TYPES.find(t => t.id === type);
@@ -282,7 +281,7 @@ const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssue, onDeleteIssu
         </button>
       </div>
 
-      <div className="p-4 border-b border-slate-700 flex gap-2">
+      <div className="p-4 border-b border-slate-700 flex flex-wrap gap-2">
         <select
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
@@ -290,7 +289,7 @@ const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssue, onDeleteIssu
         >
           <option value="all">All Types</option>
           {ISSUE_TYPES.map(t => (
-            <option key={t.id} value={t.id}>{t.label}</option>
+            <option key={t.id} value={t.id}>{t.label} ({issues.filter(i => i.type === t.id).length})</option>
           ))}
         </select>
         <select
@@ -300,6 +299,16 @@ const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssue, onDeleteIssu
         >
           <option value="all">All Statuses</option>
           {STATUSES.map(s => (
+            <option key={s.id} value={s.id}>{s.label}</option>
+          ))}
+        </select>
+        <select
+          value={filterScreen}
+          onChange={(e) => setFilterScreen(e.target.value)}
+          className="px-3 py-1.5 bg-slate-700/50 border border-slate-600 rounded-lg text-sm text-white focus:outline-none"
+        >
+          <option value="all">All Screens</option>
+          {SCREENS.map(s => (
             <option key={s.id} value={s.id}>{s.label}</option>
           ))}
         </select>
@@ -365,8 +374,21 @@ const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssue, onDeleteIssu
                       <Clock className="w-3 h-3" />
                       <span>{new Date(issue.createdAt).toLocaleDateString()}</span>
                       <span>•</span>
-                      <span>{issue.fixBy.replace('-', ' ')}</span>
+                      <span>{issue.fixBy?.replace('-', ' ') || 'No deadline'}</span>
+                      {issue.area && (
+                        <>
+                          <span>•</span>
+                          <span>{issue.area}</span>
+                        </>
+                      )}
                     </div>
+                    {issue.ideasToDiscuss && (
+                      <div className="mt-2 p-2 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+                        <p className="text-xs text-purple-300">
+                          <span className="font-medium">Ideas to discuss:</span> {issue.ideasToDiscuss}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
