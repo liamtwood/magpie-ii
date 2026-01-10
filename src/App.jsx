@@ -13,6 +13,7 @@ import EnhancedPlayerProfile from './ui/EnhancedPlayerProfile';
 import PlayerVisualizer from './ui/PlayerVisualizer';
 import PlayerSwipe from './ui/PlayerSwipe';
 import { FeedbackButton, IssuesPanel } from './ui/FeedbackSystem';
+import { WidgetHighlight, WidgetLegend } from './ui/WidgetHighlight';
 
 // Data source badge component
 const SourceBadge = ({ source }) => {
@@ -270,6 +271,7 @@ export default function MagpieV2() {
   const [squadViewMode, setSquadViewMode] = useState('list');
   const [selectedPitchPosition, setSelectedPitchPosition] = useState(null);
   const [issuesTab, setIssuesTab] = useState('critical');
+  const [widgetDiscoverMode, setWidgetDiscoverMode] = useState(false);
   
   const standardStatusOptions = [
     { id: 'available', label: 'Available', color: 'bg-green-100 text-green-700' },
@@ -1993,7 +1995,7 @@ export default function MagpieV2() {
         </div>
       ) : (
         <div className="flex gap-6">
-          <div className="flex-1 bg-gradient-to-b from-green-600 to-green-700 rounded-xl p-6 relative" style={{ minHeight: '600px' }}>
+          <WidgetHighlight widgetId="pitch-view" discoverMode={widgetDiscoverMode} className="flex-1 bg-gradient-to-b from-green-600 to-green-700 rounded-xl p-6 relative" style={{ minHeight: '600px' }}>
             <div className="absolute inset-4 border-2 border-white/30 rounded-lg" />
             <div className="absolute left-1/2 top-4 bottom-4 w-0.5 bg-white/30 -translate-x-1/2" />
             <div className="absolute left-1/2 top-1/2 w-24 h-24 border-2 border-white/30 rounded-full -translate-x-1/2 -translate-y-1/2" />
@@ -2069,7 +2071,7 @@ export default function MagpieV2() {
                 );
               });
             })()}
-          </div>
+          </WidgetHighlight>
 
           {selectedPitchPosition && (
             <div className="w-80 bg-white rounded-xl border border-gray-200 p-4 overflow-hidden">
@@ -3171,7 +3173,7 @@ export default function MagpieV2() {
           ))}
         </nav>
 
-        <div className="border-t border-gray-200 flex flex-col flex-1 min-h-[250px]">
+        <WidgetHighlight widgetId="ai-assistant" discoverMode={widgetDiscoverMode} className="border-t border-gray-200 flex flex-col flex-1 min-h-[250px]">
           <div className="p-3 border-b border-gray-100">
             <div className="flex items-center gap-2">
               <Zap className="h-4 w-4 text-amber-500" />
@@ -3209,7 +3211,7 @@ export default function MagpieV2() {
               </button>
             </div>
           </div>
-        </div>
+        </WidgetHighlight>
 
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center gap-3">
@@ -3246,6 +3248,18 @@ export default function MagpieV2() {
               )}
             </div>
             <div className="flex items-center gap-4">
+              <button
+                onClick={() => setWidgetDiscoverMode(!widgetDiscoverMode)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  widgetDiscoverMode 
+                    ? 'bg-purple-600 text-white' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                }`}
+                title="Toggle Widget Discover Mode to see which components are which widgets"
+              >
+                <Eye className="h-4 w-4" />
+                <span>{widgetDiscoverMode ? 'Hide Widgets' : 'Show Widgets'}</span>
+              </button>
               <div className="text-sm text-gray-500">
                 Window: <span className="font-medium text-gray-900">{currentWindow.name}</span>
                 <span className="ml-2 text-blue-600">{currentWindow.daysRemaining}d left</span>
@@ -3646,15 +3660,17 @@ export default function MagpieV2() {
         onInitiateGroup={handleInitiateWhatsAppGroup}
       />
 
-      <FeedbackButton 
-        currentScreen={activeScreen} 
-        onOpenPanel={() => {
-          setIssuesPanelFilters({ type: 'all', screen: 'all' });
-          setShowIssuesPanel(true);
-        }}
-        issues={feedbackIssues}
-        onAddIssue={handleAddIssue}
-      />
+      <WidgetHighlight widgetId="feedback-system" discoverMode={widgetDiscoverMode}>
+        <FeedbackButton 
+          currentScreen={activeScreen} 
+          onOpenPanel={() => {
+            setIssuesPanelFilters({ type: 'all', screen: 'all' });
+            setShowIssuesPanel(true);
+          }}
+          issues={feedbackIssues}
+          onAddIssue={handleAddIssue}
+        />
+      </WidgetHighlight>
       <IssuesPanel 
         isOpen={showIssuesPanel} 
         onClose={() => setShowIssuesPanel(false)}
@@ -3665,6 +3681,21 @@ export default function MagpieV2() {
         initialFilters={issuesPanelFilters}
       />
 
+      {widgetDiscoverMode && (
+        <div className="fixed bottom-4 left-72 z-50 animate-fade-in">
+          <WidgetLegend 
+            onScrollToWidget={(widgetId) => {
+              const el = document.querySelector(`[data-widget-id="${widgetId}"]`);
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.classList.add('ring-4', 'ring-yellow-400');
+                setTimeout(() => el.classList.remove('ring-4', 'ring-yellow-400'), 2000);
+              }
+            }}
+          />
+        </div>
+      )}
+
       <style>{`
         @keyframes slide-in-right {
           from { transform: translateX(100%); }
@@ -3672,6 +3703,13 @@ export default function MagpieV2() {
         }
         .animate-slide-in-right {
           animation: slide-in-right 0.3s ease-out;
+        }
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
         }
       `}</style>
     </div>
