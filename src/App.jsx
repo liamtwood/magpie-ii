@@ -379,6 +379,7 @@ export default function MagpieV2() {
     { id: 'squad', name: 'Squad', icon: Users },
     { id: 'player-search', name: 'Player Search', icon: Search },
     { id: 'shortlists', name: 'Shortlists', icon: ClipboardList },
+    { id: 'user-management', name: 'User Management', icon: Users },
     { 
       id: 'options', 
       name: 'Options', 
@@ -387,7 +388,6 @@ export default function MagpieV2() {
         { id: 'player-profile', name: 'Player Profile', icon: User },
         { id: 'player-visualizer', name: 'Player Visualizer', icon: Eye },
         { id: 'player-swipe', name: 'Player Swipe', icon: Zap },
-        { id: 'user-management', name: 'User Management', icon: Users },
       ]
     },
   ];
