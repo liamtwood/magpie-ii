@@ -68,38 +68,37 @@ const FeedbackButton = ({ currentScreen, onOpenPanel, issues = [], onAddIssue, o
   return (
     <>
       <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
-        {discoverMode ? (
-          <button
-            onClick={() => onShowWidgetInfo()}
-            className="w-12 h-12 bg-purple-600 hover:bg-purple-500 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 animate-pulse"
-            title="View Widget Requirements"
-          >
-            <HelpCircle className="w-6 h-6" />
-          </button>
-        ) : (
-          <>
-            <button
-              onClick={() => onOpenPanel()}
-              className="w-12 h-12 bg-slate-700 hover:bg-slate-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 relative"
-              title="View Issues"
+        <button
+          onClick={() => onOpenPanel()}
+          className="w-12 h-12 bg-slate-700 hover:bg-slate-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 relative"
+          title="View Issues"
+        >
+          <MessageSquare className="w-5 h-5" />
+          {issues.filter(i => i.status === 'new').length > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+              {issues.filter(i => i.status === 'new').length}
+            </span>
+          )}
+          {discoverMode && (
+            <div 
+              className="absolute -top-2 -left-2 bg-purple-600 text-white rounded-full p-1 shadow-lg animate-pulse"
+              onClick={(e) => {
+                e.stopPropagation();
+                onShowWidgetInfo();
+              }}
             >
-              <MessageSquare className="w-5 h-5" />
-              {issues.filter(i => i.status === 'new').length > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  {issues.filter(i => i.status === 'new').length}
-                </span>
-              )}
-            </button>
-            
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="w-12 h-12 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
-              title="Report Issue"
-            >
-              <Bug className="w-5 h-5" />
-            </button>
-          </>
-        )}
+              <HelpCircle className="w-4 h-4" />
+            </div>
+          )}
+        </button>
+        
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="w-12 h-12 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+          title="Report Issue"
+        >
+          <Bug className="w-5 h-5" />
+        </button>
       </div>
 
       {isModalOpen && (
