@@ -3661,6 +3661,7 @@ export default function MagpieV2() {
         issues={feedbackIssues}
         onUpdateIssue={handleUpdateIssue}
         onDeleteIssue={handleDeleteIssue}
+        onAddIssue={handleAddIssue}
         initialFilters={issuesPanelFilters}
       />
 
