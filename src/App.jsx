@@ -387,6 +387,7 @@ export default function MagpieV2() {
         { id: 'player-profile', name: 'Player Profile', icon: User },
         { id: 'player-visualizer', name: 'Player Visualizer', icon: Eye },
         { id: 'player-swipe', name: 'Player Swipe', icon: Zap },
+        { id: 'user-management', name: 'User Management', icon: Users },
       ]
     },
   ];
@@ -3328,6 +3329,24 @@ export default function MagpieV2() {
           {activeScreen === 'player-profile' && renderPlayerProfileScreen()}
           {activeScreen === 'player-visualizer' && <PlayerVisualizer />}
           {activeScreen === 'player-swipe' && <PlayerSwipe />}
+          {activeScreen === 'user-management' && (
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+                </div>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-8">
+                <div className="text-center py-12">
+                  <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <h2 className="text-xl font-semibold text-gray-700 mb-2">User Management Coming Soon</h2>
+                  <p className="text-gray-500 max-w-md mx-auto">
+                    This section will allow you to manage users, roles, and permissions for the MAGPIE II platform.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </main>
       </div>
 
