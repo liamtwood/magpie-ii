@@ -3379,7 +3379,9 @@ export default function MagpieV2() {
                           </td>
                           <td className="px-4 py-3 text-gray-900 max-w-xs truncate">{issue.title}</td>
                           <td className="px-4 py-3 text-gray-600 max-w-xs truncate">{issue.description || '-'}</td>
-                          <td className="px-4 py-3 text-gray-600">{issue.screen || '-'}</td>
+                          <td className="px-4 py-3 text-gray-600">
+                            {issue.screen ? issue.screen.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : '-'}
+                          </td>
                           <td className="px-4 py-3 text-gray-600">{issue.parentId || '-'}</td>
                           <td className="px-4 py-3">
                             <span className={`px-2 py-1 rounded text-xs font-medium ${
@@ -3389,7 +3391,7 @@ export default function MagpieV2() {
                               issue.status === 'closed' ? 'bg-gray-100 text-gray-700' :
                               'bg-gray-100 text-gray-700'
                             }`}>
-                              {issue.status}
+                              {issue.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                             </span>
                           </td>
                           <td className="px-4 py-3">
@@ -3399,10 +3401,12 @@ export default function MagpieV2() {
                               issue.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
                               'bg-gray-100 text-gray-700'
                             }`}>
-                              {issue.priority}
+                              {issue.priority.charAt(0).toUpperCase() + issue.priority.slice(1)}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-gray-600">{issue.fixBy || '-'}</td>
+                          <td className="px-4 py-3 text-gray-600">
+                            {issue.fixBy ? issue.fixBy.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : '-'}
+                          </td>
                           <td className="px-4 py-3 text-gray-600">{issue.area || '-'}</td>
                           <td className="px-4 py-3 text-gray-600 max-w-xs truncate">{issue.ideasToDiscuss || '-'}</td>
                           <td className="px-4 py-3 text-gray-600">{issue.createdBy || '-'}</td>
