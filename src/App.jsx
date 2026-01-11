@@ -3461,7 +3461,6 @@ export default function MagpieV2() {
                         <thead className="bg-gray-50 border-b border-gray-200">
                           <tr>
                             <th className="px-4 py-3 text-left font-semibold text-gray-700">ID</th>
-                            <th className="px-4 py-3 text-left font-semibold text-gray-700">Type</th>
                             <th className="px-4 py-3 text-left font-semibold text-gray-700">Screen</th>
                             <th className="px-4 py-3 text-left font-semibold text-gray-700">Title</th>
                             <th className="px-4 py-3 text-left font-semibold text-gray-700">Status</th>
@@ -3480,11 +3479,6 @@ export default function MagpieV2() {
                               }`}
                             >
                               <td className="px-4 py-3 text-gray-900 font-medium">{epic.id}</td>
-                              <td className="px-4 py-3">
-                                <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
-                                  Epic
-                                </span>
-                              </td>
                               <td className="px-4 py-3 text-gray-600">
                                 {epic.screen ? epic.screen.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : '-'}
                               </td>
