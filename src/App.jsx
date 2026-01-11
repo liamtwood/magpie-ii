@@ -277,6 +277,7 @@ export default function MagpieV2() {
   const [featureViewMode, setFeatureViewMode] = useState('list');
   const [selectedEpic, setSelectedEpic] = useState(null);
   const [newStoryTitle, setNewStoryTitle] = useState('');
+  const [editingEpic, setEditingEpic] = useState({ title: '', description: '', status: '' });
   const [showWidgetInfoPanel, setShowWidgetInfoPanel] = useState(false);
   const [activeWidgetKey, setActiveWidgetKey] = useState(null);
   const [showReportIssueModal, setShowReportIssueModal] = useState(false);
@@ -3471,7 +3472,7 @@ export default function MagpieV2() {
                           {feedbackIssues.filter(i => i.type === 'Epic').map((epic) => (
                             <tr
                               key={epic.id}
-                              onClick={() => setSelectedEpic(epic)}
+                              onClick={() => { setSelectedEpic(epic); setEditingEpic({ title: '', description: '', status: '' }); }}
                               className={`cursor-pointer transition-colors ${
                                 selectedEpic?.id === epic.id
                                   ? 'bg-purple-50 border-l-4 border-purple-500'
@@ -3514,27 +3515,99 @@ export default function MagpieV2() {
                     {selectedEpic ? (
                       <>
                         <div className="p-4 border-b border-gray-200 bg-purple-50">
-                          <div className="flex items-center gap-3 mb-2">
+                          <div className="flex items-center gap-3 mb-3">
                             <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
                               Epic #{selectedEpic.id}
                             </span>
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              selectedEpic.status === 'new' ? 'bg-blue-100 text-blue-700' :
-                              selectedEpic.status === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
-                              selectedEpic.status === 'resolved' ? 'bg-green-100 text-green-700' :
-                              'bg-gray-100 text-gray-700'
-                            }`}>
-                              {selectedEpic.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                            </span>
+                            <select
+                              value={editingEpic.status || selectedEpic.status}
+                              onChange={async (e) => {
+                                const newStatus = e.target.value;
+                                setEditingEpic(prev => ({ ...prev, status: newStatus }));
+                                try {
+                                  const response = await fetch(`/api/issues/${selectedEpic.id}`, {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ status: newStatus }),
+                                  });
+                                  if (response.ok) {
+                                    const updated = await response.json();
+                                    setFeedbackIssues(prev => prev.map(i => i.id === updated.id ? updated : i));
+                                    setSelectedEpic(updated);
+                                  }
+                                } catch (error) {
+                                  console.error('Error updating status:', error);
+                                }
+                              }}
+                              className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
+                                (editingEpic.status || selectedEpic.status) === 'new' ? 'bg-blue-100 text-blue-700' :
+                                (editingEpic.status || selectedEpic.status) === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
+                                (editingEpic.status || selectedEpic.status) === 'resolved' ? 'bg-green-100 text-green-700' :
+                                'bg-gray-100 text-gray-700'
+                              }`}
+                            >
+                              <option value="new">New</option>
+                              <option value="in-progress">In Progress</option>
+                              <option value="resolved">Resolved</option>
+                              <option value="closed">Closed</option>
+                            </select>
                           </div>
-                          <h3 className="text-lg font-bold text-gray-900">{selectedEpic.title}</h3>
+                          <input
+                            type="text"
+                            value={editingEpic.title !== undefined && editingEpic.title !== '' ? editingEpic.title : selectedEpic.title}
+                            onChange={(e) => setEditingEpic(prev => ({ ...prev, title: e.target.value }))}
+                            onBlur={async () => {
+                              if (editingEpic.title && editingEpic.title !== selectedEpic.title) {
+                                try {
+                                  const response = await fetch(`/api/issues/${selectedEpic.id}`, {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ title: editingEpic.title }),
+                                  });
+                                  if (response.ok) {
+                                    const updated = await response.json();
+                                    setFeedbackIssues(prev => prev.map(i => i.id === updated.id ? updated : i));
+                                    setSelectedEpic(updated);
+                                    setEditingEpic(prev => ({ ...prev, title: '' }));
+                                  }
+                                } catch (error) {
+                                  console.error('Error updating title:', error);
+                                }
+                              }
+                            }}
+                            className="w-full text-lg font-bold text-gray-900 bg-transparent border-b-2 border-transparent hover:border-purple-300 focus:border-purple-500 focus:outline-none transition-colors"
+                          />
                         </div>
 
                         <div className="p-4 border-b border-gray-200">
                           <h4 className="text-sm font-semibold text-gray-700 mb-2">Description</h4>
-                          <p className="text-sm text-gray-600">
-                            {selectedEpic.description || 'No description provided.'}
-                          </p>
+                          <textarea
+                            value={editingEpic.description !== undefined && editingEpic.description !== '' ? editingEpic.description : (selectedEpic.description || '')}
+                            onChange={(e) => setEditingEpic(prev => ({ ...prev, description: e.target.value }))}
+                            onBlur={async () => {
+                              const newDesc = editingEpic.description;
+                              if (newDesc !== undefined && newDesc !== (selectedEpic.description || '')) {
+                                try {
+                                  const response = await fetch(`/api/issues/${selectedEpic.id}`, {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ description: newDesc }),
+                                  });
+                                  if (response.ok) {
+                                    const updated = await response.json();
+                                    setFeedbackIssues(prev => prev.map(i => i.id === updated.id ? updated : i));
+                                    setSelectedEpic(updated);
+                                    setEditingEpic(prev => ({ ...prev, description: '' }));
+                                  }
+                                } catch (error) {
+                                  console.error('Error updating description:', error);
+                                }
+                              }
+                            }}
+                            placeholder="Add a description..."
+                            rows={3}
+                            className="w-full text-sm text-gray-600 bg-transparent border border-gray-200 rounded-lg p-2 hover:border-purple-300 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-colors resize-none"
+                          />
                         </div>
 
                         <div className="flex-1 p-4 overflow-auto">
