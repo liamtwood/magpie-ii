@@ -6,7 +6,7 @@ import {
   Circle, Clock, TrendingUp, Activity, Zap, Shield, Heart,
   Send, X, MoreHorizontal, Filter, ArrowUpDown, Phone, Eye,
   ArrowUp, ArrowDown, ExternalLink, GripVertical, MessageCircle,
-  Home, Trophy, Flag, List, LayoutGrid, FileText, Settings
+  Home, Trophy, Flag, List, LayoutGrid, FileText, Settings, Layers
 } from 'lucide-react';
 import WhatsAppPanel from './ui/WhatsAppPanel';
 import EnhancedPlayerProfile from './ui/EnhancedPlayerProfile';
@@ -274,6 +274,9 @@ export default function MagpieV2() {
   const [selectedPitchPosition, setSelectedPitchPosition] = useState(null);
   const [issuesTab, setIssuesTab] = useState('critical');
   const [widgetDiscoverMode, setWidgetDiscoverMode] = useState(false);
+  const [featureViewMode, setFeatureViewMode] = useState('list');
+  const [selectedEpic, setSelectedEpic] = useState(null);
+  const [newStoryTitle, setNewStoryTitle] = useState('');
   const [showWidgetInfoPanel, setShowWidgetInfoPanel] = useState(false);
   const [activeWidgetKey, setActiveWidgetKey] = useState(null);
   const [showReportIssueModal, setShowReportIssueModal] = useState(false);
@@ -3338,90 +3341,302 @@ export default function MagpieV2() {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">Feature Management</h1>
-                <div className="text-sm text-gray-500">
-                  {feedbackIssues.length} items
+                <div className="flex items-center gap-4">
+                  <div className="flex bg-gray-100 rounded-lg p-1">
+                    <button
+                      onClick={() => { setFeatureViewMode('list'); setSelectedEpic(null); }}
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        featureViewMode === 'list'
+                          ? 'bg-white text-gray-900 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      List
+                    </button>
+                    <button
+                      onClick={() => setFeatureViewMode('epic')}
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        featureViewMode === 'epic'
+                          ? 'bg-white text-gray-900 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      Epic
+                    </button>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {feedbackIssues.length} items
+                  </div>
                 </div>
               </div>
-              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-gray-50 border-b border-gray-200">
-                      <tr>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">ID</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Type</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Title</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Description</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Screen</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Parent ID</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Status</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Priority</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Fix By</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Area</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Ideas to Discuss</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Created By</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Created At</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Updated At</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {feedbackIssues.map((issue) => (
-                        <tr key={issue.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-gray-900 font-medium">{issue.id}</td>
-                          <td className="px-4 py-3">
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              issue.type === 'Epic' ? 'bg-purple-100 text-purple-700' :
-                              issue.type === 'bug' ? 'bg-red-100 text-red-700' :
-                              issue.type === 'enhancement' ? 'bg-blue-100 text-blue-700' :
-                              'bg-gray-100 text-gray-700'
-                            }`}>
-                              {issue.type}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-gray-900 max-w-xs truncate">{issue.title}</td>
-                          <td className="px-4 py-3 text-gray-600 max-w-xs truncate">{issue.description || '-'}</td>
-                          <td className="px-4 py-3 text-gray-600">
-                            {issue.screen ? issue.screen.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : '-'}
-                          </td>
-                          <td className="px-4 py-3 text-gray-600">{issue.parentId || '-'}</td>
-                          <td className="px-4 py-3">
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              issue.status === 'new' ? 'bg-blue-100 text-blue-700' :
-                              issue.status === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
-                              issue.status === 'resolved' ? 'bg-green-100 text-green-700' :
-                              issue.status === 'closed' ? 'bg-gray-100 text-gray-700' :
-                              'bg-gray-100 text-gray-700'
-                            }`}>
-                              {issue.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              issue.priority === 'critical' ? 'bg-red-100 text-red-700' :
-                              issue.priority === 'high' ? 'bg-orange-100 text-orange-700' :
-                              issue.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                              'bg-gray-100 text-gray-700'
-                            }`}>
-                              {issue.priority.charAt(0).toUpperCase() + issue.priority.slice(1)}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-gray-600">
-                            {issue.fixBy ? issue.fixBy.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : '-'}
-                          </td>
-                          <td className="px-4 py-3 text-gray-600">{issue.area || '-'}</td>
-                          <td className="px-4 py-3 text-gray-600 max-w-xs truncate">{issue.ideasToDiscuss || '-'}</td>
-                          <td className="px-4 py-3 text-gray-600">{issue.createdBy || '-'}</td>
-                          <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
-                            {new Date(issue.createdAt).toLocaleDateString()}
-                          </td>
-                          <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
-                            {new Date(issue.updatedAt).toLocaleDateString()}
-                          </td>
+
+              {featureViewMode === 'list' && (
+                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">ID</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Type</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Title</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Description</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Screen</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Parent ID</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Status</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Priority</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Fix By</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Area</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Ideas to Discuss</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Created By</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Created At</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Updated At</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {feedbackIssues.map((issue) => (
+                          <tr key={issue.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 text-gray-900 font-medium">{issue.id}</td>
+                            <td className="px-4 py-3">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                issue.type === 'Epic' ? 'bg-purple-100 text-purple-700' :
+                                issue.type === 'bug' ? 'bg-red-100 text-red-700' :
+                                issue.type === 'enhancement' ? 'bg-blue-100 text-blue-700' :
+                                'bg-gray-100 text-gray-700'
+                              }`}>
+                                {issue.type}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-gray-900 max-w-xs truncate">{issue.title}</td>
+                            <td className="px-4 py-3 text-gray-600 max-w-xs truncate">{issue.description || '-'}</td>
+                            <td className="px-4 py-3 text-gray-600">
+                              {issue.screen ? issue.screen.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : '-'}
+                            </td>
+                            <td className="px-4 py-3 text-gray-600">{issue.parentId || '-'}</td>
+                            <td className="px-4 py-3">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                issue.status === 'new' ? 'bg-blue-100 text-blue-700' :
+                                issue.status === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
+                                issue.status === 'resolved' ? 'bg-green-100 text-green-700' :
+                                issue.status === 'closed' ? 'bg-gray-100 text-gray-700' :
+                                'bg-gray-100 text-gray-700'
+                              }`}>
+                                {issue.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                issue.priority === 'critical' ? 'bg-red-100 text-red-700' :
+                                issue.priority === 'high' ? 'bg-orange-100 text-orange-700' :
+                                issue.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-gray-100 text-gray-700'
+                              }`}>
+                                {issue.priority.charAt(0).toUpperCase() + issue.priority.slice(1)}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-gray-600">
+                              {issue.fixBy ? issue.fixBy.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : '-'}
+                            </td>
+                            <td className="px-4 py-3 text-gray-600">{issue.area || '-'}</td>
+                            <td className="px-4 py-3 text-gray-600 max-w-xs truncate">{issue.ideasToDiscuss || '-'}</td>
+                            <td className="px-4 py-3 text-gray-600">{issue.createdBy || '-'}</td>
+                            <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
+                              {new Date(issue.createdAt).toLocaleDateString()}
+                            </td>
+                            <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
+                              {new Date(issue.updatedAt).toLocaleDateString()}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {featureViewMode === 'epic' && (
+                <div className="flex gap-6">
+                  <div className="flex-1 bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                          <tr>
+                            <th className="px-4 py-3 text-left font-semibold text-gray-700">ID</th>
+                            <th className="px-4 py-3 text-left font-semibold text-gray-700">Type</th>
+                            <th className="px-4 py-3 text-left font-semibold text-gray-700">Screen</th>
+                            <th className="px-4 py-3 text-left font-semibold text-gray-700">Title</th>
+                            <th className="px-4 py-3 text-left font-semibold text-gray-700">Status</th>
+                            <th className="px-4 py-3 text-left font-semibold text-gray-700">Priority</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {feedbackIssues.filter(i => i.type === 'Epic').map((epic) => (
+                            <tr
+                              key={epic.id}
+                              onClick={() => setSelectedEpic(epic)}
+                              className={`cursor-pointer transition-colors ${
+                                selectedEpic?.id === epic.id
+                                  ? 'bg-purple-50 border-l-4 border-purple-500'
+                                  : 'hover:bg-gray-50'
+                              }`}
+                            >
+                              <td className="px-4 py-3 text-gray-900 font-medium">{epic.id}</td>
+                              <td className="px-4 py-3">
+                                <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
+                                  Epic
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-gray-600">
+                                {epic.screen ? epic.screen.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : '-'}
+                              </td>
+                              <td className="px-4 py-3 text-gray-900">{epic.title}</td>
+                              <td className="px-4 py-3">
+                                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                  epic.status === 'new' ? 'bg-blue-100 text-blue-700' :
+                                  epic.status === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
+                                  epic.status === 'resolved' ? 'bg-green-100 text-green-700' :
+                                  'bg-gray-100 text-gray-700'
+                                }`}>
+                                  {epic.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                  epic.priority === 'critical' ? 'bg-red-100 text-red-700' :
+                                  epic.priority === 'high' ? 'bg-orange-100 text-orange-700' :
+                                  epic.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                  'bg-gray-100 text-gray-700'
+                                }`}>
+                                  {epic.priority.charAt(0).toUpperCase() + epic.priority.slice(1)}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div className="w-[400px] bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
+                    {selectedEpic ? (
+                      <>
+                        <div className="p-4 border-b border-gray-200 bg-purple-50">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
+                              Epic #{selectedEpic.id}
+                            </span>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              selectedEpic.status === 'new' ? 'bg-blue-100 text-blue-700' :
+                              selectedEpic.status === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
+                              selectedEpic.status === 'resolved' ? 'bg-green-100 text-green-700' :
+                              'bg-gray-100 text-gray-700'
+                            }`}>
+                              {selectedEpic.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                            </span>
+                          </div>
+                          <h3 className="text-lg font-bold text-gray-900">{selectedEpic.title}</h3>
+                        </div>
+
+                        <div className="p-4 border-b border-gray-200">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Description</h4>
+                          <p className="text-sm text-gray-600">
+                            {selectedEpic.description || 'No description provided.'}
+                          </p>
+                        </div>
+
+                        <div className="flex-1 p-4 overflow-auto">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-semibold text-gray-700">
+                              Stories ({feedbackIssues.filter(i => i.parentId === selectedEpic.id).length})
+                            </h4>
+                          </div>
+
+                          <div className="space-y-2 mb-4">
+                            {feedbackIssues.filter(i => i.parentId === selectedEpic.id).map((story) => (
+                              <div key={story.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-xs font-medium text-gray-500">#{story.id}</span>
+                                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                    story.status === 'new' ? 'bg-blue-100 text-blue-700' :
+                                    story.status === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
+                                    story.status === 'resolved' ? 'bg-green-100 text-green-700' :
+                                    'bg-gray-100 text-gray-700'
+                                  }`}>
+                                    {story.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                                  </span>
+                                </div>
+                                <p className="text-sm font-medium text-gray-900">{story.title}</p>
+                              </div>
+                            ))}
+                            {feedbackIssues.filter(i => i.parentId === selectedEpic.id).length === 0 && (
+                              <div className="text-center py-6 text-gray-500 text-sm">
+                                No stories yet. Create one below.
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="border-t border-gray-200 pt-4">
+                            <h4 className="text-sm font-semibold text-gray-700 mb-2">Create Story</h4>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={newStoryTitle}
+                                onChange={(e) => setNewStoryTitle(e.target.value)}
+                                placeholder="Enter story title..."
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                              />
+                              <button
+                                onClick={async () => {
+                                  if (!newStoryTitle.trim()) return;
+                                  try {
+                                    const response = await fetch('/api/issues', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({
+                                        type: 'Story',
+                                        title: newStoryTitle.trim(),
+                                        parentId: selectedEpic.id,
+                                        screen: selectedEpic.screen,
+                                        area: selectedEpic.area,
+                                        status: 'new',
+                                        priority: 'medium',
+                                        fixBy: 'current-release',
+                                        createdBy: 'Current User',
+                                      }),
+                                    });
+                                    if (response.ok) {
+                                      const created = await response.json();
+                                      setFeedbackIssues(prev => [...prev, created]);
+                                      setNewStoryTitle('');
+                                    }
+                                  } catch (error) {
+                                    console.error('Error creating story:', error);
+                                  }
+                                }}
+                                disabled={!newStoryTitle.trim()}
+                                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                Add
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex-1 flex items-center justify-center p-8">
+                        <div className="text-center">
+                          <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Layers className="h-8 w-8 text-purple-600" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">Select an Epic</h3>
+                          <p className="text-sm text-gray-500">
+                            Click on an Epic from the table to view details and manage stories.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </main>
