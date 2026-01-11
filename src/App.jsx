@@ -307,6 +307,10 @@ export default function MagpieV2() {
   const [newStoryTitle, setNewStoryTitle] = useState('');
   const [epicDraft, setEpicDraft] = useState({ title: '', description: '', status: '' });
   const [epicSaving, setEpicSaving] = useState(false);
+  const [objectDraft, setObjectDraft] = useState({ name: '', description: '' });
+  const [objectSaving, setObjectSaving] = useState(false);
+  const [newObjectStoryTitle, setNewObjectStoryTitle] = useState('');
+  const [newObjectStoryEpicId, setNewObjectStoryEpicId] = useState('');
   const [editingStory, setEditingStory] = useState(null);
   const [storyDraft, setStoryDraft] = useState({ storyId: null, title: '', description: '', status: '', priority: '', objectId: null, targetId: null, targetLoaded: false });
   const [storySaving, setStorySaving] = useState(false);
@@ -3808,7 +3812,11 @@ export default function MagpieV2() {
                         return (
                           <div
                             key={obj.id}
-                            onClick={() => setSelectedObject(obj)}
+                            onClick={() => {
+                              setSelectedObject(obj);
+                              setObjectDraft({ name: obj.name, description: obj.description || '' });
+                              setNewObjectStoryTitle('');
+                            }}
                             className={`p-4 cursor-pointer transition-colors ${
                               selectedObject?.id === obj.id
                                 ? 'bg-purple-50 border-l-4 border-purple-600'
@@ -3831,95 +3839,222 @@ export default function MagpieV2() {
                   </div>
 
                   {selectedObject ? (
-                    <div className="flex-1 bg-white rounded-xl border border-gray-200 overflow-hidden">
-                      <div className="p-4 border-b border-gray-200 bg-purple-50">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
-                            <Layers className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <h2 className="text-lg font-bold text-gray-900">{selectedObject.name}</h2>
-                            <p className="text-sm text-gray-600">{selectedObject.description}</p>
-                          </div>
-                        </div>
-                      </div>
+                    <div className="flex-1 bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
+                      {(() => {
+                        const isObjectDirty = objectDraft.name !== selectedObject.name || 
+                                              objectDraft.description !== (selectedObject.description || '');
+                        
+                        const handleObjectSave = async () => {
+                          if (!isObjectDirty) return;
+                          setObjectSaving(true);
+                          try {
+                            const updates = {};
+                            if (objectDraft.name !== selectedObject.name) updates.name = objectDraft.name;
+                            if (objectDraft.description !== (selectedObject.description || '')) updates.description = objectDraft.description;
+                            
+                            const response = await fetch(`/api/objects/${selectedObject.id}`, {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify(updates),
+                            });
+                            if (response.ok) {
+                              const updated = await response.json();
+                              setDomainObjects(prev => prev.map(o => o.id === updated.id ? updated : o));
+                              setSelectedObject(updated);
+                              setObjectDraft({ name: updated.name, description: updated.description || '' });
+                            }
+                          } catch (error) {
+                            console.error('Error saving object:', error);
+                          } finally {
+                            setObjectSaving(false);
+                          }
+                        };
 
-                      <div className="p-4">
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3">
-                          Linked Stories ({feedbackIssues.filter(i => i.objectId === selectedObject.id).length})
-                        </h4>
-                        <div className="space-y-2">
-                          {feedbackIssues.filter(i => i.objectId === selectedObject.id).map(story => {
-                            const parentEpic = feedbackIssues.find(e => e.id === story.parentId);
-                            return (
-                              <div 
-                                key={story.id}
-                                onClick={() => {
-                                  setEditingStory(story);
-                                  const storyId = story.id;
-                                  setStoryDraft({ 
-                                    storyId: story.id,
-                                    title: story.title, 
-                                    description: story.description || '', 
-                                    status: story.status, 
-                                    priority: story.priority || 'medium',
-                                    objectId: story.objectId || null,
-                                    targetId: null,
-                                    targetLoaded: false
-                                  });
-                                  fetch(`/api/issues/${story.id}/assignments`)
-                                    .then(res => res.json())
-                                    .then(assignments => {
-                                      setStoryDraft(prev => {
-                                        if (prev.storyId !== storyId) return prev;
-                                        if (prev.targetLoaded) return prev;
-                                        return { 
-                                          ...prev, 
-                                          targetId: assignments.length > 0 ? assignments[0].targetId : null,
-                                          targetLoaded: true
-                                        };
-                                      });
-                                    })
-                                    .catch(err => console.error('Error fetching assignments:', err));
-                                }}
-                                className="p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-purple-300 hover:bg-purple-50 transition-colors"
-                              >
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className="text-xs font-medium text-gray-500">#{story.id}</span>
-                                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                                    story.type === 'Story' ? 'bg-purple-100 text-purple-700' :
-                                    story.type === 'Epic' ? 'bg-indigo-100 text-indigo-700' :
-                                    'bg-gray-100 text-gray-700'
-                                  }`}>
-                                    {story.type}
-                                  </span>
-                                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                                    story.status === 'new' ? 'bg-blue-100 text-blue-700' :
-                                    story.status === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
-                                    story.status === 'resolved' ? 'bg-green-100 text-green-700' :
-                                    'bg-gray-100 text-gray-700'
-                                  }`}>
-                                    {story.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                        const handleObjectUndo = () => {
+                          setObjectDraft({ name: selectedObject.name, description: selectedObject.description || '' });
+                        };
+
+                        return (
+                          <>
+                            <div className="p-4 border-b border-gray-200 bg-purple-50">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                                    <Layers className="w-5 h-5 text-white" />
+                                  </div>
+                                  <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
+                                    Object
                                   </span>
                                 </div>
-                                <p className="text-sm font-medium text-gray-900">{story.title}</p>
-                                {parentEpic && (
-                                  <p className="text-xs text-gray-500 mt-1">
-                                    Epic: {parentEpic.title}
-                                  </p>
+                                {isObjectDirty && (
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={handleObjectUndo}
+                                      className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1"
+                                    >
+                                      <RotateCcw className="h-4 w-4" />
+                                      Undo
+                                    </button>
+                                    <button
+                                      onClick={handleObjectSave}
+                                      disabled={objectSaving}
+                                      className="px-3 py-1.5 text-sm font-medium bg-purple-600 text-white hover:bg-purple-700 rounded-lg transition-colors flex items-center gap-1 disabled:opacity-50"
+                                    >
+                                      <Save className="h-4 w-4" />
+                                      {objectSaving ? 'Saving...' : 'Save'}
+                                    </button>
+                                  </div>
                                 )}
                               </div>
-                            );
-                          })}
-                          {feedbackIssues.filter(i => i.objectId === selectedObject.id).length === 0 && (
-                            <div className="text-center py-8 text-gray-500 text-sm">
-                              No stories linked to this object yet.
-                              <br />
-                              <span className="text-xs">Assign stories to this object from the Epic view.</span>
                             </div>
-                          )}
-                        </div>
-                      </div>
+
+                            <div className="p-4 border-b border-gray-100 space-y-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                                <input
+                                  type="text"
+                                  value={objectDraft.name}
+                                  onChange={(e) => setObjectDraft(prev => ({ ...prev, name: e.target.value }))}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                <textarea
+                                  value={objectDraft.description}
+                                  onChange={(e) => setObjectDraft(prev => ({ ...prev, description: e.target.value }))}
+                                  rows={2}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="p-4 flex-1 overflow-y-auto">
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-sm font-semibold text-gray-700">
+                                  Linked Stories ({feedbackIssues.filter(i => i.objectId === selectedObject.id).length})
+                                </h4>
+                              </div>
+                              <div className="space-y-2 mb-4">
+                                {feedbackIssues.filter(i => i.objectId === selectedObject.id).map(story => {
+                                  const parentEpic = feedbackIssues.find(e => e.id === story.parentId);
+                                  return (
+                                    <div 
+                                      key={story.id}
+                                      onClick={() => {
+                                        setEditingStory(story);
+                                        const storyId = story.id;
+                                        setStoryDraft({ 
+                                          storyId: story.id,
+                                          title: story.title, 
+                                          description: story.description || '', 
+                                          status: story.status, 
+                                          priority: story.priority || 'medium',
+                                          objectId: story.objectId || null,
+                                          targetId: null,
+                                          targetLoaded: false
+                                        });
+                                        fetch(`/api/issues/${story.id}/assignments`)
+                                          .then(res => res.json())
+                                          .then(assignments => {
+                                            setStoryDraft(prev => {
+                                              if (prev.storyId !== storyId) return prev;
+                                              if (prev.targetLoaded) return prev;
+                                              return { 
+                                                ...prev, 
+                                                targetId: assignments.length > 0 ? assignments[0].targetId : null,
+                                                targetLoaded: true
+                                              };
+                                            });
+                                          })
+                                          .catch(err => console.error('Error fetching assignments:', err));
+                                      }}
+                                      className="p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-purple-300 hover:bg-purple-50 transition-colors"
+                                    >
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-xs font-medium text-gray-500">#{story.id}</span>
+                                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                          story.type === 'Story' ? 'bg-purple-100 text-purple-700' :
+                                          story.type === 'Epic' ? 'bg-indigo-100 text-indigo-700' :
+                                          'bg-gray-100 text-gray-700'
+                                        }`}>
+                                          {story.type}
+                                        </span>
+                                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                          story.status === 'new' ? 'bg-blue-100 text-blue-700' :
+                                          story.status === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
+                                          story.status === 'resolved' ? 'bg-green-100 text-green-700' :
+                                          'bg-gray-100 text-gray-700'
+                                        }`}>
+                                          {story.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                                        </span>
+                                      </div>
+                                      <p className="text-sm font-medium text-gray-900">{story.title}</p>
+                                      {parentEpic && (
+                                        <p className="text-xs text-gray-500 mt-1">
+                                          Epic: {parentEpic.title}
+                                        </p>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                                {feedbackIssues.filter(i => i.objectId === selectedObject.id).length === 0 && (
+                                  <div className="text-center py-8 text-gray-500 text-sm">
+                                    No stories linked to this object yet.
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="border-t border-gray-100 pt-4">
+                                <h4 className="text-sm font-semibold text-gray-700 mb-3">Add Story</h4>
+                                <div className="space-y-2">
+                                  <input
+                                    type="text"
+                                    value={newObjectStoryTitle}
+                                    onChange={(e) => setNewObjectStoryTitle(e.target.value)}
+                                    placeholder="Enter story title..."
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                  />
+                                  <div className="flex gap-2">
+                                    <select
+                                      value={newObjectStoryEpicId}
+                                      onChange={(e) => setNewObjectStoryEpicId(e.target.value)}
+                                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    >
+                                      <option value="">No Epic (standalone)</option>
+                                      {feedbackIssues.filter(i => i.type === 'Epic').map(epic => (
+                                        <option key={epic.id} value={epic.id}>{epic.title}</option>
+                                      ))}
+                                    </select>
+                                    <button
+                                      onClick={() => {
+                                        if (newObjectStoryTitle.trim()) {
+                                          const parentId = newObjectStoryEpicId ? parseInt(newObjectStoryEpicId) : null;
+                                          handleAddIssue({
+                                            type: 'Story',
+                                            title: newObjectStoryTitle.trim(),
+                                            status: 'new',
+                                            priority: 'medium',
+                                            objectId: selectedObject.id,
+                                            parentId: parentId
+                                          });
+                                          setNewObjectStoryTitle('');
+                                          setNewObjectStoryEpicId('');
+                                        }
+                                      }}
+                                      disabled={!newObjectStoryTitle.trim()}
+                                      className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    >
+                                      <Plus className="h-4 w-4" />
+                                      Add
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
                   ) : (
                     <div className="flex-1 flex items-center justify-center bg-white rounded-xl border border-gray-200">

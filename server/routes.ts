@@ -143,3 +143,39 @@ router.get("/api/objects/:id/issues", async (req: Request<{id: string}>, res: Re
     res.status(500).json({ error: "Failed to fetch issues for object" });
   }
 });
+
+router.patch("/api/objects/:id", async (req: Request<{id: string}>, res: Response) => {
+  try {
+    const id = parseInt(req.params.id);
+    const allowedFields = ['name', 'description'];
+    const updates: Record<string, any> = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
+    }
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: "No valid fields to update" });
+    }
+    if (updates.name !== undefined) {
+      if (typeof updates.name !== 'string' || updates.name.trim().length === 0) {
+        return res.status(400).json({ error: "Name cannot be empty" });
+      }
+      if (updates.name.length > 255) {
+        return res.status(400).json({ error: "Name cannot exceed 255 characters" });
+      }
+      updates.name = updates.name.trim();
+    }
+    if (updates.description !== undefined && typeof updates.description === 'string') {
+      updates.description = updates.description.trim() || null;
+    }
+    const object = await storage.updateObject(id, updates);
+    if (!object) {
+      return res.status(404).json({ error: "Object not found" });
+    }
+    res.json(object);
+  } catch (error) {
+    console.error("Error updating object:", error);
+    res.status(500).json({ error: "Failed to update object" });
+  }
+});

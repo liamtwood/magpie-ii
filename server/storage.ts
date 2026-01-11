@@ -161,6 +161,11 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+  async updateObject(id: number, updates: Partial<InsertDomainObject>): Promise<DomainObject | undefined> {
+    const [result] = await db.update(objects).set(updates).where(eq(objects.id, id)).returning();
+    return result || undefined;
+  }
+
   async getIssuesForObject(objectId: number): Promise<Issue[]> {
     return await db.select().from(issues).where(eq(issues.objectId, objectId)).orderBy(asc(issues.id));
   }
