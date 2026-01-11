@@ -3834,12 +3834,122 @@ export default function MagpieV2() {
                           </div>
                         );
                       })}
+                      <div className="border-t-2 border-gray-300 my-1"></div>
+                      {(() => {
+                        const unassignedStories = feedbackIssues.filter(i => !i.objectId && i.type === 'Story');
+                        return (
+                          <div
+                            onClick={() => {
+                              setSelectedObject({ id: null, key: 'none', name: 'None', description: 'Stories not assigned to any object' });
+                              setObjectDraft({ name: 'None', description: 'Stories not assigned to any object' });
+                              setNewObjectStoryTitle('');
+                            }}
+                            className={`p-4 cursor-pointer transition-colors ${
+                              selectedObject?.id === null
+                                ? 'bg-purple-50 border-l-4 border-purple-600'
+                                : 'hover:bg-gray-50 border-l-4 border-transparent'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h4 className="font-semibold text-gray-500 italic">None</h4>
+                              </div>
+                              <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
+                                {unassignedStories.length}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
 
                   {selectedObject ? (
                     <div className="flex-1 bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
-                      {(() => {
+                      {selectedObject.id === null ? (
+                        <>
+                          <div className="p-4 border-b border-gray-200 bg-gray-50">
+                            <div className="flex items-center gap-3 mb-3">
+                              <span className="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-600">
+                                Unassigned
+                              </span>
+                            </div>
+                            <h2 className="text-lg font-bold text-gray-500 italic">None</h2>
+                          </div>
+
+                          <div className="p-4 border-b border-gray-200">
+                            <p className="text-sm text-gray-500">Stories not assigned to any domain object</p>
+                          </div>
+
+                          <div className="p-4 flex-1 overflow-y-auto">
+                            <div className="flex items-center justify-between mb-3">
+                              <h4 className="text-sm font-semibold text-gray-700">
+                                Unassigned Stories ({feedbackIssues.filter(i => !i.objectId && i.type === 'Story').length})
+                              </h4>
+                            </div>
+                            <div className="space-y-2">
+                              {feedbackIssues.filter(i => !i.objectId && i.type === 'Story').map(story => {
+                                const parentEpic = feedbackIssues.find(e => e.id === story.parentId);
+                                return (
+                                  <div 
+                                    key={story.id}
+                                    onClick={() => {
+                                      setEditingStory(story);
+                                      const storyId = story.id;
+                                      setStoryDraft({ 
+                                        storyId: story.id,
+                                        title: story.title, 
+                                        description: story.description || '', 
+                                        status: story.status, 
+                                        priority: story.priority || 'medium',
+                                        objectId: story.objectId || null,
+                                        targetId: null,
+                                        targetLoaded: false
+                                      });
+                                      fetch(`/api/issues/${story.id}/assignments`)
+                                        .then(res => res.json())
+                                        .then(assignments => {
+                                          setStoryDraft(prev => {
+                                            if (prev.storyId !== storyId) return prev;
+                                            if (prev.targetLoaded) return prev;
+                                            return { 
+                                              ...prev, 
+                                              targetId: assignments.length > 0 ? assignments[0].targetId : null,
+                                              targetLoaded: true
+                                            };
+                                          });
+                                        })
+                                        .catch(err => console.error('Error fetching assignments:', err));
+                                    }}
+                                    className="p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-purple-300 hover:bg-purple-50 transition-colors"
+                                  >
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <span className="text-xs font-medium text-gray-500">#{story.id}</span>
+                                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                        story.status === 'new' ? 'bg-blue-100 text-blue-700' :
+                                        story.status === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
+                                        story.status === 'resolved' ? 'bg-green-100 text-green-700' :
+                                        'bg-gray-100 text-gray-700'
+                                      }`}>
+                                        {story.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                                      </span>
+                                      {parentEpic && (
+                                        <span className="px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700">
+                                          {parentEpic.title}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-sm font-medium text-gray-900">{story.title}</p>
+                                  </div>
+                                );
+                              })}
+                              {feedbackIssues.filter(i => !i.objectId && i.type === 'Story').length === 0 && (
+                                <p className="text-sm text-gray-500 italic py-4 text-center">No unassigned stories</p>
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      ) : (() => {
                         const isObjectDirty = objectDraft.name !== selectedObject.name || 
                                               objectDraft.description !== (selectedObject.description || '');
                         
