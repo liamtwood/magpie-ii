@@ -1,4 +1,4 @@
-import { issues, deliveryTargets, issueAssignments, type Issue, type InsertIssue, type DeliveryTarget, type InsertDeliveryTarget, type IssueAssignment, type InsertIssueAssignment } from "../shared/schema";
+import { issues, deliveryTargets, issueAssignments, objects, type Issue, type InsertIssue, type DeliveryTarget, type InsertDeliveryTarget, type IssueAssignment, type InsertIssueAssignment, type DomainObject, type InsertDomainObject } from "../shared/schema";
 import { db } from "./db";
 import { eq, asc, isNull, inArray } from "drizzle-orm";
 
@@ -18,6 +18,11 @@ export interface IStorage {
   getAssignmentsForIssue(issueId: number): Promise<(IssueAssignment & { target?: DeliveryTarget })[]>;
   getIssuesForTarget(targetKey: string): Promise<Issue[]>;
   setIssueAssignments(issueId: number, targetIds: number[]): Promise<void>;
+
+  getAllObjects(): Promise<DomainObject[]>;
+  getObject(id: number): Promise<DomainObject | undefined>;
+  createObject(obj: InsertDomainObject): Promise<DomainObject>;
+  getIssuesForObject(objectId: number): Promise<Issue[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -140,6 +145,24 @@ export class DatabaseStorage implements IStorage {
       const values = targetIds.map(targetId => ({ issueId, targetId }));
       await db.insert(issueAssignments).values(values);
     }
+  }
+
+  async getAllObjects(): Promise<DomainObject[]> {
+    return await db.select().from(objects).orderBy(asc(objects.name));
+  }
+
+  async getObject(id: number): Promise<DomainObject | undefined> {
+    const [obj] = await db.select().from(objects).where(eq(objects.id, id));
+    return obj || undefined;
+  }
+
+  async createObject(obj: InsertDomainObject): Promise<DomainObject> {
+    const [result] = await db.insert(objects).values(obj).returning();
+    return result;
+  }
+
+  async getIssuesForObject(objectId: number): Promise<Issue[]> {
+    return await db.select().from(issues).where(eq(issues.objectId, objectId)).orderBy(asc(issues.id));
   }
 }
 

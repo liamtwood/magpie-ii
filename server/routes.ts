@@ -122,3 +122,24 @@ router.get("/api/delivery-targets/:key/issues", async (req: Request<{key: string
     res.status(500).json({ error: "Failed to fetch issues for target" });
   }
 });
+
+router.get("/api/objects", async (_req: Request, res: Response) => {
+  try {
+    const objects = await storage.getAllObjects();
+    res.json(objects);
+  } catch (error) {
+    console.error("Error fetching objects:", error);
+    res.status(500).json({ error: "Failed to fetch objects" });
+  }
+});
+
+router.get("/api/objects/:id/issues", async (req: Request<{id: string}>, res: Response) => {
+  try {
+    const id = parseInt(req.params.id);
+    const issues = await storage.getIssuesForObject(id);
+    res.json(issues);
+  } catch (error) {
+    console.error("Error fetching issues for object:", error);
+    res.status(500).json({ error: "Failed to fetch issues for object" });
+  }
+});
