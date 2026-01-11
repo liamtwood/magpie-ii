@@ -3639,6 +3639,7 @@ export default function MagpieV2() {
                                     priority: story.priority || 'medium' 
                                   });
                                 }}
+                                title={story.description || 'No description'}
                                 className="p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-purple-300 hover:bg-purple-50 transition-colors"
                               >
                                 <div className="flex items-center gap-2 mb-1">
