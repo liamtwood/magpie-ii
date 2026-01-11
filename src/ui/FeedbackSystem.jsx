@@ -9,7 +9,7 @@ const ISSUE_TYPES = [
   { id: 'bug', label: 'Bug', icon: Bug, color: 'red' },
   { id: 'enhancement', label: 'Enhancement', icon: Lightbulb, color: 'amber' },
   { id: 'question', label: 'Question', icon: HelpCircle, color: 'blue' },
-  { id: 'requirement', label: 'Requirement', icon: Flag, color: 'purple' },
+  { id: 'Epic', label: 'Epic', icon: Flag, color: 'purple' },
 ];
 
 const PRIORITIES = [
@@ -424,7 +424,7 @@ const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssue, onDeleteIssu
     const parentIssue = issues.find(i => i.id === showAddStoryModal);
     
     onAddIssue({
-      type: 'requirement',
+      type: 'Epic',
       title: storyForm.title,
       description: storyForm.description,
       parentId: showAddStoryModal,
@@ -489,7 +489,7 @@ const IssuesPanel = ({ isOpen, onClose, issues = [], onUpdateIssue, onDeleteIssu
       <div className={isChild ? 'ml-6 border-l-2 border-purple-500/30 pl-4' : ''}>
         <div className={`bg-slate-700/50 border border-slate-600 rounded-lg p-4 ${isChild ? 'bg-slate-700/30' : ''}`}>
           <div className="flex items-start gap-3">
-            {!isChild && issue.type === 'requirement' && (
+            {!isChild && issue.type === 'Epic' && (
               <button 
                 onClick={() => toggleExpand(issue.id)}
                 className="mt-1 p-1 hover:bg-slate-600 rounded transition-colors"

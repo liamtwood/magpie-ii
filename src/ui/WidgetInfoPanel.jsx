@@ -29,8 +29,8 @@ export function WidgetInfoPanel({ isOpen, onClose, widgetKey, onChangeWidget, on
       const response = await fetch(`/api/delivery-targets/${key}/issues`);
       if (response.ok) {
         const widgetIssues = await response.json();
-        const reqs = widgetIssues.filter(i => i.type === 'requirement');
-        const bugs = widgetIssues.filter(i => i.type !== 'requirement');
+        const reqs = widgetIssues.filter(i => i.type === 'Epic');
+        const bugs = widgetIssues.filter(i => i.type !== 'Epic');
         setRequirements(reqs);
         setIssues(bugs);
       } else {
@@ -114,7 +114,7 @@ export function WidgetInfoPanel({ isOpen, onClose, widgetKey, onChangeWidget, on
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Lightbulb className="h-4 w-4 text-blue-600" />
-            <h3 className="font-medium text-gray-900">Requirements</h3>
+            <h3 className="font-medium text-gray-900">Epics</h3>
             <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
               {requirements.length}
             </span>

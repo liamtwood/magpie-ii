@@ -177,11 +177,11 @@ export default function MagpieV2() {
   const [issuesLoading, setIssuesLoading] = useState(true);
   
   const getRequirementsForScreen = (screen) => {
-    return feedbackIssues.filter(i => i.type === 'requirement' && i.screen === screen);
+    return feedbackIssues.filter(i => i.type === 'Epic' && i.screen === screen);
   };
   
   const openRequirementsForScreen = (screen) => {
-    setIssuesPanelFilters({ type: 'requirement', screen });
+    setIssuesPanelFilters({ type: 'Epic', screen });
     setShowIssuesPanel(true);
   };
   
@@ -3369,7 +3369,7 @@ export default function MagpieV2() {
                           <td className="px-4 py-3 text-gray-900 font-medium">{issue.id}</td>
                           <td className="px-4 py-3">
                             <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              issue.type === 'requirement' ? 'bg-purple-100 text-purple-700' :
+                              issue.type === 'Epic' ? 'bg-purple-100 text-purple-700' :
                               issue.type === 'bug' ? 'bg-red-100 text-red-700' :
                               issue.type === 'enhancement' ? 'bg-blue-100 text-blue-700' :
                               'bg-gray-100 text-gray-700'
