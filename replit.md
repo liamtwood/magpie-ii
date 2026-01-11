@@ -156,6 +156,17 @@ The application follows a full-stack architecture with React frontend and Expres
 - **Components**: `src/ui/InfoButton.jsx`, `src/ui/WidgetInfoPanel.jsx`, `src/ui/WidgetTargets.js`
 - **State**: `widgetDiscoverMode`, `showWidgetInfoPanel`, `activeWidgetKey` in App.jsx
 
+### 16. Domain Objects System
+- **Object Definition**: Define domain entities (Player, Club, Squad, Shortlist, Season, User, Contract, Activity) that features can be linked to
+- **Two-Dimensional Model**: Stories have both a delivery target (WHERE - page/widget) and an object (WHAT - domain entity)
+- **Object View**: Third view mode in Feature Management (List | Epic | Object) showing objects on the left and linked stories on the right
+- **Object Dropdown**: Story Edit Dialog includes Object selector to assign stories to domain objects
+- **Count Badges**: Each object shows count of linked stories
+- **Cross-Epic Visibility**: See all features related to an object regardless of which Epic they belong to
+- **Database Table**: `objects` with id, key, name, description fields
+- **API Endpoints**: GET `/api/objects`, GET `/api/objects/:id/issues`
+- **State**: `domainObjects`, `selectedObject` in App.jsx
+
 ### 13. Player Swipe (Dating App Style)
 - **Issue Cards View**: Large cards showing squad issues (contract expiring, injuries, succession) with risk percentages
 - **Card Sizing**: Card size and glow intensity reflects issue criticality (higher risk = bigger/brighter)
