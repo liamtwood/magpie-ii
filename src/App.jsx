@@ -274,7 +274,7 @@ export default function MagpieV2() {
   const [selectedPitchPosition, setSelectedPitchPosition] = useState(null);
   const [issuesTab, setIssuesTab] = useState('critical');
   const [widgetDiscoverMode, setWidgetDiscoverMode] = useState(false);
-  const [featureViewMode, setFeatureViewMode] = useState('list');
+  const [featureViewMode, setFeatureViewMode] = useState('epic');
   const [selectedEpic, setSelectedEpic] = useState(null);
   const [newStoryTitle, setNewStoryTitle] = useState('');
   const [epicDraft, setEpicDraft] = useState({ title: '', description: '', status: '' });
