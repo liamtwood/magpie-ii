@@ -279,6 +279,9 @@ export default function MagpieV2() {
   const [newStoryTitle, setNewStoryTitle] = useState('');
   const [epicDraft, setEpicDraft] = useState({ title: '', description: '', status: '' });
   const [epicSaving, setEpicSaving] = useState(false);
+  const [editingStory, setEditingStory] = useState(null);
+  const [storyDraft, setStoryDraft] = useState({ title: '', description: '', status: '', priority: '' });
+  const [storySaving, setStorySaving] = useState(false);
   const [showWidgetInfoPanel, setShowWidgetInfoPanel] = useState(false);
   const [activeWidgetKey, setActiveWidgetKey] = useState(null);
   const [showReportIssueModal, setShowReportIssueModal] = useState(false);
@@ -3625,7 +3628,19 @@ export default function MagpieV2() {
 
                           <div className="space-y-2 mb-4">
                             {feedbackIssues.filter(i => i.parentId === selectedEpic.id).map((story) => (
-                              <div key={story.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                              <div 
+                                key={story.id} 
+                                onClick={() => {
+                                  setEditingStory(story);
+                                  setStoryDraft({ 
+                                    title: story.title, 
+                                    description: story.description || '', 
+                                    status: story.status, 
+                                    priority: story.priority || 'medium' 
+                                  });
+                                }}
+                                className="p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-purple-300 hover:bg-purple-50 transition-colors"
+                              >
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="text-xs font-medium text-gray-500">#{story.id}</span>
                                   <span className={`px-2 py-0.5 rounded text-xs font-medium ${
@@ -4138,6 +4153,122 @@ export default function MagpieV2() {
           setShowReportIssueModal(true);
         }}
       />
+
+      {editingStory && (
+        <div className="fixed inset-0 bg-black/50 z-[70] flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-purple-50 rounded-t-xl">
+              <div className="flex items-center gap-3">
+                <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
+                  Story #{editingStory.id}
+                </span>
+                <h2 className="text-lg font-bold text-gray-900">Edit Story</h2>
+              </div>
+              <button 
+                onClick={() => setEditingStory(null)}
+                className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                <input
+                  type="text"
+                  value={storyDraft.title}
+                  onChange={(e) => setStoryDraft(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea
+                  value={storyDraft.description}
+                  onChange={(e) => setStoryDraft(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Add a description..."
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                  <select
+                    value={storyDraft.status}
+                    onChange={(e) => setStoryDraft(prev => ({ ...prev, status: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="new">New</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="resolved">Resolved</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                  <select
+                    value={storyDraft.priority}
+                    onChange={(e) => setStoryDraft(prev => ({ ...prev, priority: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-gray-200 flex gap-3">
+              <button
+                onClick={() => setEditingStory(null)}
+                className="flex-1 py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  setStorySaving(true);
+                  try {
+                    const updates = {};
+                    if (storyDraft.title !== editingStory.title) updates.title = storyDraft.title;
+                    if (storyDraft.description !== (editingStory.description || '')) updates.description = storyDraft.description;
+                    if (storyDraft.status !== editingStory.status) updates.status = storyDraft.status;
+                    if (storyDraft.priority !== (editingStory.priority || 'medium')) updates.priority = storyDraft.priority;
+                    
+                    if (Object.keys(updates).length > 0) {
+                      const response = await fetch(`/api/issues/${editingStory.id}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updates),
+                      });
+                      if (response.ok) {
+                        const updated = await response.json();
+                        setFeedbackIssues(prev => prev.map(i => i.id === updated.id ? updated : i));
+                      }
+                    }
+                    setEditingStory(null);
+                  } catch (error) {
+                    console.error('Error saving story:', error);
+                  } finally {
+                    setStorySaving(false);
+                  }
+                }}
+                disabled={storySaving || !storyDraft.title.trim()}
+                className="flex-1 py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {storySaving ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ReportIssueModal
         isOpen={showReportIssueModal}
