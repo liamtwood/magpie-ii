@@ -148,7 +148,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllObjects(): Promise<DomainObject[]> {
-    return await db.select().from(objects).orderBy(asc(objects.name));
+    return await db.select().from(objects).orderBy(asc(objects.displayOrder));
   }
 
   async getObject(id: number): Promise<DomainObject | undefined> {

@@ -7,6 +7,7 @@ export const objects = pgTable("objects", {
   key: varchar("key", { length: 100 }).notNull().unique(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
+  displayOrder: integer("display_order").default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
