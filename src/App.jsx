@@ -176,6 +176,7 @@ export default function MagpieV2() {
   const [feedbackIssues, setFeedbackIssues] = useState([]);
   const [issuesLoading, setIssuesLoading] = useState(true);
   const [domainObjects, setDomainObjects] = useState([]);
+  const [deliveryTargets, setDeliveryTargets] = useState([]);
   
   const getRequirementsForScreen = (screen) => {
     return feedbackIssues.filter(i => i.type === 'Epic' && i.screen === screen);
@@ -189,6 +190,7 @@ export default function MagpieV2() {
   useEffect(() => {
     fetchIssues();
     fetchObjects();
+    fetchDeliveryTargets();
   }, []);
   
   const fetchIssues = async () => {
@@ -214,6 +216,18 @@ export default function MagpieV2() {
       }
     } catch (error) {
       console.error('Error fetching objects:', error);
+    }
+  };
+
+  const fetchDeliveryTargets = async () => {
+    try {
+      const response = await fetch('/api/delivery-targets');
+      if (response.ok) {
+        const data = await response.json();
+        setDeliveryTargets(data);
+      }
+    } catch (error) {
+      console.error('Error fetching delivery targets:', error);
     }
   };
   
@@ -294,7 +308,7 @@ export default function MagpieV2() {
   const [epicDraft, setEpicDraft] = useState({ title: '', description: '', status: '' });
   const [epicSaving, setEpicSaving] = useState(false);
   const [editingStory, setEditingStory] = useState(null);
-  const [storyDraft, setStoryDraft] = useState({ title: '', description: '', status: '', priority: '', objectId: null });
+  const [storyDraft, setStoryDraft] = useState({ storyId: null, title: '', description: '', status: '', priority: '', objectId: null, targetId: null, targetLoaded: false });
   const [storySaving, setStorySaving] = useState(false);
   const [selectedObject, setSelectedObject] = useState(null);
   const [showWidgetInfoPanel, setShowWidgetInfoPanel] = useState(false);
@@ -3657,13 +3671,31 @@ export default function MagpieV2() {
                                 key={story.id} 
                                 onClick={() => {
                                   setEditingStory(story);
+                                  const storyId = story.id;
                                   setStoryDraft({ 
+                                    storyId: story.id,
                                     title: story.title, 
                                     description: story.description || '', 
                                     status: story.status, 
                                     priority: story.priority || 'medium',
-                                    objectId: story.objectId || null
+                                    objectId: story.objectId || null,
+                                    targetId: null,
+                                    targetLoaded: false
                                   });
+                                  fetch(`/api/issues/${story.id}/assignments`)
+                                    .then(res => res.json())
+                                    .then(assignments => {
+                                      setStoryDraft(prev => {
+                                        if (prev.storyId !== storyId) return prev;
+                                        if (prev.targetLoaded) return prev;
+                                        return { 
+                                          ...prev, 
+                                          targetId: assignments.length > 0 ? assignments[0].targetId : null,
+                                          targetLoaded: true
+                                        };
+                                      });
+                                    })
+                                    .catch(err => console.error('Error fetching assignments:', err));
                                 }}
                                 className="group relative p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-purple-300 hover:bg-purple-50 transition-colors"
                               >
@@ -3824,13 +3856,31 @@ export default function MagpieV2() {
                                 key={story.id}
                                 onClick={() => {
                                   setEditingStory(story);
+                                  const storyId = story.id;
                                   setStoryDraft({ 
+                                    storyId: story.id,
                                     title: story.title, 
                                     description: story.description || '', 
                                     status: story.status, 
                                     priority: story.priority || 'medium',
-                                    objectId: story.objectId || null
+                                    objectId: story.objectId || null,
+                                    targetId: null,
+                                    targetLoaded: false
                                   });
+                                  fetch(`/api/issues/${story.id}/assignments`)
+                                    .then(res => res.json())
+                                    .then(assignments => {
+                                      setStoryDraft(prev => {
+                                        if (prev.storyId !== storyId) return prev;
+                                        if (prev.targetLoaded) return prev;
+                                        return { 
+                                          ...prev, 
+                                          targetId: assignments.length > 0 ? assignments[0].targetId : null,
+                                          targetLoaded: true
+                                        };
+                                      });
+                                    })
+                                    .catch(err => console.error('Error fetching assignments:', err));
                                 }}
                                 className="p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-purple-300 hover:bg-purple-50 transition-colors"
                               >
@@ -4382,18 +4432,41 @@ export default function MagpieV2() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Object</label>
-                <select
-                  value={storyDraft.objectId || ''}
-                  onChange={(e) => setStoryDraft(prev => ({ ...prev, objectId: e.target.value ? parseInt(e.target.value) : null }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                >
-                  <option value="">No object</option>
-                  {domainObjects.map(obj => (
-                    <option key={obj.id} value={obj.id}>{obj.name}</option>
-                  ))}
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Object</label>
+                  <select
+                    value={storyDraft.objectId || ''}
+                    onChange={(e) => setStoryDraft(prev => ({ ...prev, objectId: e.target.value ? parseInt(e.target.value) : null }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="">No object</option>
+                    {domainObjects.map(obj => (
+                      <option key={obj.id} value={obj.id}>{obj.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Page / Widget</label>
+                  <select
+                    value={storyDraft.targetId || ''}
+                    onChange={(e) => setStoryDraft(prev => ({ ...prev, targetId: e.target.value ? parseInt(e.target.value) : null, targetLoaded: true }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="">No target</option>
+                    <optgroup label="Pages">
+                      {deliveryTargets.filter(t => t.type === 'page').map(target => (
+                        <option key={target.id} value={target.id}>{target.name}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Widgets">
+                      {deliveryTargets.filter(t => t.type === 'widget').map(target => (
+                        <option key={target.id} value={target.id}>{target.name}</option>
+                      ))}
+                    </optgroup>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -4415,16 +4488,18 @@ export default function MagpieV2() {
                     if (storyDraft.priority !== (editingStory.priority || 'medium')) updates.priority = storyDraft.priority;
                     if (storyDraft.objectId !== (editingStory.objectId || null)) updates.objectId = storyDraft.objectId;
                     
-                    if (Object.keys(updates).length > 0) {
-                      const response = await fetch(`/api/issues/${editingStory.id}`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(updates),
-                      });
-                      if (response.ok) {
-                        const updated = await response.json();
-                        setFeedbackIssues(prev => prev.map(i => i.id === updated.id ? updated : i));
-                      }
+                    if (storyDraft.targetLoaded) {
+                      updates.targetIds = storyDraft.targetId ? [storyDraft.targetId] : [];
+                    }
+                    
+                    const response = await fetch(`/api/issues/${editingStory.id}`, {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(updates),
+                    });
+                    if (response.ok) {
+                      const updated = await response.json();
+                      setFeedbackIssues(prev => prev.map(i => i.id === updated.id ? updated : i));
                     }
                     setEditingStory(null);
                   } catch (error) {
