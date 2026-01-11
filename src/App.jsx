@@ -3639,8 +3639,7 @@ export default function MagpieV2() {
                                     priority: story.priority || 'medium' 
                                   });
                                 }}
-                                title={story.description || 'No description'}
-                                className="p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-purple-300 hover:bg-purple-50 transition-colors"
+                                className="group relative p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-purple-300 hover:bg-purple-50 transition-colors"
                               >
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="text-xs font-medium text-gray-500">#{story.id}</span>
@@ -3654,6 +3653,15 @@ export default function MagpieV2() {
                                   </span>
                                 </div>
                                 <p className="text-sm font-medium text-gray-900">{story.title}</p>
+                                
+                                {story.description && (
+                                  <div className="absolute left-0 right-0 top-full mt-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                                    <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg mx-2">
+                                      <div className="absolute -top-1.5 left-4 w-3 h-3 bg-gray-900 rotate-45"></div>
+                                      <p className="relative z-10 leading-relaxed">{story.description}</p>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             ))}
                             {feedbackIssues.filter(i => i.parentId === selectedEpic.id).length === 0 && (
