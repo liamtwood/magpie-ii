@@ -3826,7 +3826,6 @@ export default function MagpieV2() {
                             <div className="flex items-center justify-between">
                               <div>
                                 <h4 className="font-semibold text-gray-900">{obj.name}</h4>
-                                <p className="text-xs text-gray-500 mt-1">{obj.description}</p>
                               </div>
                               <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
                                 {linkedStories.length}
