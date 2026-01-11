@@ -3877,11 +3877,8 @@ export default function MagpieV2() {
                         return (
                           <>
                             <div className="p-4 border-b border-gray-200 bg-purple-50">
-                              <div className="flex items-center justify-between">
+                              <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-3">
-                                  <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
-                                    <Layers className="w-5 h-5 text-white" />
-                                  </div>
                                   <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
                                     Object
                                   </span>
@@ -3890,43 +3887,37 @@ export default function MagpieV2() {
                                   <div className="flex items-center gap-2">
                                     <button
                                       onClick={handleObjectUndo}
-                                      className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1"
+                                      className="px-3 py-1 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
                                     >
-                                      <RotateCcw className="h-4 w-4" />
                                       Undo
                                     </button>
                                     <button
                                       onClick={handleObjectSave}
                                       disabled={objectSaving}
-                                      className="px-3 py-1.5 text-sm font-medium bg-purple-600 text-white hover:bg-purple-700 rounded-lg transition-colors flex items-center gap-1 disabled:opacity-50"
+                                      className="px-3 py-1 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded transition-colors disabled:opacity-50"
                                     >
-                                      <Save className="h-4 w-4" />
                                       {objectSaving ? 'Saving...' : 'Save'}
                                     </button>
                                   </div>
                                 )}
                               </div>
+                              <input
+                                type="text"
+                                value={objectDraft.name}
+                                onChange={(e) => setObjectDraft(prev => ({ ...prev, name: e.target.value }))}
+                                className="w-full text-lg font-bold text-gray-900 bg-transparent border-b-2 border-transparent hover:border-purple-300 focus:border-purple-500 focus:outline-none transition-colors"
+                              />
                             </div>
 
-                            <div className="p-4 border-b border-gray-100 space-y-4">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                                <input
-                                  type="text"
-                                  value={objectDraft.name}
-                                  onChange={(e) => setObjectDraft(prev => ({ ...prev, name: e.target.value }))}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                                <textarea
-                                  value={objectDraft.description}
-                                  onChange={(e) => setObjectDraft(prev => ({ ...prev, description: e.target.value }))}
-                                  rows={2}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                                />
-                              </div>
+                            <div className="p-4 border-b border-gray-200">
+                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Description</h4>
+                              <textarea
+                                value={objectDraft.description}
+                                onChange={(e) => setObjectDraft(prev => ({ ...prev, description: e.target.value }))}
+                                placeholder="Add a description..."
+                                rows={3}
+                                className="w-full text-sm text-gray-600 bg-transparent border border-gray-200 rounded-lg p-2 hover:border-purple-300 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-colors resize-none"
+                              />
                             </div>
 
                             <div className="p-4 flex-1 overflow-y-auto">
