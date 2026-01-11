@@ -277,7 +277,8 @@ export default function MagpieV2() {
   const [featureViewMode, setFeatureViewMode] = useState('list');
   const [selectedEpic, setSelectedEpic] = useState(null);
   const [newStoryTitle, setNewStoryTitle] = useState('');
-  const [editingEpic, setEditingEpic] = useState({ title: '', description: '', status: '' });
+  const [epicDraft, setEpicDraft] = useState({ title: '', description: '', status: '' });
+  const [epicSaving, setEpicSaving] = useState(false);
   const [showWidgetInfoPanel, setShowWidgetInfoPanel] = useState(false);
   const [activeWidgetKey, setActiveWidgetKey] = useState(null);
   const [showReportIssueModal, setShowReportIssueModal] = useState(false);
@@ -3472,7 +3473,7 @@ export default function MagpieV2() {
                           {feedbackIssues.filter(i => i.type === 'Epic').map((epic) => (
                             <tr
                               key={epic.id}
-                              onClick={() => { setSelectedEpic(epic); setEditingEpic({ title: '', description: '', status: '' }); }}
+                              onClick={() => { setSelectedEpic(epic); setEpicDraft({ title: epic.title, description: epic.description || '', status: epic.status }); }}
                               className={`cursor-pointer transition-colors ${
                                 selectedEpic?.id === epic.id
                                   ? 'bg-purple-50 border-l-4 border-purple-500'
@@ -3514,101 +3515,106 @@ export default function MagpieV2() {
                   <div className="w-[400px] bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
                     {selectedEpic ? (
                       <>
-                        <div className="p-4 border-b border-gray-200 bg-purple-50">
-                          <div className="flex items-center gap-3 mb-3">
-                            <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
-                              Epic #{selectedEpic.id}
-                            </span>
-                            <select
-                              value={editingEpic.status || selectedEpic.status}
-                              onChange={async (e) => {
-                                const newStatus = e.target.value;
-                                setEditingEpic(prev => ({ ...prev, status: newStatus }));
-                                try {
-                                  const response = await fetch(`/api/issues/${selectedEpic.id}`, {
-                                    method: 'PATCH',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ status: newStatus }),
-                                  });
-                                  if (response.ok) {
-                                    const updated = await response.json();
-                                    setFeedbackIssues(prev => prev.map(i => i.id === updated.id ? updated : i));
-                                    setSelectedEpic(updated);
-                                  }
-                                } catch (error) {
-                                  console.error('Error updating status:', error);
-                                }
-                              }}
-                              className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
-                                (editingEpic.status || selectedEpic.status) === 'new' ? 'bg-blue-100 text-blue-700' :
-                                (editingEpic.status || selectedEpic.status) === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
-                                (editingEpic.status || selectedEpic.status) === 'resolved' ? 'bg-green-100 text-green-700' :
-                                'bg-gray-100 text-gray-700'
-                              }`}
-                            >
-                              <option value="new">New</option>
-                              <option value="in-progress">In Progress</option>
-                              <option value="resolved">Resolved</option>
-                              <option value="closed">Closed</option>
-                            </select>
-                          </div>
-                          <input
-                            type="text"
-                            value={editingEpic.title !== undefined && editingEpic.title !== '' ? editingEpic.title : selectedEpic.title}
-                            onChange={(e) => setEditingEpic(prev => ({ ...prev, title: e.target.value }))}
-                            onBlur={async () => {
-                              if (editingEpic.title && editingEpic.title !== selectedEpic.title) {
-                                try {
-                                  const response = await fetch(`/api/issues/${selectedEpic.id}`, {
-                                    method: 'PATCH',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ title: editingEpic.title }),
-                                  });
-                                  if (response.ok) {
-                                    const updated = await response.json();
-                                    setFeedbackIssues(prev => prev.map(i => i.id === updated.id ? updated : i));
-                                    setSelectedEpic(updated);
-                                    setEditingEpic(prev => ({ ...prev, title: '' }));
-                                  }
-                                } catch (error) {
-                                  console.error('Error updating title:', error);
-                                }
+                        {(() => {
+                          const isDirty = epicDraft.title !== selectedEpic.title || 
+                                          epicDraft.description !== (selectedEpic.description || '') || 
+                                          epicDraft.status !== selectedEpic.status;
+                          
+                          const handleSave = async () => {
+                            if (!isDirty) return;
+                            setEpicSaving(true);
+                            try {
+                              const updates = {};
+                              if (epicDraft.title !== selectedEpic.title) updates.title = epicDraft.title;
+                              if (epicDraft.description !== (selectedEpic.description || '')) updates.description = epicDraft.description;
+                              if (epicDraft.status !== selectedEpic.status) updates.status = epicDraft.status;
+                              
+                              const response = await fetch(`/api/issues/${selectedEpic.id}`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(updates),
+                              });
+                              if (response.ok) {
+                                const updated = await response.json();
+                                setFeedbackIssues(prev => prev.map(i => i.id === updated.id ? updated : i));
+                                setSelectedEpic(updated);
+                                setEpicDraft({ title: updated.title, description: updated.description || '', status: updated.status });
                               }
-                            }}
-                            className="w-full text-lg font-bold text-gray-900 bg-transparent border-b-2 border-transparent hover:border-purple-300 focus:border-purple-500 focus:outline-none transition-colors"
-                          />
-                        </div>
+                            } catch (error) {
+                              console.error('Error saving epic:', error);
+                            } finally {
+                              setEpicSaving(false);
+                            }
+                          };
+                          
+                          const handleUndo = () => {
+                            setEpicDraft({ 
+                              title: selectedEpic.title, 
+                              description: selectedEpic.description || '', 
+                              status: selectedEpic.status 
+                            });
+                          };
+                          
+                          return (
+                            <>
+                              <div className="p-4 border-b border-gray-200 bg-purple-50">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center gap-3">
+                                    <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
+                                      Epic #{selectedEpic.id}
+                                    </span>
+                                    <select
+                                      value={epicDraft.status}
+                                      onChange={(e) => setEpicDraft(prev => ({ ...prev, status: e.target.value }))}
+                                      className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
+                                        epicDraft.status === 'new' ? 'bg-blue-100 text-blue-700' :
+                                        epicDraft.status === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
+                                        epicDraft.status === 'resolved' ? 'bg-green-100 text-green-700' :
+                                        'bg-gray-100 text-gray-700'
+                                      }`}
+                                    >
+                                      <option value="new">New</option>
+                                      <option value="in-progress">In Progress</option>
+                                      <option value="resolved">Resolved</option>
+                                      <option value="closed">Closed</option>
+                                    </select>
+                                  </div>
+                                  {isDirty && (
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={handleUndo}
+                                        className="px-3 py-1 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+                                      >
+                                        Undo
+                                      </button>
+                                      <button
+                                        onClick={handleSave}
+                                        disabled={epicSaving}
+                                        className="px-3 py-1 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded transition-colors disabled:opacity-50"
+                                      >
+                                        {epicSaving ? 'Saving...' : 'Save'}
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                                <input
+                                  type="text"
+                                  value={epicDraft.title}
+                                  onChange={(e) => setEpicDraft(prev => ({ ...prev, title: e.target.value }))}
+                                  className="w-full text-lg font-bold text-gray-900 bg-transparent border-b-2 border-transparent hover:border-purple-300 focus:border-purple-500 focus:outline-none transition-colors"
+                                />
+                              </div>
 
-                        <div className="p-4 border-b border-gray-200">
-                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Description</h4>
-                          <textarea
-                            value={editingEpic.description !== undefined && editingEpic.description !== '' ? editingEpic.description : (selectedEpic.description || '')}
-                            onChange={(e) => setEditingEpic(prev => ({ ...prev, description: e.target.value }))}
-                            onBlur={async () => {
-                              const newDesc = editingEpic.description;
-                              if (newDesc !== undefined && newDesc !== (selectedEpic.description || '')) {
-                                try {
-                                  const response = await fetch(`/api/issues/${selectedEpic.id}`, {
-                                    method: 'PATCH',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ description: newDesc }),
-                                  });
-                                  if (response.ok) {
-                                    const updated = await response.json();
-                                    setFeedbackIssues(prev => prev.map(i => i.id === updated.id ? updated : i));
-                                    setSelectedEpic(updated);
-                                    setEditingEpic(prev => ({ ...prev, description: '' }));
-                                  }
-                                } catch (error) {
-                                  console.error('Error updating description:', error);
-                                }
-                              }
-                            }}
-                            placeholder="Add a description..."
-                            rows={3}
-                            className="w-full text-sm text-gray-600 bg-transparent border border-gray-200 rounded-lg p-2 hover:border-purple-300 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-colors resize-none"
-                          />
-                        </div>
+                              <div className="p-4 border-b border-gray-200">
+                                <h4 className="text-sm font-semibold text-gray-700 mb-2">Description</h4>
+                                <textarea
+                                  value={epicDraft.description}
+                                  onChange={(e) => setEpicDraft(prev => ({ ...prev, description: e.target.value }))}
+                                  placeholder="Add a description..."
+                                  rows={3}
+                                  className="w-full text-sm text-gray-600 bg-transparent border border-gray-200 rounded-lg p-2 hover:border-purple-300 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-colors resize-none"
+                                />
+                              </div>
 
                         <div className="flex-1 p-4 overflow-auto">
                           <div className="flex items-center justify-between mb-3">
@@ -3687,6 +3693,9 @@ export default function MagpieV2() {
                             </div>
                           </div>
                         </div>
+                            </>
+                          );
+                        })()}
                       </>
                     ) : (
                       <div className="flex-1 flex items-center justify-center p-8">
