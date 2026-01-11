@@ -2,6 +2,14 @@ import { pgTable, serial, varchar, text, timestamp, integer } from "drizzle-orm/
 import { createInsertSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
+export const objects = pgTable("objects", {
+  id: serial("id").primaryKey(),
+  key: varchar("key", { length: 100 }).notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const deliveryTargets = pgTable("delivery_targets", {
   id: serial("id").primaryKey(),
   type: varchar("type", { length: 50 }).notNull(),
@@ -18,6 +26,7 @@ export const issues = pgTable("issues", {
   description: text("description"),
   screen: varchar("screen", { length: 100 }),
   parentId: integer("parent_id"),
+  objectId: integer("object_id"),
   status: varchar("status", { length: 50 }).notNull().default("new"),
   priority: varchar("priority", { length: 50 }).default("medium"),
   fixBy: varchar("fix_by", { length: 50 }).default("current-release"),
@@ -35,6 +44,10 @@ export const issueAssignments = pgTable("issue_assignments", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const objectsRelations = relations(objects, ({ many }) => ({
+  issues: many(issues),
+}));
+
 export const issuesRelations = relations(issues, ({ one, many }) => ({
   parent: one(issues, {
     fields: [issues.parentId],
@@ -43,6 +56,10 @@ export const issuesRelations = relations(issues, ({ one, many }) => ({
   }),
   children: many(issues, { relationName: "parentChild" }),
   assignments: many(issueAssignments),
+  object: one(objects, {
+    fields: [issues.objectId],
+    references: [objects.id],
+  }),
 }));
 
 export const issueAssignmentsRelations = relations(issueAssignments, ({ one }) => ({
@@ -66,7 +83,10 @@ export type DeliveryTarget = typeof deliveryTargets.$inferSelect;
 export type InsertDeliveryTarget = typeof deliveryTargets.$inferInsert;
 export type IssueAssignment = typeof issueAssignments.$inferSelect;
 export type InsertIssueAssignment = typeof issueAssignments.$inferInsert;
+export type DomainObject = typeof objects.$inferSelect;
+export type InsertDomainObject = typeof objects.$inferInsert;
 
 export const insertIssueSchema = createInsertSchema(issues);
 export const insertDeliveryTargetSchema = createInsertSchema(deliveryTargets);
 export const insertIssueAssignmentSchema = createInsertSchema(issueAssignments);
+export const insertObjectSchema = createInsertSchema(objects);
