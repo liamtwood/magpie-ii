@@ -3671,6 +3671,15 @@ export default function MagpieV2() {
                                     <option value="shortlists">Shortlists</option>
                                     <option value="feature-management">Feature Management</option>
                                   </optgroup>
+                                  <optgroup label="Widgets">
+                                    <option value="squad-health-check">Squad Health Check</option>
+                                    <option value="issues">Issues</option>
+                                    <option value="ai-assistant">AI Assistant</option>
+                                    <option value="squad-overview">Squad Overview</option>
+                                    <option value="shortlist-panel">Shortlist Panel</option>
+                                    <option value="player-panel">Player Panel</option>
+                                    <option value="pitch-view">Pitch View</option>
+                                  </optgroup>
                                 </select>
                               </div>
 
