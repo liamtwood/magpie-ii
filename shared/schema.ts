@@ -25,6 +25,7 @@ export const issues = pgTable("issues", {
   type: varchar("type", { length: 50 }).notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
+  scope: text("scope"),
   screen: varchar("screen", { length: 100 }),
   parentId: integer("parent_id"),
   objectId: integer("object_id"),

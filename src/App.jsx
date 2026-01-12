@@ -305,7 +305,7 @@ export default function MagpieV2() {
   const [featureViewMode, setFeatureViewMode] = useState('epic');
   const [selectedEpic, setSelectedEpic] = useState(null);
   const [newStoryTitle, setNewStoryTitle] = useState('');
-  const [epicDraft, setEpicDraft] = useState({ title: '', description: '', status: '' });
+  const [epicDraft, setEpicDraft] = useState({ title: '', description: '', status: '', scope: '' });
   const [epicSaving, setEpicSaving] = useState(false);
   const [objectDraft, setObjectDraft] = useState({ name: '', description: '' });
   const [objectSaving, setObjectSaving] = useState(false);
@@ -3519,7 +3519,7 @@ export default function MagpieV2() {
                           {feedbackIssues.filter(i => i.type === 'Epic').map((epic) => (
                             <tr
                               key={epic.id}
-                              onClick={() => { setSelectedEpic(epic); setEpicDraft({ title: epic.title, description: epic.description || '', status: epic.status }); }}
+                              onClick={() => { setSelectedEpic(epic); setEpicDraft({ title: epic.title, description: epic.description || '', status: epic.status, scope: epic.scope || '' }); }}
                               className={`cursor-pointer transition-colors ${
                                 selectedEpic?.id === epic.id
                                   ? 'bg-purple-50 border-l-4 border-purple-500'
@@ -3564,7 +3564,8 @@ export default function MagpieV2() {
                         {(() => {
                           const isDirty = epicDraft.title !== selectedEpic.title || 
                                           epicDraft.description !== (selectedEpic.description || '') || 
-                                          epicDraft.status !== selectedEpic.status;
+                                          epicDraft.status !== selectedEpic.status ||
+                                          epicDraft.scope !== (selectedEpic.scope || '');
                           
                           const handleSave = async () => {
                             if (!isDirty) return;
@@ -3574,6 +3575,7 @@ export default function MagpieV2() {
                               if (epicDraft.title !== selectedEpic.title) updates.title = epicDraft.title;
                               if (epicDraft.description !== (selectedEpic.description || '')) updates.description = epicDraft.description;
                               if (epicDraft.status !== selectedEpic.status) updates.status = epicDraft.status;
+                              if (epicDraft.scope !== (selectedEpic.scope || '')) updates.scope = epicDraft.scope;
                               
                               const response = await fetch(`/api/issues/${selectedEpic.id}`, {
                                 method: 'PATCH',
@@ -3584,7 +3586,7 @@ export default function MagpieV2() {
                                 const updated = await response.json();
                                 setFeedbackIssues(prev => prev.map(i => i.id === updated.id ? updated : i));
                                 setSelectedEpic(updated);
-                                setEpicDraft({ title: updated.title, description: updated.description || '', status: updated.status });
+                                setEpicDraft({ title: updated.title, description: updated.description || '', status: updated.status, scope: updated.scope || '' });
                               }
                             } catch (error) {
                               console.error('Error saving epic:', error);
@@ -3597,7 +3599,8 @@ export default function MagpieV2() {
                             setEpicDraft({ 
                               title: selectedEpic.title, 
                               description: selectedEpic.description || '', 
-                              status: selectedEpic.status 
+                              status: selectedEpic.status,
+                              scope: selectedEpic.scope || ''
                             });
                           };
                           
@@ -3657,6 +3660,17 @@ export default function MagpieV2() {
                                   value={epicDraft.description}
                                   onChange={(e) => setEpicDraft(prev => ({ ...prev, description: e.target.value }))}
                                   placeholder="Add a description..."
+                                  rows={3}
+                                  className="w-full text-sm text-gray-600 bg-transparent border border-gray-200 rounded-lg p-2 hover:border-purple-300 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-colors resize-none"
+                                />
+                              </div>
+
+                              <div className="p-4 border-b border-gray-200">
+                                <h4 className="text-sm font-semibold text-gray-700 mb-2">Scope</h4>
+                                <textarea
+                                  value={epicDraft.scope}
+                                  onChange={(e) => setEpicDraft(prev => ({ ...prev, scope: e.target.value }))}
+                                  placeholder="Describe the scope concerns for this feature..."
                                   rows={3}
                                   className="w-full text-sm text-gray-600 bg-transparent border border-gray-200 rounded-lg p-2 hover:border-purple-300 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-colors resize-none"
                                 />
