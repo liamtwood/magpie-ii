@@ -305,7 +305,7 @@ export default function MagpieV2() {
   const [featureViewMode, setFeatureViewMode] = useState('epic');
   const [selectedEpic, setSelectedEpic] = useState(null);
   const [newStoryTitle, setNewStoryTitle] = useState('');
-  const [epicDraft, setEpicDraft] = useState({ title: '', description: '', status: '', scope: '' });
+  const [epicDraft, setEpicDraft] = useState({ title: '', description: '', status: '', scope: '', screen: '' });
   const [epicSaving, setEpicSaving] = useState(false);
   const [objectDraft, setObjectDraft] = useState({ name: '', description: '' });
   const [objectSaving, setObjectSaving] = useState(false);
@@ -3519,7 +3519,7 @@ export default function MagpieV2() {
                           {feedbackIssues.filter(i => i.type === 'Epic').map((epic) => (
                             <tr
                               key={epic.id}
-                              onClick={() => { setSelectedEpic(epic); setEpicDraft({ title: epic.title, description: epic.description || '', status: epic.status, scope: epic.scope || '' }); }}
+                              onClick={() => { setSelectedEpic(epic); setEpicDraft({ title: epic.title, description: epic.description || '', status: epic.status, scope: epic.scope || '', screen: epic.screen || '' }); }}
                               className={`cursor-pointer transition-colors ${
                                 selectedEpic?.id === epic.id
                                   ? 'bg-purple-50 border-l-4 border-purple-500'
@@ -3565,7 +3565,8 @@ export default function MagpieV2() {
                           const isDirty = epicDraft.title !== selectedEpic.title || 
                                           epicDraft.description !== (selectedEpic.description || '') || 
                                           epicDraft.status !== selectedEpic.status ||
-                                          epicDraft.scope !== (selectedEpic.scope || '');
+                                          epicDraft.scope !== (selectedEpic.scope || '') ||
+                                          epicDraft.screen !== (selectedEpic.screen || '');
                           
                           const handleSave = async () => {
                             if (!isDirty) return;
@@ -3576,6 +3577,7 @@ export default function MagpieV2() {
                               if (epicDraft.description !== (selectedEpic.description || '')) updates.description = epicDraft.description;
                               if (epicDraft.status !== selectedEpic.status) updates.status = epicDraft.status;
                               if (epicDraft.scope !== (selectedEpic.scope || '')) updates.scope = epicDraft.scope;
+                              if (epicDraft.screen !== (selectedEpic.screen || '')) updates.screen = epicDraft.screen;
                               
                               const response = await fetch(`/api/issues/${selectedEpic.id}`, {
                                 method: 'PATCH',
@@ -3586,7 +3588,7 @@ export default function MagpieV2() {
                                 const updated = await response.json();
                                 setFeedbackIssues(prev => prev.map(i => i.id === updated.id ? updated : i));
                                 setSelectedEpic(updated);
-                                setEpicDraft({ title: updated.title, description: updated.description || '', status: updated.status, scope: updated.scope || '' });
+                                setEpicDraft({ title: updated.title, description: updated.description || '', status: updated.status, scope: updated.scope || '', screen: updated.screen || '' });
                               }
                             } catch (error) {
                               console.error('Error saving epic:', error);
@@ -3600,7 +3602,8 @@ export default function MagpieV2() {
                               title: selectedEpic.title, 
                               description: selectedEpic.description || '', 
                               status: selectedEpic.status,
-                              scope: selectedEpic.scope || ''
+                              scope: selectedEpic.scope || '',
+                              screen: selectedEpic.screen || ''
                             });
                           };
                           
@@ -3652,6 +3655,23 @@ export default function MagpieV2() {
                                   onChange={(e) => setEpicDraft(prev => ({ ...prev, title: e.target.value }))}
                                   className="w-full text-lg font-bold text-gray-900 bg-transparent border-b-2 border-transparent hover:border-purple-300 focus:border-purple-500 focus:outline-none transition-colors"
                                 />
+                              </div>
+
+                              <div className="p-4 border-b border-gray-200">
+                                <h4 className="text-sm font-semibold text-gray-700 mb-2">Screen</h4>
+                                <select
+                                  value={epicDraft.screen}
+                                  onChange={(e) => setEpicDraft(prev => ({ ...prev, screen: e.target.value }))}
+                                  className="w-full text-sm text-gray-600 bg-transparent border border-gray-200 rounded-lg p-2 hover:border-purple-300 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-colors"
+                                >
+                                  <option value="">None</option>
+                                  <optgroup label="Pages">
+                                    <option value="dashboard">Dashboard</option>
+                                    <option value="squad">Squad</option>
+                                    <option value="shortlists">Shortlists</option>
+                                    <option value="feature-management">Feature Management</option>
+                                  </optgroup>
+                                </select>
                               </div>
 
                               <div className="p-4 border-b border-gray-200">
