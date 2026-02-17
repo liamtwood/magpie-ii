@@ -3190,9 +3190,9 @@ export default function MagpieV2() {
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <img src="/newcastle-logo.png" alt="Newcastle United" className="w-10 h-10 object-contain" />
+            <img src="/everton-logo.png" alt="Everton FC" className="w-10 h-10 object-contain" />
             <div>
-              <div className="font-bold text-lg tracking-tight text-gray-900">MAGPIE II</div>
+              <div className="font-bold text-lg tracking-tight text-gray-900">GameScout</div>
               <div className="text-xs text-gray-500">Recruitment Platform</div>
             </div>
           </div>
@@ -3369,7 +3369,7 @@ export default function MagpieV2() {
                   <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                   <h2 className="text-xl font-semibold text-gray-700 mb-2">User Management Coming Soon</h2>
                   <p className="text-gray-500 max-w-md mx-auto">
-                    This section will allow you to manage users, roles, and permissions for the MAGPIE II platform.
+                    This section will allow you to manage users, roles, and permissions for the GameScout platform.
                   </p>
                 </div>
               </div>
